@@ -33,7 +33,7 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
   const unreadAlerts = alerts.filter((a) => !a.read);
 
   return (
-    <header className="h-16 bg-[#11131A] border-b border-[#232736] px-6 flex items-center justify-between sticky top-0 z-30">
+    <header className="h-16 bg-[#11131A] border-b border-[#232736] px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
       {/* Left: Region Selector & Search */}
       <div className="flex items-center gap-4 flex-1 max-w-xl">
         {/* Datacenter Region Selector */}
