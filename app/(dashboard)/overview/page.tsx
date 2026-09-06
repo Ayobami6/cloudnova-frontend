@@ -160,22 +160,22 @@ export default function OverviewPage() {
           </span>
         </div>
 
-        {/* Card 4: Reseller Margin */}
+        {/* Card 4: Global SLA & Network */}
         <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Monthly Reseller Profit
+              Uptime SLA & Network
             </span>
-            <TrendingUp className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            <Shield className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-              +${monthlyProfit.toLocaleString()}
+              99.995%
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">/ mo</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400">Target: 99.99%</span>
           </div>
-          <span className="mt-1 text-xs text-slate-500 font-mono">
-            Billed: ${monthlyRetail} • Base: ${monthlyWholesale}
+          <span className="mt-1 text-xs text-slate-500">
+            DDoS Shield Active • 8 Anycast PoPs
           </span>
         </div>
       </div>

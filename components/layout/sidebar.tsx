@@ -34,8 +34,6 @@ export function Sidebar() {
     buckets,
     firewalls,
     domains,
-    marginConfig,
-    monthlyProfit,
     setIsDepositModalOpen,
   } = useCloud();
 
@@ -46,7 +44,6 @@ export function Sidebar() {
     { name: "Storage", href: "/storage", icon: HardDrive, badge: volumes.length + buckets.length },
     { name: "Network", href: "/network", icon: Shield, badge: firewalls.length },
     { name: "Domains", href: "/domains", icon: Globe, badge: domains.length },
-    { name: "Reseller", href: "/reseller", icon: Sliders, badge: `+${marginConfig.globalMarkupPercent}%` },
     { name: "Billing", href: "/billing", icon: CreditCard },
   ];
 
@@ -65,7 +62,7 @@ export function Sidebar() {
                 CONSOLE
               </span>
             </span>
-            <p className="text-[11px] text-slate-500 font-normal">Edge Reseller Engine</p>
+            <p className="text-[11px] text-slate-500 font-normal">Enterprise Cloud Platform</p>
           </div>
         </div>
 
@@ -113,26 +110,26 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Reseller Bottom Widget */}
+      {/* Global Infrastructure Status Widget */}
       <div className="p-3 border-t border-slate-200 dark:border-[#232736] space-y-2">
         <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
           <div className="flex items-center justify-between text-xs mb-1">
             <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
-              Monthly Profit
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              SLA Health
             </span>
             <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-              +${monthlyProfit.toLocaleString()}
+              99.995%
             </span>
           </div>
           <p className="text-[11px] text-slate-500">
-            Markup active at +{marginConfig.globalMarkupPercent}% wholesale
+            8 Global Anycast regions online
           </p>
         </div>
 
         <button
           onClick={() => setIsDepositModalOpen(true)}
-          className="w-full h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-between transition-colors"
+          className="w-full h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-between transition-colors cursor-pointer"
         >
           <span>Deposit Prepaid Funds</span>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />

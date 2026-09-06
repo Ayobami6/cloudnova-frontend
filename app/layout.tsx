@@ -3,8 +3,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "CloudNova — Infrastructure & Reseller Console",
-  description: "Modern calm cloud management console for compute droplets, managed databases, NVMe volumes, S3 spaces, and domains.",
+  title: "CloudNova — Developer-First Cloud Infrastructure & Global Compute Platform",
+  description: "Next-generation developer cloud: high-performance KVM droplets, managed databases, zero-egress NVMe & S3 storage, and global Anycast network.",
 };
 
 export default function RootLayout({
