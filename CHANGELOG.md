@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Domains & Anycast DNS manager with 1-click resource binding and TLD registrar search.
 - Reseller & Margins engine with multi-tenant client accounts, markup multipliers, and live profit simulator.
 - Billing & Invoices ledger with multi-rail wallet deposit gateway (Card, FedNow wire, USDC crypto).
+- Persistent Light and Dark mode theme system with header toggle, localStorage state synchronization, Tailwind v4 custom variants, and tokenized styling across all components, tables, modals, and charts.
 
 ### Fixed
 - Removed restrictive `max-w-7xl` container width constraint from main dashboard layout, enabling fluid full-width rendering across wide and ultra-wide screens without empty horizontal margins.

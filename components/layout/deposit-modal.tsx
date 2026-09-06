@@ -56,19 +56,19 @@ export function DepositModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-[#161922] border border-[#232736] rounded-lg shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-5">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] rounded-lg shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-5">
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-slate-100">Deposit Prepaid Cloud Funds</h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Deposit Prepaid Cloud Funds</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Funds are debited hourly based on active VM and storage burn.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 p-1 rounded hover:bg-white/[0.06]"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded hover:bg-slate-100 dark:hover:bg-white/[0.06]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -76,14 +76,14 @@ export function DepositModal({
 
         {successMessage ? (
           <div className="py-8 flex flex-col items-center justify-center space-y-2 text-center">
-            <CheckCircle2 className="w-10 h-10 text-emerald-400" />
-            <p className="text-sm font-medium text-slate-200">{successMessage}</p>
+            <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{successMessage}</p>
           </div>
         ) : (
           <>
             {/* Amount Presets */}
             <div className="space-y-2">
-              <label className="text-xs font-medium text-slate-400">Select Deposit Amount (USD)</label>
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Select Deposit Amount (USD)</label>
               <div className="grid grid-cols-5 gap-2">
                 {presets.map((amt) => (
                   <button
@@ -96,7 +96,7 @@ export function DepositModal({
                     className={`h-9 rounded-md text-xs font-mono font-medium transition-colors ${
                       selectedAmount === amt && !customAmount
                         ? "bg-blue-600 text-white font-semibold shadow-sm"
-                        : "bg-[#1E2230] text-slate-300 hover:bg-[#252B3D] border border-[#232736]"
+                        : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
                     }`}
                   >
                     ${amt}
@@ -108,21 +108,21 @@ export function DepositModal({
                 value={customAmount}
                 onChange={(e) => setCustomAmount(e.target.value)}
                 placeholder="Or enter custom amount ($)"
-                className="w-full h-9 px-3 rounded-md bg-[#11131A] border border-[#232736] text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
+                className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
               />
             </div>
 
             {/* Payment Method Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-medium text-slate-400">Funding Method</label>
+              <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Funding Method</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("card")}
                   className={`p-3 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                     paymentMethod === "card"
-                      ? "bg-blue-600/12 text-blue-400 border border-blue-600/40"
-                      : "bg-[#1E2230] text-slate-400 border border-[#232736] hover:text-slate-200"
+                      ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500"
+                      : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
                   }`}
                 >
                   <CreditCard className="w-4 h-4" />
@@ -134,8 +134,8 @@ export function DepositModal({
                   onClick={() => setPaymentMethod("wire")}
                   className={`p-3 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                     paymentMethod === "wire"
-                      ? "bg-blue-600/12 text-blue-400 border border-blue-600/40"
-                      : "bg-[#1E2230] text-slate-400 border border-[#232736] hover:text-slate-200"
+                      ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500"
+                      : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
                   }`}
                 >
                   <Building2 className="w-4 h-4" />
@@ -147,8 +147,8 @@ export function DepositModal({
                   onClick={() => setPaymentMethod("crypto")}
                   className={`p-3 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                     paymentMethod === "crypto"
-                      ? "bg-blue-600/12 text-blue-400 border border-blue-600/40"
-                      : "bg-[#1E2230] text-slate-400 border border-[#232736] hover:text-slate-200"
+                      ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500"
+                      : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
                   }`}
                 >
                   <Coins className="w-4 h-4" />
@@ -158,10 +158,10 @@ export function DepositModal({
             </div>
 
             {/* Submit Action */}
-            <div className="pt-3 border-t border-[#232736] flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between">
               <div>
                 <span className="text-[11px] text-slate-500">Total charge:</span>
-                <p className="text-base font-mono font-semibold text-slate-100">${finalAmount.toFixed(2)}</p>
+                <p className="text-base font-mono font-semibold text-slate-900 dark:text-slate-100">${finalAmount.toFixed(2)}</p>
               </div>
               <button
                 onClick={handleDeposit}

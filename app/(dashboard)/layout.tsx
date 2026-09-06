@@ -18,7 +18,7 @@ export default function DashboardLayout({
   const [isDeployOpen, setIsDeployOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#090A0F]">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#090A0F] text-slate-900 dark:text-slate-100">
       {/* Sidebar Navigation */}
       <Sidebar />
 

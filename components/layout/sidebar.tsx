@@ -51,17 +51,17 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-[#11131A] border-r border-[#232736] flex flex-col justify-between shrink-0 h-screen sticky top-0 overflow-y-auto">
+    <aside className="w-64 bg-white dark:bg-[#11131A] border-r border-slate-200 dark:border-[#232736] flex flex-col justify-between shrink-0 h-screen sticky top-0 overflow-y-auto transition-colors duration-150">
       <div>
         {/* Brand Header */}
-        <div className="h-16 flex items-center px-5 border-b border-[#232736] gap-3">
+        <div className="h-16 flex items-center px-5 border-b border-slate-200 dark:border-[#232736] gap-3">
           <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
             <Cloud className="w-5 h-5" />
           </div>
           <div>
-            <span className="font-semibold text-sm tracking-tight text-slate-100 flex items-center gap-1.5">
+            <span className="font-semibold text-sm tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
               CloudNova
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-600/10 text-blue-400 border border-blue-600/20">
+              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-600/20">
                 CONSOLE
               </span>
             </span>
@@ -72,7 +72,7 @@ export function Sidebar() {
         {/* Navigation Menu */}
         <div className="px-3 py-4 space-y-1">
           <div className="px-3 pb-2">
-            <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
               Infrastructure
             </span>
           </div>
@@ -87,12 +87,12 @@ export function Sidebar() {
                 href={item.href}
                 className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-blue-600/12 text-blue-400 font-semibold border border-blue-600/20"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-[#161922]"
+                    ? "bg-blue-600/10 text-blue-600 dark:text-blue-400 font-semibold border border-blue-600/20"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-[#161922]"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? "text-blue-400" : "text-slate-400"}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? "text-blue-600 dark:text-blue-400" : "text-slate-400"}`} />
                   <span>{item.name}</span>
                 </div>
 
@@ -100,8 +100,8 @@ export function Sidebar() {
                   <span
                     className={`text-[11px] font-mono px-1.5 py-0.5 rounded ${
                       isActive
-                        ? "bg-blue-600/20 text-blue-300"
-                        : "bg-[#1E2230] text-slate-400 border border-[#232736]"
+                        ? "bg-blue-600/20 text-blue-700 dark:text-blue-300"
+                        : "bg-slate-100 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736]"
                     }`}
                   >
                     {item.badge}
@@ -114,14 +114,14 @@ export function Sidebar() {
       </div>
 
       {/* Reseller Bottom Widget */}
-      <div className="p-3 border-t border-[#232736] space-y-2">
-        <div className="p-3 rounded-lg bg-[#161922] border border-[#232736]">
+      <div className="p-3 border-t border-slate-200 dark:border-[#232736] space-y-2">
+        <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
           <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-slate-400 flex items-center gap-1.5 font-medium">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
               Monthly Profit
             </span>
-            <span className="font-mono font-semibold text-emerald-400">
+            <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
               +${monthlyProfit.toLocaleString()}
             </span>
           </div>
@@ -132,10 +132,10 @@ export function Sidebar() {
 
         <button
           onClick={() => setIsDepositModalOpen(true)}
-          className="w-full h-8 px-3 rounded-md bg-[#1E2230] hover:bg-[#252B3D] border border-[#232736] text-xs font-medium text-slate-300 hover:text-white flex items-center justify-between transition-colors"
+          className="w-full h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-between transition-colors"
         >
           <span>Deposit Prepaid Funds</span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+          <ChevronRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
         </button>
       </div>
     </aside>
