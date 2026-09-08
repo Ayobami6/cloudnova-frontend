@@ -89,11 +89,15 @@ All code updates (features, bug fixes, refactors, dependency bumps) must follow 
    * Keep commits focused; do not combine unrelated refactors with functional changes.
 3. **Pull Request Creation:**
    * Push the branch and open a PR against the target branch using GitHub CLI (`gh pr create`) or project automation.
+   * Explicitly link the PR to the relevant GitHub issue using `Closes #<issue_number>` or `Fixes #<issue_number>`.
    * Provide a PR description detailing: **Summary of Changes**, **Architecture Decisions/Tradeoffs**, and **Verification Evidence** (test commands and pass outputs).
 4. **Automated Self-Review (`pr-reviewer`):**
    * Before flagging the PR for human merge, the agent MUST run the `pr-reviewer` skill/tool on its own generated PR.
    * Review criteria: boundary leakages, concurrency bugs, missing type hints, missing test coverage, breaking API changes, or lint failures.
    * If `pr-reviewer` flags issues or critical feedback, resolve the issues on the branch and push updates before concluding the task.
+5. **Issue & Todo Closure Lifecycle:**
+   * Consult `todo.md` prior to starting work to verify scope.
+   * When a PR is successfully merged, immediately update `todo.md` to mark completed tasks (`- [x]`), verify the linked GitHub issue is closed (or close it explicitly if not auto-closed), and commit the updated `todo.md`.
 
 ---
 
@@ -117,7 +121,29 @@ All code updates (features, bug fixes, refactors, dependency bumps) must follow 
 
 ---
 
-## 7. Verification & Quality Gates
+## 7. Service Level Objectives (SLOs) & Operational Standards
+All backend services, data pipelines, and infrastructure layers must be architected and tuned against these strict production SLOs:
+
+* **Low Latency:**
+  * **API Response Time:** $p95 < 50\text{ms}$, $p99 < 120\text{ms}$ on all core read/write endpoints.
+  * **Database Query Budget:** Max 15ms per transaction query; eliminate N+1 queries using Django `select_related`/`prefetch_related` and custom SQL projections.
+  * **Network I/O:** Asynchronous, non-blocking I/O across all Django Ninja endpoints and Celery tasks; keep connection pools warm (RDS proxy / PgBouncer).
+* **High Throughput & Concurrency:**
+  * Target sustaining **$\ge 2,500\text{ requests/sec}$** per cluster without thread starvation or memory leaks.
+  * Stateless application servers scaled horizontally behind AWS ALB/NLB.
+  * Offload all long-running or CPU-intensive operations (VM orchestration, EBS volume attachment, DB snapshots, invoice PDF rendering, email dispatch) to Celery/Redis queues with dedicated worker pools.
+* **High Availability & Fault Tolerance:**
+  * **Uptime Target:** **$99.99\%$ (Four Nines)** service availability.
+  * **Zero Single Point of Failure (SPOF):** Multi-AZ deployments for RDS clusters, Redis clusters, and distributed workers.
+  * **Resilience & Circuit Breakers:** Every external outbound adapter (AWS Boto3, MailNow, Stripe/Paystack/Bitnob) must implement timeout boundaries (max 5s), circuit breakers, and exponential backoff with full jitter.
+  * **Graceful Degradation:** Temporary external provider outages must never corrupt financial ledgers or cause unbounded cascading request failures.
+* **Financial Data Consistency (Strict Zero-Overdraft):**
+  * 100% strict balance consistency: wallet accounts and ledger entries must be modified exclusively inside atomic transactions with pessimistic row-level locking (`SELECT ... FOR UPDATE`).
+  * Idempotency keys enforced on every mutation endpoint to eliminate duplicate resource creations or billing charges.
+
+---
+
+## 8. Verification & Quality Gates
 Before opening a PR and triggering `pr-reviewer`:
 * **Python:** Must pass `mypy --strict` and `ruff check`.
 * **Rust:** Must pass `cargo clippy -- -D warnings` and `cargo test`.
