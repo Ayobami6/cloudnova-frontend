@@ -15,8 +15,10 @@ import {
   Cloud,
   ChevronRight,
   TrendingUp,
+  Users,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 
 interface NavItem {
   name: string;
@@ -34,8 +36,8 @@ export function Sidebar() {
     buckets,
     firewalls,
     domains,
-    setIsDepositModalOpen,
   } = useCloud();
+  const { setIsDepositModalOpen } = useBilling();
 
   const navItems: NavItem[] = [
     { name: "Overview", href: "/overview", icon: LayoutDashboard },
@@ -45,6 +47,7 @@ export function Sidebar() {
     { name: "Network", href: "/network", icon: Shield, badge: firewalls.length },
     { name: "Domains", href: "/domains", icon: Globe, badge: domains.length },
     { name: "Billing", href: "/billing", icon: CreditCard },
+    { name: "Team", href: "/team", icon: Users },
   ];
 
   return (

@@ -12,9 +12,6 @@ import {
   FloatingIP,
   Domain,
   ClientTenant,
-  MarginConfig,
-  Transaction,
-  Invoice,
   OperationalAlert,
   DatacenterRegion,
   DNSRecord,
@@ -32,9 +29,6 @@ import {
   INITIAL_FLOATING_IPS,
   INITIAL_DOMAINS,
   INITIAL_CLIENTS,
-  INITIAL_MARGIN_CONFIG,
-  INITIAL_TRANSACTIONS,
-  INITIAL_INVOICES,
   INITIAL_ALERTS,
   COMPUTE_PLANS,
 } from "../mock-data/initial-state";
@@ -52,19 +46,13 @@ interface CloudContextType {
   floatingIps: FloatingIP[];
   domains: Domain[];
   clients: ClientTenant[];
-  marginConfig: MarginConfig;
-  transactions: Transaction[];
-  invoices: Invoice[];
   alerts: OperationalAlert[];
-  walletBalance: number;
   selectedRegion: DatacenterRegion | "all";
   searchQuery: string;
 
   // Modals & Overlays
   terminalInstance: Instance | null;
-  isDepositModalOpen: boolean;
   setTerminalInstance: (inst: Instance | null) => void;
-  setIsDepositModalOpen: (open: boolean) => void;
   setSelectedRegion: (region: DatacenterRegion | "all") => void;
   setSearchQuery: (q: string) => void;
 
@@ -110,12 +98,10 @@ interface CloudContextType {
   linkDomainToResource: (domainId: string, resourceId: string) => void;
 
   // Client & Reseller Actions
-  updateMarginConfig: (config: Partial<MarginConfig>) => void;
   createClient: (client: Omit<ClientTenant, "id" | "createdAt" | "activeResourcesCount" | "monthlySpend">) => void;
   updateClient: (id: string, updates: Partial<ClientTenant>) => void;
 
-  // Finance Actions
-  depositFunds: (amount: number, methodDescription: string) => void;
+  // Alert Actions
   markAlertRead: (id: string) => void;
   clearAllAlerts: () => void;
 }
@@ -133,17 +119,12 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [floatingIps] = useState<FloatingIP[]>(INITIAL_FLOATING_IPS);
   const [domains, setDomains] = useState<Domain[]>(INITIAL_DOMAINS);
   const [clients, setClients] = useState<ClientTenant[]>(INITIAL_CLIENTS);
-  const [marginConfig, setMarginConfig] = useState<MarginConfig>(INITIAL_MARGIN_CONFIG);
-  const [transactions, setTransactions] = useState<Transaction[]>(INITIAL_TRANSACTIONS);
-  const [invoices] = useState<Invoice[]>(INITIAL_INVOICES);
   const [alerts, setAlerts] = useState<OperationalAlert[]>(INITIAL_ALERTS);
-  const [walletBalance, setWalletBalance] = useState<number>(1420.5);
 
   // Filter & Navigation State
   const [selectedRegion, setSelectedRegion] = useState<DatacenterRegion | "all">("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [terminalInstance, setTerminalInstance] = useState<Instance | null>(null);
-  const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
 
   // Financial Aggregations
   const monthlyWholesale = useMemo(() => {
@@ -447,11 +428,6 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
   }, []);
 
-  // Reseller Margin Actions
-  const updateMarginConfig = useCallback((config: Partial<MarginConfig>) => {
-    setMarginConfig((prev) => ({ ...prev, ...config }));
-  }, []);
-
   const createClient = useCallback(
     (client: Omit<ClientTenant, "id" | "createdAt" | "activeResourcesCount" | "monthlySpend">) => {
       const newClient: ClientTenant = {
@@ -470,21 +446,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setClients((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
   }, []);
 
-  // Finance Actions
-  const depositFunds = useCallback((amount: number, methodDescription: string) => {
-    setWalletBalance((prev) => Number((prev + amount).toFixed(2)));
-    const newTx: Transaction = {
-      id: `tx-${Date.now().toString().slice(-6)}`,
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
-      type: "deposit",
-      description: `Wallet Top-up (${methodDescription})`,
-      amount,
-      status: "completed",
-      resourceCategory: "wallet",
-    };
-    setTransactions((prev) => [newTx, ...prev]);
-  }, []);
-
+  // Alert Actions
   const markAlertRead = useCallback((id: string) => {
     setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, read: true } : a)));
   }, []);
@@ -504,17 +466,11 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     floatingIps,
     domains,
     clients,
-    marginConfig,
-    transactions,
-    invoices,
     alerts,
-    walletBalance,
     selectedRegion,
     searchQuery,
     terminalInstance,
-    isDepositModalOpen,
     setTerminalInstance,
-    setIsDepositModalOpen,
     setSelectedRegion,
     setSearchQuery,
     monthlyWholesale,
@@ -544,10 +500,8 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     addDNSRecord,
     deleteDNSRecord,
     linkDomainToResource,
-    updateMarginConfig,
     createClient,
     updateClient,
-    depositFunds,
     markAlertRead,
     clearAllAlerts,
   };

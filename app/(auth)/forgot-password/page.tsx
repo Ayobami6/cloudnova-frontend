@@ -3,16 +3,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { KeyRound, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, Sparkles, RotateCw } from "lucide-react";
+import { KeyRound, Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, RotateCw } from "lucide-react";
 import { useAuth } from "@/lib/store/auth-context";
 import { ForgotPasswordRequestSchema, ResetPasswordWithOtpSchema } from "@/lib/schemas/auth";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
-  const { requestPasswordReset, resetPasswordWithOtp, resendOtp, generatedOtp, isLoading } = useAuth();
+  const { requestPasswordReset, resetPasswordWithOtp, resendOtp, isLoading } = useAuth();
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [email, setEmail] = useState("alex.chen@cloudnova.io");
+  const [email, setEmail] = useState("");
   const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -75,12 +75,6 @@ export default function ForgotPasswordPage() {
       setDigits(pasted.split(""));
       inputRefs.current[5]?.focus();
     }
-  };
-
-  const handleQuickFillResetOtp = () => {
-    const code = generatedOtp || "491028";
-    setDigits(code.split(""));
-    setError(null);
   };
 
   const handleStep2Submit = async (e: React.FormEvent) => {
@@ -190,26 +184,6 @@ export default function ForgotPasswordPage() {
               Verify the 6-digit OTP code sent to{" "}
               <span className="font-mono font-medium text-slate-900 dark:text-slate-200">{email}</span>
             </p>
-          </div>
-
-          {/* Test OTP Helper */}
-          <div className="p-3.5 rounded-lg bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 flex items-center justify-between gap-3">
-            <div className="text-xs text-blue-900 dark:text-blue-300">
-              <span className="font-semibold flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                Testing Mode
-              </span>
-              <span className="text-[11px] text-blue-700 dark:text-blue-400">
-                Sample Reset OTP: <span className="font-mono font-semibold">{generatedOtp || "491028"}</span>
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={handleQuickFillResetOtp}
-              className="h-7 px-3 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shrink-0 cursor-pointer shadow-xs transition-colors"
-            >
-              Use Reset OTP
-            </button>
           </div>
 
           {error && (
