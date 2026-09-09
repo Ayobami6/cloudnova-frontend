@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import * as authApi from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/errors";
@@ -34,6 +34,10 @@ interface AuthContextType {
   pendingVerificationEmail: string | null;
   pendingResetEmail: string | null;
 
+  /** `rememberMe` is currently a no-op: token persistence to localStorage
+   *  is unconditional (see lib/api/token-storage.ts). Kept in the
+   *  signature for the existing login form and as a hook for a future
+   *  sessionStorage-backed "don't remember me" mode. */
   login: (email: string, password: string, rememberMe?: boolean) => Promise<ActionResult>;
   register: (name: string, email: string, password: string, company: string) => Promise<ActionResult>;
   verifyEmailOtp: (email: string, otp: string) => Promise<ActionResult>;
@@ -91,9 +95,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
   const [pendingResetEmail, setPendingResetEmail] = useState<string | null>(null);
-  // Company name captured at registration time, applied once email
-  // verification succeeds and the tenant Account is actually created.
-  const pendingCompanyName = useRef<string>("");
 
   const refreshSession = useCallback(async () => {
     try {
@@ -140,7 +141,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshSession]);
 
   const register = useCallback(
-    async (name: string, email: string, password: string, company: string): Promise<ActionResult> => {
+    async (name: string, email: string, password: string, _company: string): Promise<ActionResult> => {
+      // Note: the backend has no "create account with this name at signup"
+      // step - verify-email-otp below auto-creates a default Account named
+      // "<first name>'s Team" for a brand-new user (see
+      // AuthService.verify_email_otp), and login()/register() otherwise
+      // requires the user to already belong to one. The "Company / Team"
+      // field is kept on the registration form for UX continuity but has
+      // no server-side effect yet; renaming the auto-created organization
+      // is a job for the team settings page once the API exposes it.
       setIsLoading(true);
       try {
         const { firstName, lastName } = splitName(name);
@@ -150,7 +159,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           first_name: firstName,
           last_name: lastName,
         });
-        pendingCompanyName.current = company;
         setPendingVerificationEmail(email);
         return { success: true };
       } catch (err) {
@@ -167,19 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await authApi.verifyEmailOtp({ email, otp_code: otp });
       setTokens({ accessToken: result.tokens.access_token, refreshToken: result.tokens.refresh_token });
-
-      // A brand-new user has no Account yet (register() only creates the
-      // User row) - create their first tenant organization now, using the
-      // company name captured at registration, and switch into it so the
-      // JWT carries account_id/role claims.
-      if (!result.account && pendingCompanyName.current) {
-        const account = await authApi.createAccount({ name: pendingCompanyName.current });
-        const switched = await authApi.switchAccount({ account_id: account.id });
-        setTokens({ accessToken: switched.access_token, refreshToken: result.tokens.refresh_token });
-      }
-
       await refreshSession();
-      pendingCompanyName.current = "";
       setPendingVerificationEmail(null);
       return { success: true };
     } catch (err) {
