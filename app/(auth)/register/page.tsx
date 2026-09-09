@@ -50,7 +50,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const res = await register(name, email, password, company);
+    const res = await register(name, email, password);
     if (res.success) {
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } else {

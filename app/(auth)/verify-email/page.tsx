@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, CheckCircle2, AlertCircle, ArrowRight, RotateCw, Sparkles } from "lucide-react";
+import { Mail, CheckCircle2, AlertCircle, ArrowRight, RotateCw } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useAuth } from "@/lib/store/auth-context";
 import { VerifyOtpSchema } from "@/lib/schemas/auth";
@@ -11,7 +11,7 @@ import { VerifyOtpSchema } from "@/lib/schemas/auth";
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { verifyEmailOtp, resendOtp, pendingVerificationEmail, generatedOtp, isLoading } = useAuth();
+  const { verifyEmailOtp, resendOtp, pendingVerificationEmail, isLoading } = useAuth();
 
   const email = searchParams.get("email") || pendingVerificationEmail || "alex.chen@cloudnova.io";
 
@@ -60,12 +60,6 @@ function VerifyEmailContent() {
       setDigits(nextDigits);
       inputRefs.current[5]?.focus();
     }
-  };
-
-  const handleQuickFill = () => {
-    const code = generatedOtp || "849201";
-    setDigits(code.split(""));
-    setError(null);
   };
 
   const handleVerify = async (e?: React.FormEvent) => {
@@ -123,26 +117,6 @@ function VerifyEmailContent() {
           We sent a 6-digit verification code to{" "}
           <span className="font-mono font-medium text-slate-900 dark:text-slate-200">{email}</span>
         </p>
-      </div>
-
-      {/* Test Code Quick Fill */}
-      <div className="p-3.5 rounded-lg bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 flex items-center justify-between gap-3">
-        <div className="text-xs text-blue-900 dark:text-blue-300">
-          <span className="font-semibold flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            Testing Environment
-          </span>
-          <span className="text-[11px] text-blue-700 dark:text-blue-400">
-            Sample OTP code: <span className="font-mono font-semibold">{generatedOtp || "849201"}</span>
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={handleQuickFill}
-          className="h-7 px-3 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shrink-0 cursor-pointer shadow-xs transition-colors"
-        >
-          Use Sample OTP
-        </button>
       </div>
 
       {/* Error alert */}

@@ -18,6 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import { useTheme } from "@/lib/store/theme-context";
 import { useAuth } from "@/lib/store/auth-context";
 import { REGIONS } from "@/lib/mock-data/initial-state";
@@ -25,8 +26,6 @@ import { DatacenterRegion } from "@/lib/types/cloud";
 
 export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
   const {
-    walletBalance,
-    hourlyBurnRate,
     selectedRegion,
     setSelectedRegion,
     searchQuery,
@@ -34,8 +33,8 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
     alerts,
     markAlertRead,
     clearAllAlerts,
-    setIsDepositModalOpen,
   } = useCloud();
+  const { walletBalance, hourlyBurnRate, setIsDepositModalOpen } = useBilling();
 
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
