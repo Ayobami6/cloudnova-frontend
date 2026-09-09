@@ -39,7 +39,7 @@ interface AuthContextType {
    *  signature for the existing login form and as a hook for a future
    *  sessionStorage-backed "don't remember me" mode. */
   login: (email: string, password: string, rememberMe?: boolean) => Promise<ActionResult>;
-  register: (name: string, email: string, password: string, company: string) => Promise<ActionResult>;
+  register: (name: string, email: string, password: string) => Promise<ActionResult>;
   verifyEmailOtp: (email: string, otp: string) => Promise<ActionResult>;
   requestPasswordReset: (email: string) => Promise<ActionResult>;
   resetPasswordWithOtp: (email: string, otp: string, newPassword: string) => Promise<ActionResult>;
@@ -141,15 +141,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshSession]);
 
   const register = useCallback(
-    async (name: string, email: string, password: string, _company: string): Promise<ActionResult> => {
+    async (name: string, email: string, password: string): Promise<ActionResult> => {
       // Note: the backend has no "create account with this name at signup"
       // step - verify-email-otp below auto-creates a default Account named
       // "<first name>'s Team" for a brand-new user (see
       // AuthService.verify_email_otp), and login()/register() otherwise
-      // requires the user to already belong to one. The "Company / Team"
-      // field is kept on the registration form for UX continuity but has
-      // no server-side effect yet; renaming the auto-created organization
-      // is a job for the team settings page once the API exposes it.
+      // requires the user to already belong to one. The registration
+      // form's "Company / Team" field is validated client-side but has no
+      // server-side effect yet; renaming the auto-created organization is
+      // a job for the team page once the API exposes a rename endpoint.
       setIsLoading(true);
       try {
         const { firstName, lastName } = splitName(name);
