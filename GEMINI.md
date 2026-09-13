@@ -10,7 +10,22 @@ You are a Principal Software Architect and Staff Systems Engineer. Your focus is
 
 ## 2. Core Architectural Patterns
 Adhere strictly to these principles across implementations:
-* **Architecture:** Hexagonal (Ports & Adapters) or clean Domain-Driven Design (DDD). Domain logic must remain agnostic of transport (HTTP, gRPC) and persistence (SQL, NoSQL).
+* **Hexagonal Architecture (Ports & Adapters) & Clean DDD Layers:**
+  * **Domain Layer (Pure Logic):**
+    * Houses pure domain entities, value objects, and domain services.
+    * Encapsulates domain rules, calculations, and invariants that do not fit onto a single entity.
+    * **Zero I/O or infrastructure awareness:** Domain services/entities must never import or call databases, HTTP clients, message brokers, or external cloud APIs.
+  * **Application Layer (Use Cases & Orchestration):**
+    * Implements task-oriented workflows per user action (Single Responsibility Principle: one class/struct per user action with `execute()`, e.g., `ProvisionInstanceUseCase`, `TransferFundsUseCase`).
+    * Validates workflow prerequisites, invokes pure domain services/entities, manages transactional boundaries, and persists state via secondary ports.
+    * Calls outbound secondary ports (repositories, notification dispatchers, cloud drivers).
+  * **Ports & Structural Subtyping (Protocol / Interface Standard):**
+    * In Python: **Strictly use `typing.Protocol` (structural subtyping) instead of `abc.ABC`** for all port definitions.
+    * In TypeScript: Strictly use type-only `interface` or `type` abstractions for port contracts.
+  * **Infrastructure Layer (Adapters):**
+    * Concrete driven adapters implementing outbound secondary ports using persistence ORMs, Boto3, Redis, external SDKs.
+  * **Presentation Layer (Driving Adapters):**
+    * Thin controllers/routers translating transport requests into application commands/inputs, delegating immediately to Use Cases.
 * **Ledgers & Financial Logic:** Always use immutable, double-entry bookkeeping models. Enforce balance consistency at the database level with atomic transactions and explicit concurrency controls.
 * **Concurrency & Safety:**
   * Design every asynchronous event handler for idempotency (e.g., using `idempotency_key` or message deduplication tables).
@@ -42,8 +57,9 @@ Adhere strictly to these principles across implementations:
 * **Typing & Validation:**
   * Strict typing enforced via **mypy in strict mode** (`--strict`, no untyped `def`s, no implicit `Any`).
   * Enforce domain boundary runtime validation with Pydantic v2.
+  * **Port Interfaces:** All ports (repository, messaging, external services) MUST use `typing.Protocol`, never `abc.ABC`.
 * **Framework Guidelines:**
-  * **Django Ninja:** Use as the default modern Django API toolkit. Explicitly define schema inputs/outputs (`Schema`) with strict typing.
+  * **Django Ninja:** Use as the default modern Django API toolkit. Explicitly define schema inputs/outputs (`Schema`) with strict typing. Handlers must stay thin and delegate orchestration to dedicated Application Use Cases.
   * **Django REST Framework (DRF):** **Strictly use `APIView` only.** Generic class-based views (`generics.*`) and ViewSets/ModelViewSets are disallowed. Write explicit HTTP verb handlers (`get`, `post`, `put`, `delete`), manual serializer validation, and direct service-layer invocations.
   * **FastAPI:** Fully asynchronous endpoints (`async def`), dependency injection for state/services, modular routers.
 * **Environment:** Follow PEP 8, enforce formatting and linting via Ruff, and handle package management deterministically (UV or Poetry).
@@ -89,11 +105,15 @@ All code updates (features, bug fixes, refactors, dependency bumps) must follow 
    * Keep commits focused; do not combine unrelated refactors with functional changes.
 3. **Pull Request Creation:**
    * Push the branch and open a PR against the target branch using GitHub CLI (`gh pr create`) or project automation.
+   * Explicitly link the PR to the relevant GitHub issue using `Closes #<issue_number>` or `Fixes #<issue_number>`.
    * Provide a PR description detailing: **Summary of Changes**, **Architecture Decisions/Tradeoffs**, and **Verification Evidence** (test commands and pass outputs).
 4. **Automated Self-Review (`pr-reviewer`):**
    * Before flagging the PR for human merge, the agent MUST run the `pr-reviewer` skill/tool on its own generated PR.
    * Review criteria: boundary leakages, concurrency bugs, missing type hints, missing test coverage, breaking API changes, or lint failures.
    * If `pr-reviewer` flags issues or critical feedback, resolve the issues on the branch and push updates before concluding the task.
+5. **Issue & Todo Closure Lifecycle:**
+   * Consult `todo.md` prior to starting work to verify scope.
+   * When a PR is successfully merged, immediately update `todo.md` to mark completed tasks (`- [x]`), verify the linked GitHub issue is closed (or close it explicitly if not auto-closed), and commit the updated `todo.md`.
 
 ---
 
@@ -117,7 +137,29 @@ All code updates (features, bug fixes, refactors, dependency bumps) must follow 
 
 ---
 
-## 7. Verification & Quality Gates
+## 7. Service Level Objectives (SLOs) & Operational Standards
+All backend services, data pipelines, and infrastructure layers must be architected and tuned against these strict production SLOs:
+
+* **Low Latency:**
+  * **API Response Time:** $p95 < 50\text{ms}$, $p99 < 120\text{ms}$ on all core read/write endpoints.
+  * **Database Query Budget:** Max 15ms per transaction query; eliminate N+1 queries using Django `select_related`/`prefetch_related` and custom SQL projections.
+  * **Network I/O:** Asynchronous, non-blocking I/O across all Django Ninja endpoints and Celery tasks; keep connection pools warm (RDS proxy / PgBouncer).
+* **High Throughput & Concurrency:**
+  * Target sustaining **$\ge 2,500\text{ requests/sec}$** per cluster without thread starvation or memory leaks.
+  * Stateless application servers scaled horizontally behind AWS ALB/NLB.
+  * Offload all long-running or CPU-intensive operations (VM orchestration, EBS volume attachment, DB snapshots, invoice PDF rendering, email dispatch) to Celery/Redis queues with dedicated worker pools.
+* **High Availability & Fault Tolerance:**
+  * **Uptime Target:** **$99.99\%$ (Four Nines)** service availability.
+  * **Zero Single Point of Failure (SPOF):** Multi-AZ deployments for RDS clusters, Redis clusters, and distributed workers.
+  * **Resilience & Circuit Breakers:** Every external outbound adapter (AWS Boto3, MailNow, Stripe/Paystack/Bitnob) must implement timeout boundaries (max 5s), circuit breakers, and exponential backoff with full jitter.
+  * **Graceful Degradation:** Temporary external provider outages must never corrupt financial ledgers or cause unbounded cascading request failures.
+* **Financial Data Consistency (Strict Zero-Overdraft):**
+  * 100% strict balance consistency: wallet accounts and ledger entries must be modified exclusively inside atomic transactions with pessimistic row-level locking (`SELECT ... FOR UPDATE`).
+  * Idempotency keys enforced on every mutation endpoint to eliminate duplicate resource creations or billing charges.
+
+---
+
+## 8. Verification & Quality Gates
 Before opening a PR and triggering `pr-reviewer`:
 * **Python:** Must pass `mypy --strict` and `ruff check`.
 * **Rust:** Must pass `cargo clippy -- -D warnings` and `cargo test`.

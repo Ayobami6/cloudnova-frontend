@@ -7,18 +7,19 @@ import { TerminalModal } from "@/components/layout/terminal-modal";
 import { DepositModal } from "@/components/layout/deposit-modal";
 import { DeployDropletModal } from "@/components/compute/deploy-droplet-modal";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { terminalInstance, setTerminalInstance, isDepositModalOpen, setIsDepositModalOpen } =
-    useCloud();
+  const { terminalInstance, setTerminalInstance } = useCloud();
+  const { isDepositModalOpen, setIsDepositModalOpen } = useBilling();
   const [isDeployOpen, setIsDeployOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#090A0F]">
+    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#090A0F] text-slate-900 dark:text-slate-100">
       {/* Sidebar Navigation */}
       <Sidebar />
 
