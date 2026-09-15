@@ -36,6 +36,7 @@ import {
 import { CreateDropletInput } from "../schemas/cloud";
 import { useAuth } from "./auth-context";
 import { ApiError } from "../api/errors";
+import { isUUID } from "../api/http";
 import * as computeApi from "../api/compute";
 import * as databasesApi from "../api/databases";
 import * as storageApi from "../api/storage";
@@ -215,11 +216,40 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
 
       if (instRes.status === "fulfilled" && Array.isArray(instRes.value)) {
-        setInstances(instRes.value.map((i) => mapInstance(i, loadedPlans)));
+        setInstances(
+          instRes.value
+            .filter((i) => i.status.toLowerCase() !== "terminated")
+            .map((i) => mapInstance(i, loadedPlans))
+        );
       }
 
       if (dbRes.status === "fulfilled" && Array.isArray(dbRes.value)) {
-        setDatabases(dbRes.value.map(mapDatabaseCluster));
+        const activeDbList = dbRes.value.filter(
+          (c) => c.status.toLowerCase() !== "terminated"
+        );
+        const mappedDbs = activeDbList.map(mapDatabaseCluster);
+        setDatabases(mappedDbs);
+
+        if (isAuthenticated && activeDbList.length > 0) {
+          const validUuids = activeDbList.filter((c) => isUUID(c.id));
+          if (validUuids.length > 0) {
+            Promise.allSettled(
+              validUuids.map((c) => databasesApi.getDatabaseCluster(c.id))
+            ).then((details) => {
+              setDatabases((prev) =>
+                prev.map((db) => {
+                  const detailRes = details.find(
+                    (d) => d.status === "fulfilled" && d.value.id === db.id
+                  );
+                  if (detailRes && detailRes.status === "fulfilled") {
+                    return mapDatabaseCluster(detailRes.value);
+                  }
+                  return db;
+                })
+              );
+            });
+          }
+        }
       }
 
       if (volRes.status === "fulfilled" && Array.isArray(volRes.value)) {
@@ -430,6 +460,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const powerAction = useCallback(
     async (id: string, action: "on" | "off" | "reboot") => {
+      const original = instances.find((i) => i.id === id);
       setInstances((prev) =>
         prev.map((inst) => {
           if (inst.id !== id) return inst;
@@ -440,12 +471,21 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         })
       );
 
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(id)) {
         try {
           const apiAction = action === "on" ? "power_on" : action === "off" ? "power_off" : "reboot";
           await computeApi.powerAction(id, apiAction);
-        } catch {
-          // ignore or fallback
+        } catch (err: unknown) {
+          if (original) {
+            setInstances((prev) => prev.map((inst) => (inst.id === id ? original : inst)));
+          }
+          if (err instanceof ApiError) {
+            showToast({
+              type: "error",
+              title: "Power Action Failed",
+              message: err.detail || "Unable to change instance power state.",
+            });
+          }
         }
       }
 
@@ -457,21 +497,31 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }, 3000);
       }
     },
-    [isAuthenticated]
+    [isAuthenticated, instances, showToast]
   );
 
   const destroyInstance = useCallback(
     async (id: string) => {
+      const original = instances.find((i) => i.id === id);
       setInstances((prev) => prev.filter((i) => i.id !== id));
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(id)) {
         try {
           await computeApi.destroyInstance(id);
-        } catch {
-          // ignore
+        } catch (err: unknown) {
+          if (original) {
+            setInstances((prev) => [...prev, original]);
+          }
+          if (err instanceof ApiError) {
+            showToast({
+              type: "error",
+              title: "Failed to Destroy Instance",
+              message: err.detail || "Unable to terminate instance.",
+            });
+          }
         }
       }
     },
-    [isAuthenticated]
+    [isAuthenticated, instances, showToast]
   );
 
   // Database Actions
@@ -519,14 +569,14 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         vcpu: 2,
         port: data.engine === "redis" ? 6379 : data.engine === "mysql" ? 3306 : 5432,
         host: `${data.name || "db"}.internal.cloudnova.net`,
-        defaultDb: "main_db",
-        adminUser: "nova_admin",
+        defaultDb: "postgres",
+        adminUser: "cloudnova_admin",
         adminPasswordReveal: "Secr3tP@ssw0rd!2026",
-        connectionUri: `postgresql://nova_admin:Secr3tP@ssw0rd!2026@${data.name || "db"}.internal.cloudnova.net:5432/main_db`,
+        connectionUri: `postgresql://cloudnova_admin:Secr3tP@ssw0rd!2026@${data.name || "db"}.internal.cloudnova.net:5432/postgres?sslmode=require`,
         wholesaleMonthly: 45.0,
         retailMonthly: 67.5,
-        users: [{ username: "nova_admin", role: "admin", createdAt: "Just now" }],
-        schemas: ["main_db"],
+        users: [{ username: "cloudnova_admin", role: "admin", createdAt: "Just now" }],
+        schemas: ["postgres"],
         pools: [],
         backups: [{ id: `bak-${Date.now()}`, createdAt: "Initial snapshot", sizeMb: 50, status: "completed" }],
         replicas: [],
@@ -540,16 +590,26 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const destroyDatabase = useCallback(
     async (id: string) => {
+      const original = databases.find((d) => d.id === id);
       setDatabases((prev) => prev.filter((d) => d.id !== id));
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(id)) {
         try {
           await databasesApi.destroyDatabaseCluster(id);
-        } catch {
-          // ignore
+        } catch (err: unknown) {
+          if (original) {
+            setDatabases((prev) => [...prev, original]);
+          }
+          if (err instanceof ApiError) {
+            showToast({
+              type: "error",
+              title: "Failed to Destroy Database",
+              message: err.detail || "Unable to destroy database cluster.",
+            });
+          }
         }
       }
     },
-    [isAuthenticated]
+    [databases, isAuthenticated, showToast]
   );
 
   const toggleDatabaseHA = useCallback(
@@ -561,15 +621,26 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           d.id === id ? { ...d, haEnabled: nextHA, nodesCount: nextHA ? 2 : 1 } : d
         )
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(id)) {
         try {
           await databasesApi.toggleDatabaseHA(id, nextHA);
-        } catch {
-          // ignore
+        } catch (err: unknown) {
+          if (target) {
+            setDatabases((prev) =>
+              prev.map((d) => (d.id === id ? target : d))
+            );
+          }
+          if (err instanceof ApiError) {
+            showToast({
+              type: "error",
+              title: "HA Update Failed",
+              message: err.detail || "Unable to update database high availability.",
+            });
+          }
         }
       }
     },
-    [databases, isAuthenticated]
+    [databases, isAuthenticated, showToast]
   );
 
   // Volume Actions
@@ -617,7 +688,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setVolumes((prev) =>
         prev.map((v) => (v.id === volumeId ? { ...v, attachedToInstanceId: instanceId } : v))
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(volumeId) && isUUID(instanceId)) {
         try {
           await storageApi.attachVolume(volumeId, instanceId);
         } catch {
@@ -633,7 +704,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setVolumes((prev) =>
         prev.map((v) => (v.id === volumeId ? { ...v, attachedToInstanceId: null } : v))
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(volumeId)) {
         try {
           await storageApi.detachVolume(volumeId);
         } catch {
@@ -660,7 +731,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           };
         })
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(volumeId)) {
         try {
           await storageApi.resizeVolume(volumeId, newSizeGb);
         } catch {
@@ -674,7 +745,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const destroyVolume = useCallback(
     async (volumeId: string) => {
       setVolumes((prev) => prev.filter((v) => v.id !== volumeId));
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(volumeId)) {
         try {
           await storageApi.destroyVolume(volumeId);
         } catch {
@@ -760,7 +831,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const destroyBucket = useCallback(
     async (bucketId: string) => {
       setBuckets((prev) => prev.filter((b) => b.id !== bucketId));
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(bucketId)) {
         try {
           await storageApi.destroyBucket(bucketId);
         } catch {
@@ -810,7 +881,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const deleteFirewall = useCallback(
     async (id: string) => {
       setFirewalls((prev) => prev.filter((f) => f.id !== id));
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(id)) {
         try {
           await networkApi.destroyFirewall(id);
         } catch {
@@ -826,7 +897,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setFirewalls((prev) =>
         prev.map((f) => (f.id === firewallId ? { ...f, rules: [...f.rules, rule] } : f))
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(firewallId)) {
         try {
           await networkApi.addFirewallRule(firewallId, {
             type: rule.type,
@@ -851,7 +922,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           f.id === firewallId ? { ...f, rules: f.rules.filter((r) => r.id !== ruleId) } : f
         )
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(firewallId) && isUUID(ruleId)) {
         try {
           await networkApi.deleteFirewallRule(firewallId, ruleId);
         } catch {
@@ -954,7 +1025,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setDomains((prev) =>
         prev.map((d) => (d.id === domainId ? { ...d, records: [...d.records, newRecord] } : d))
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(domainId)) {
         try {
           await domainsApi.addDNSRecord(domainId, {
             type: record.type,
@@ -978,7 +1049,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           d.id === domainId ? { ...d, records: d.records.filter((r) => r.id !== recordId) } : d
         )
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(domainId) && isUUID(recordId)) {
         try {
           await domainsApi.deleteDNSRecord(domainId, recordId);
         } catch {
@@ -994,7 +1065,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setDomains((prev) =>
         prev.map((d) => (d.id === domainId ? { ...d, linkedResourceId: resourceId } : d))
       );
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(domainId) && isUUID(resourceId)) {
         try {
           await domainsApi.linkDomain(domainId, { resource_id: resourceId });
         } catch {
@@ -1027,7 +1098,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const markAlertRead = useCallback(
     async (id: string) => {
       setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, read: true } : a)));
-      if (isAuthenticated) {
+      if (isAuthenticated && isUUID(id)) {
         try {
           await alertsApi.markAlertRead(id);
         } catch {

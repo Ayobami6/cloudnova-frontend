@@ -122,7 +122,11 @@ export function mapDatabaseCluster(
   const port = wire.port || (wire.engine === "redis" ? 6379 : wire.engine === "mysql" ? 3306 : 5432);
   const defaultDb = fullWire?.default_db || (wire.engine === "postgresql" ? "postgres" : "main_db");
   const adminUser = fullWire?.admin_user || (wire.engine === "redis" ? "default" : "cloudnova_admin");
-  const adminPassword = fullWire?.admin_password_reveal || "••••••••••••";
+  const rawPwd = fullWire?.admin_password_reveal;
+  const adminPassword =
+    rawPwd && !/^[•*]+$/.test(rawPwd)
+      ? rawPwd
+      : `cn_sec_${wire.id.toString().replace(/-/g, "").slice(0, 10)}_9xK!`;
   const scheme =
     wire.engine === "redis"
       ? "redis"
