@@ -263,7 +263,11 @@ export default function OverviewPage() {
                     <div className="inline-flex items-center gap-1.5">
                       <span
                         className={`w-2 h-2 rounded-full ${
-                          inst.status === "active" ? "bg-emerald-500" : "bg-rose-500"
+                          inst.status === "active"
+                            ? "bg-emerald-500"
+                            : inst.status === "provisioning"
+                            ? "bg-amber-400 animate-pulse"
+                            : "bg-rose-500"
                         }`}
                       />
                       <span className="text-xs text-slate-700 dark:text-slate-300 capitalize">{inst.status}</span>

@@ -156,7 +156,7 @@ export default function ComputePage() {
                           className={`w-2 h-2 rounded-full ${
                             inst.status === "active"
                               ? "bg-emerald-500"
-                              : inst.status === "rebooting"
+                              : inst.status === "rebooting" || inst.status === "provisioning"
                               ? "bg-amber-500 animate-pulse"
                               : "bg-rose-500"
                           }`}

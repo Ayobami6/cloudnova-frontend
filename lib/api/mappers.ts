@@ -109,8 +109,8 @@ export function mapDatabaseCluster(
     maintenance: "maintenance",
     backup: "backup",
     rebuilding: "rebuilding",
-    creating: "rebuilding",
-    provisioning: "rebuilding",
+    creating: "provisioning",
+    provisioning: "provisioning",
   };
 
   const status = statusMap[wire.status.toLowerCase()] || "online";
@@ -181,12 +181,22 @@ export function mapDatabaseCluster(
 }
 
 export function mapVolume(wire: VolumeResponse): Volume {
+  const statusMap: Record<string, Volume["status"]> = {
+    available: "available",
+    in_use: "in_use",
+    provisioning: "provisioning",
+    creating: "provisioning",
+    offline: "offline",
+  };
+  const status = statusMap[wire.status?.toLowerCase()] || "available";
+
   return {
     id: wire.id,
     name: wire.name,
     region: wire.region as DatacenterRegion,
     sizeGb: wire.size_gb,
     iops: wire.iops || wire.size_gb * 3,
+    status,
     attachedToInstanceId: wire.attached_to_instance_id,
     filesystem: (wire.filesystem as "ext4" | "xfs") || "ext4",
     wholesaleMonthly: Number(wire.wholesale_monthly) || wire.size_gb * 0.08,

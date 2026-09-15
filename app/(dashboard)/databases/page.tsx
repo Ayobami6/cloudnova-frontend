@@ -115,7 +115,15 @@ export default function DatabasesPage() {
           >
             <div className="flex items-center justify-between">
               <span className="font-semibold text-xs text-slate-900 dark:text-slate-200 block truncate">{db.name}</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  db.status === "online"
+                    ? "bg-emerald-500"
+                    : db.status === "provisioning" || db.status === "rebuilding"
+                    ? "bg-amber-500 animate-pulse"
+                    : "bg-blue-500"
+                }`}
+              />
             </div>
             <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-mono">
               <span className="capitalize">{db.engine} {db.version}</span>
@@ -140,8 +148,16 @@ export default function DatabasesPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">{activeDb.name}</h2>
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    ONLINE
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded uppercase border ${
+                      activeDb.status === "online"
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                        : activeDb.status === "provisioning" || activeDb.status === "rebuilding"
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 animate-pulse"
+                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
+                    }`}
+                  >
+                    {activeDb.status}
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">

@@ -190,8 +190,21 @@ export default function StoragePage() {
                 return (
                   <tr key={vol.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02] transition-colors">
                     <td className="py-3 px-4">
-                      <span className="font-semibold text-slate-900 dark:text-slate-200 block">{vol.name}</span>
-                      <span className="text-[11px] font-mono text-slate-500 uppercase">{vol.region}</span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 ${
+                            vol.status === "available" || vol.status === "in_use"
+                              ? "bg-emerald-500"
+                              : vol.status === "provisioning" || vol.status === "creating"
+                              ? "bg-amber-500 animate-pulse"
+                              : "bg-slate-500"
+                          }`}
+                        />
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-slate-200 block">{vol.name}</span>
+                          <span className="text-[11px] font-mono text-slate-500 uppercase">{vol.region}</span>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3 px-4 font-mono">
                       <span className="text-slate-900 dark:text-slate-200 font-medium block">{vol.sizeGb} GB</span>

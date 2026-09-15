@@ -80,7 +80,7 @@ export interface Instance {
 }
 
 export type DatabaseEngine = "postgresql" | "mysql" | "redis" | "mongodb";
-export type DatabaseStatus = "online" | "maintenance" | "backup" | "rebuilding";
+export type DatabaseStatus = "online" | "maintenance" | "backup" | "rebuilding" | "provisioning";
 
 export interface DatabaseUser {
   username: string;
@@ -143,12 +143,15 @@ export interface DatabaseCluster {
   createdAt: string;
 }
 
+export type VolumeStatus = "available" | "in_use" | "provisioning" | "creating" | "offline";
+
 export interface Volume {
   id: string;
   name: string;
   region: DatacenterRegion;
   sizeGb: number;
   iops: number;
+  status: VolumeStatus;
   attachedToInstanceId: string | null;
   filesystem: "ext4" | "xfs";
   wholesaleMonthly: number;
