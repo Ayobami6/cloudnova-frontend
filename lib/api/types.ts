@@ -248,6 +248,46 @@ export interface CheckoutSessionResponse {
   reference: string;
 }
 
+export interface CryptoDepositInitializeRequest {
+  amount: string | number;
+  price_currency?: string;
+  pay_currency?: string;
+  reference?: string;
+}
+
+export interface CryptoDepositInitializeResponse {
+  payment_id: string;
+  payment_status: string;
+  pay_address: string;
+  price_amount: string | number;
+  price_currency: string;
+  pay_amount: string | number;
+  pay_currency: string;
+  order_id: string;
+  invoice_url: string;
+  expiration_estimate_date: string;
+}
+
+export interface CurrencyFromIPResponse {
+  ip: string;
+  country_code: string;
+  currency: string;
+}
+
+export interface CurrencyConversionRequest {
+  amount: string | number;
+  from_currency: string;
+  to_currency: string;
+}
+
+export interface CurrencyConversionResponse {
+  original_amount: string | number;
+  from_currency: string;
+  converted_amount: string | number;
+  to_currency: string;
+  rate: string | number;
+}
+
 export interface WebhookAckResponse {
   status: string;
 }

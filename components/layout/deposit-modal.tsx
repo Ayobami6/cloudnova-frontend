@@ -1,11 +1,32 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, CreditCard, Building2, Landmark, CheckCircle2, Loader2, AlertCircle, Copy, Check } from "lucide-react";
+import {
+  X,
+  CreditCard,
+  Building2,
+  Landmark,
+  Coins,
+  CheckCircle2,
+  Loader2,
+  AlertCircle,
+  Copy,
+  Check,
+  ExternalLink,
+} from "lucide-react";
 import { useBilling } from "@/lib/store/billing-context";
+import * as billingApi from "@/lib/api/billing";
+import type { CryptoDepositInitializeResponse } from "@/lib/api/types";
 
-type FundingMethod = "card" | "bank_transfer" | "other";
+type FundingMethod = "card" | "bank_transfer" | "crypto" | "other";
 const OTHER_PROVIDERS = ["stripe", "monnify", "bitnob"] as const;
+const CRYPTO_CURRENCIES = [
+  { label: "USDT (TRC20)", value: "usdttrc20" },
+  { label: "USDT (ERC20)", value: "usdterc20" },
+  { label: "Bitcoin (BTC)", value: "btc" },
+  { label: "Ethereum (ETH)", value: "eth" },
+  { label: "Solana (SOL)", value: "sol" },
+] as const;
 
 export function DepositModal({
   isOpen,
@@ -14,12 +35,20 @@ export function DepositModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { virtualAccounts, recordDeposit, provisionPaystackVirtualAccount, startPaystackCheckout } =
-    useBilling();
+  const {
+    virtualAccounts,
+    recordDeposit,
+    provisionPaystackVirtualAccount,
+    startPaystackCheckout,
+    currency,
+    currencySymbol,
+  } = useBilling();
 
   const [method, setMethod] = useState<FundingMethod>("card");
-  const [selectedAmount, setSelectedAmount] = useState<number>(250);
+  const [selectedAmount, setSelectedAmount] = useState<number>(currency === "NGN" ? 50000 : 100);
   const [customAmount, setCustomAmount] = useState<string>("");
+  const [cryptoCurrency, setCryptoCurrency] = useState<string>("usdttrc20");
+  const [cryptoSession, setCryptoSession] = useState<CryptoDepositInitializeResponse | null>(null);
   const [otherProvider, setOtherProvider] = useState<(typeof OTHER_PROVIDERS)[number]>("stripe");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isProvisioning, setIsProvisioning] = useState<boolean>(false);
@@ -29,13 +58,17 @@ export function DepositModal({
 
   if (!isOpen) return null;
 
-  const presets = [50, 100, 250, 500, 1000];
+  const presets =
+    currency === "NGN"
+      ? [20000, 50000, 100000, 250000, 500000]
+      : [50, 100, 250, 500, 1000];
   const finalAmount = customAmount && Number(customAmount) > 0 ? Number(customAmount) : selectedAmount;
   const paystackAccount = virtualAccounts.find((a) => a.provider.toLowerCase() === "paystack");
 
   const handleClose = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
+    setCryptoSession(null);
     onClose();
   };
 
@@ -43,7 +76,7 @@ export function DepositModal({
     if (finalAmount <= 0) return;
     setIsProcessing(true);
     setErrorMessage(null);
-    const result = await startPaystackCheckout(finalAmount, "NGN");
+    const result = await startPaystackCheckout(finalAmount, currency);
     setIsProcessing(false);
     if (result.success && result.data) {
       window.location.href = result.data;
@@ -62,17 +95,32 @@ export function DepositModal({
     }
   };
 
-  const handleCopyAccountNumber = () => {
-    if (!paystackAccount) return;
+  const handleCopyText = (text: string) => {
     navigator.clipboard
-      .writeText(paystackAccount.account_number)
+      .writeText(text)
       .then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       })
-      .catch(() => {
-        // Clipboard API unavailable - not fatal, the number is visible on screen.
+      .catch(() => {});
+  };
+
+  const handleInitCrypto = async () => {
+    if (finalAmount <= 0) return;
+    setIsProcessing(true);
+    setErrorMessage(null);
+    try {
+      const session = await billingApi.initializeCryptoDeposit({
+        amount: finalAmount,
+        price_currency: currency,
+        pay_currency: cryptoCurrency,
       });
+      setCryptoSession(session);
+    } catch (err: unknown) {
+      setErrorMessage(err instanceof Error ? err.message : "Failed to initialize crypto payment.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleOtherDeposit = async () => {
@@ -80,10 +128,10 @@ export function DepositModal({
     setIsProcessing(true);
     setErrorMessage(null);
     const reference = `manual-${otherProvider}-${Date.now()}`;
-    const result = await recordDeposit(finalAmount, "USD", otherProvider, reference);
+    const result = await recordDeposit(finalAmount, currency, otherProvider, reference);
     setIsProcessing(false);
     if (result.success) {
-      setSuccessMessage(`Successfully credited $${finalAmount.toFixed(2)} to your prepaid balance.`);
+      setSuccessMessage(`Successfully credited ${currencySymbol}${finalAmount.toLocaleString()} to your prepaid balance.`);
       setTimeout(handleClose, 1500);
     } else {
       setErrorMessage(result.error || "Deposit failed.");
@@ -92,13 +140,15 @@ export function DepositModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] rounded-lg shadow-2xl w-full max-w-md overflow-hidden p-6 space-y-5">
+      <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] rounded-lg shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-5">
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Deposit Prepaid Cloud Funds</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              Deposit Prepaid Cloud Funds
+            </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Funds are debited hourly based on active VM and storage burn.
+              Current Billing Currency: <span className="font-semibold text-blue-600 dark:text-blue-400">{currency} ({currencySymbol})</span>
             </p>
           </div>
           <button
@@ -117,44 +167,69 @@ export function DepositModal({
         ) : (
           <>
             {/* Funding Method Tabs */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               <button
                 type="button"
-                onClick={() => setMethod("card")}
-                className={`p-3 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
+                onClick={() => {
+                  setMethod("card");
+                  setCryptoSession(null);
+                }}
+                className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "card"
-                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500"
+                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
                     : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <CreditCard className="w-4 h-4" />
-                <span className="font-medium">Pay with Card</span>
+                <span>Card (Paystack)</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => setMethod("bank_transfer")}
-                className={`p-3 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
+                onClick={() => {
+                  setMethod("bank_transfer");
+                  setCryptoSession(null);
+                }}
+                className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "bank_transfer"
-                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500"
+                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
                     : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <Landmark className="w-4 h-4" />
-                <span className="font-medium">Bank Transfer</span>
+                <span>Bank Transfer</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => setMethod("other")}
-                className={`p-3 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
+                onClick={() => {
+                  setMethod("crypto");
+                  setCryptoSession(null);
+                }}
+                className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
+                  method === "crypto"
+                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
+                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
+                }`}
+              >
+                <Coins className="w-4 h-4" />
+                <span>Crypto</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMethod("other");
+                  setCryptoSession(null);
+                }}
+                className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "other"
-                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500"
+                    ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
                     : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <Building2 className="w-4 h-4" />
-                <span className="font-medium">Other</span>
+                <span>Other</span>
               </button>
             </div>
 
@@ -169,7 +244,9 @@ export function DepositModal({
             {method === "card" && (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Select Amount (NGN)</label>
+                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Select Amount ({currency})
+                  </label>
                   <div className="grid grid-cols-5 gap-2">
                     {presets.map((amt) => (
                       <button
@@ -185,7 +262,7 @@ export function DepositModal({
                             : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
                         }`}
                       >
-                        {amt}
+                        {currencySymbol}{amt.toLocaleString()}
                       </button>
                     ))}
                   </div>
@@ -193,14 +270,14 @@ export function DepositModal({
                     type="number"
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
-                    placeholder="Or enter custom amount (NGN)"
+                    placeholder={`Or enter custom amount (${currencySymbol})`}
                     className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
                   />
                 </div>
 
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                  You&apos;ll be redirected to Paystack&apos;s hosted checkout to complete payment. Your
-                  balance is credited automatically once Paystack confirms the charge.
+                  Redirects to Paystack secured checkout. Your balance is credited automatically once
+                  payment is confirmed.
                 </p>
 
                 <button
@@ -209,7 +286,7 @@ export function DepositModal({
                   className="w-full h-9 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
                 >
                   {isProcessing && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{isProcessing ? "Redirecting to Paystack..." : `Pay ₦${finalAmount.toLocaleString()} with Card`}</span>
+                  <span>{isProcessing ? "Redirecting to Paystack..." : `Pay ${currencySymbol}${finalAmount.toLocaleString()} with Card`}</span>
                 </button>
               </div>
             )}
@@ -221,7 +298,7 @@ export function DepositModal({
                   <div className="p-4 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-medium">
-                        Your Dedicated Account
+                        Your Dedicated Virtual Account (NUBAN)
                       </span>
                       <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-1.5 py-0.5 rounded">
                         {paystackAccount.is_active ? "ACTIVE" : "INACTIVE"}
@@ -240,7 +317,7 @@ export function DepositModal({
                           {paystackAccount.account_number}
                         </span>
                         <button
-                          onClick={handleCopyAccountNumber}
+                          onClick={() => handleCopyText(paystackAccount.account_number)}
                           className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded hover:bg-slate-200 dark:hover:bg-[#1E2230] transition-colors"
                           aria-label="Copy account number"
                         >
@@ -255,8 +332,7 @@ export function DepositModal({
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-[#232736]">
-                      Transfer any amount to this account. Your prepaid balance is credited automatically
-                      within minutes of the transfer clearing.
+                      Transfer from any Nigerian banking app. Your prepaid wallet will be credited automatically within minutes.
                     </p>
                   </div>
                 ) : (
@@ -279,11 +355,141 @@ export function DepositModal({
               </div>
             )}
 
+            {/* Cryptocurrency (NOWPayments) */}
+            {method === "crypto" && (
+              <div className="space-y-3">
+                {!cryptoSession ? (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                        Select Deposit Amount ({currency})
+                      </label>
+                      <div className="grid grid-cols-5 gap-2">
+                        {presets.map((amt) => (
+                          <button
+                            key={amt}
+                            type="button"
+                            onClick={() => {
+                              setSelectedAmount(amt);
+                              setCustomAmount("");
+                            }}
+                            className={`h-9 rounded-md text-xs font-mono font-medium transition-colors ${
+                              selectedAmount === amt && !customAmount
+                                ? "bg-blue-600 text-white font-semibold shadow-sm"
+                                : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
+                            }`}
+                          >
+                            {currencySymbol}{amt.toLocaleString()}
+                          </button>
+                        ))}
+                      </div>
+                      <input
+                        type="number"
+                        value={customAmount}
+                        onChange={(e) => setCustomAmount(e.target.value)}
+                        placeholder={`Or enter custom amount (${currencySymbol})`}
+                        className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                        Payment Coin / Token
+                      </label>
+                      <select
+                        value={cryptoCurrency}
+                        onChange={(e) => setCryptoCurrency(e.target.value)}
+                        className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                      >
+                        {CRYPTO_CURRENCIES.map((c) => (
+                          <option key={c.value} value={c.value}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <button
+                      onClick={handleInitCrypto}
+                      disabled={isProcessing || finalAmount <= 0}
+                      className="w-full h-9 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {isProcessing && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      <span>{isProcessing ? "Generating Crypto Address..." : "Generate Deposit Address"}</span>
+                    </button>
+                  </>
+                ) : (
+                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400 font-semibold">
+                        Awaiting Crypto Payment
+                      </span>
+                      <span className="text-[10px] font-mono text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-1.5 py-0.5 rounded">
+                        {cryptoSession.payment_status.toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Amount to Send</span>
+                      <span className="text-base font-mono font-bold text-slate-900 dark:text-slate-100">
+                        {cryptoSession.pay_amount} {cryptoSession.pay_currency}
+                      </span>
+                      <span className="text-[11px] text-slate-500 ml-2">
+                        (≈ {currencySymbol}{Number(cryptoSession.price_amount).toLocaleString()} {cryptoSession.price_currency})
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Deposit Address</span>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-xs font-mono bg-white dark:bg-[#1E2230] p-2 rounded border border-slate-200 dark:border-[#232736] flex-1 break-all select-all font-medium text-slate-800 dark:text-slate-200">
+                          {cryptoSession.pay_address}
+                        </span>
+                        <button
+                          onClick={() => handleCopyText(cryptoSession.pay_address)}
+                          className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded hover:bg-slate-200 dark:hover:bg-[#1E2230] transition-colors"
+                          aria-label="Copy crypto address"
+                        >
+                          {copied ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {cryptoSession.invoice_url && (
+                      <a
+                        href={cryptoSession.invoice_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-blue-600 dark:text-blue-400 hover:underline pt-1"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Open NOWPayments Checkout Page</span>
+                      </a>
+                    )}
+
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-[#232736]">
+                      Send exactly {cryptoSession.pay_amount} {cryptoSession.pay_currency} to this address.
+                      Your prepaid wallet will be credited automatically once the network confirms the transaction.
+                    </p>
+
+                    <button
+                      onClick={() => setCryptoSession(null)}
+                      className="w-full h-8 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 font-medium"
+                    >
+                      Start New Deposit
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Other / Manual Deposit */}
             {method === "other" && (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">Select Deposit Amount (USD)</label>
+                  <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Select Deposit Amount ({currency})
+                  </label>
                   <div className="grid grid-cols-5 gap-2">
                     {presets.map((amt) => (
                       <button
@@ -299,7 +505,7 @@ export function DepositModal({
                             : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
                         }`}
                       >
-                        ${amt}
+                        {currencySymbol}{amt.toLocaleString()}
                       </button>
                     ))}
                   </div>
@@ -307,7 +513,7 @@ export function DepositModal({
                     type="number"
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
-                    placeholder="Or enter custom amount ($)"
+                    placeholder={`Or enter custom amount (${currencySymbol})`}
                     className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
                   />
                 </div>
@@ -330,7 +536,9 @@ export function DepositModal({
                 <div className="pt-3 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between">
                   <div>
                     <span className="text-[11px] text-slate-500">Total charge:</span>
-                    <p className="text-base font-mono font-semibold text-slate-900 dark:text-slate-100">${finalAmount.toFixed(2)}</p>
+                    <p className="text-base font-mono font-semibold text-slate-900 dark:text-slate-100">
+                      {currencySymbol}{finalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    </p>
                   </div>
                   <button
                     onClick={handleOtherDeposit}

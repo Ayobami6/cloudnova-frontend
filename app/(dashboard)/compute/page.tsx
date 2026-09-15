@@ -14,6 +14,7 @@ import {
   Layers,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import { DeployDropletModal } from "@/components/compute/deploy-droplet-modal";
 
 export default function ComputePage() {
@@ -25,6 +26,7 @@ export default function ComputePage() {
     selectedRegion,
     searchQuery,
   } = useCloud();
+  const { formatMoney } = useBilling();
 
   const [isDeployOpen, setIsDeployOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -223,10 +225,10 @@ export default function ComputePage() {
                     {/* Retail Pricing */}
                     <td className="py-3 px-4 font-mono text-xs">
                       <span className="text-slate-900 dark:text-slate-200 font-semibold block">
-                        ${inst.plan.retailMonthly}/mo
+                        {formatMoney(inst.plan.retailMonthly)}/mo
                       </span>
                       <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-medium">
-                        +${(inst.plan.retailMonthly - inst.plan.wholesaleMonthly).toFixed(2)} profit
+                        +{formatMoney(inst.plan.retailMonthly - inst.plan.wholesaleMonthly)} profit
                       </span>
                     </td>
 

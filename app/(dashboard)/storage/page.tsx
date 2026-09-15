@@ -18,6 +18,7 @@ import {
   Sliders,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import { REGIONS } from "@/lib/mock-data/initial-state";
 import { Volume, S3Bucket } from "@/lib/types/cloud";
 
@@ -37,6 +38,7 @@ export default function StoragePage() {
     destroyBucket,
     selectedRegion,
   } = useCloud();
+  const { formatMoney } = useBilling();
 
   const [activeTab, setActiveTab] = useState<"volumes" | "s3">("volumes");
 
@@ -242,9 +244,9 @@ export default function StoragePage() {
                     </td>
                     <td className="py-3 px-4 font-mono text-slate-600 dark:text-slate-400">{vol.filesystem}</td>
                     <td className="py-3 px-4 font-mono">
-                      <span className="text-slate-900 dark:text-slate-200 font-semibold block">${vol.retailMonthly}/mo</span>
+                      <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(vol.retailMonthly)}/mo</span>
                       <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                        +${(vol.retailMonthly - vol.wholesaleMonthly).toFixed(2)} profit
+                        +{formatMoney(vol.retailMonthly - vol.wholesaleMonthly)} profit
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">

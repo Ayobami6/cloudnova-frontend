@@ -36,6 +36,7 @@ export default function OverviewPage() {
     databases,
     volumes,
     buckets,
+    domains,
     monthlyWholesale,
     monthlyRetail,
     monthlyProfit,
@@ -160,22 +161,22 @@ export default function OverviewPage() {
           </span>
         </div>
 
-        {/* Card 4: Global SLA & Network */}
+        {/* Card 4: Network & Domains */}
         <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex flex-col justify-between shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Uptime SLA & Network
+              Network & Domains
             </span>
-            <Shield className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-              99.995%
+            <span className="text-2xl font-semibold text-slate-900 dark:text-slate-100 font-mono">
+              {domains.length}
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400">Target: 99.99%</span>
+            <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Anycast DNS</span>
           </div>
           <span className="mt-1 text-xs text-slate-500">
-            DDoS Shield Active • 8 Anycast PoPs
+            DDoS Shield Active • 8 Global PoPs
           </span>
         </div>
       </div>

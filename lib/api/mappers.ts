@@ -118,6 +118,28 @@ export function mapDatabaseCluster(
   const isFull = "admin_user" in wire;
   const fullWire = isFull ? (wire as DatabaseClusterResponse) : null;
 
+  const host = wire.host || `${wire.name}.internal.cloudnova.net`;
+  const port = wire.port || (wire.engine === "redis" ? 6379 : wire.engine === "mysql" ? 3306 : 5432);
+  const defaultDb = fullWire?.default_db || (wire.engine === "postgresql" ? "postgres" : "main_db");
+  const adminUser = fullWire?.admin_user || (wire.engine === "redis" ? "default" : "cloudnova_admin");
+  const adminPassword = fullWire?.admin_password_reveal || "••••••••••••";
+  const scheme =
+    wire.engine === "redis"
+      ? "redis"
+      : wire.engine === "mysql"
+      ? "mysql"
+      : wire.engine === "mongodb"
+      ? "mongodb"
+      : "postgresql";
+
+  let connectionUri = fullWire?.connection_uri;
+  if (!connectionUri || connectionUri.includes("@:")) {
+    connectionUri =
+      wire.engine === "redis"
+        ? `redis://${host}:${port}/0`
+        : `${scheme}://${adminUser}:${adminPassword}@${host}:${port}/${defaultDb}?sslmode=require`;
+  }
+
   return {
     id: wire.id,
     name: wire.name,
@@ -131,12 +153,12 @@ export function mapDatabaseCluster(
     diskUsedGb: fullWire ? fullWire.disk_used_gb : Math.floor(wire.disk_allocated_gb * 0.4),
     ramGb: wire.ram_gb || 4,
     vcpu: wire.vcpu || 2,
-    port: wire.port || 5432,
-    host: wire.host || `${wire.name}.db.cloudnova.internal`,
-    defaultDb: fullWire ? fullWire.default_db : "defaultdb",
-    adminUser: fullWire ? fullWire.admin_user : "doadmin",
-    adminPasswordReveal: fullWire ? fullWire.admin_password_reveal : "••••••••••••",
-    connectionUri: fullWire ? fullWire.connection_uri : `postgresql://doadmin:••••@${wire.host}:${wire.port}/defaultdb`,
+    port,
+    host,
+    defaultDb,
+    adminUser,
+    adminPasswordReveal: adminPassword,
+    connectionUri,
     wholesaleMonthly: fullWire ? Number(fullWire.wholesale_monthly) : 15,
     retailMonthly: fullWire ? Number(fullWire.retail_monthly) : 25,
     users: fullWire?.users
@@ -145,8 +167,8 @@ export function mapDatabaseCluster(
           role: (u.role as "admin" | "read_write" | "read_only") || "read_write",
           createdAt: new Date().toISOString(),
         }))
-      : [{ username: fullWire?.admin_user || "doadmin", role: "admin", createdAt: wire.created_at }],
-    schemas: fullWire?.schemas || ["public"],
+      : [{ username: adminUser, role: "admin", createdAt: wire.created_at }],
+    schemas: fullWire?.schemas || [defaultDb],
     pools: fullWire?.pools
       ? fullWire.pools.map((p) => ({
           id: p.id,

@@ -34,7 +34,16 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
     markAlertRead,
     clearAllAlerts,
   } = useCloud();
-  const { walletBalance, hourlyBurnRate, setIsDepositModalOpen } = useBilling();
+  const {
+    walletBalance,
+    hourlyBurnRate,
+    setIsDepositModalOpen,
+    currencySymbol,
+    currency,
+    detectedCurrency,
+    switchCurrency,
+    isSwitchingCurrency,
+  } = useBilling();
 
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
@@ -83,8 +92,29 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
         <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs">
           <Zap className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
           <span className="text-slate-500 dark:text-slate-400">Burn:</span>
-          <span className="font-mono font-medium text-slate-800 dark:text-slate-200">${hourlyBurnRate}/hr</span>
+          <span className="font-mono font-medium text-slate-800 dark:text-slate-200">{currencySymbol}{hourlyBurnRate}/hr</span>
         </div>
+
+        {/* Currency Switcher Pill */}
+        {detectedCurrency === "NGN" && currency === "USD" ? (
+          <button
+            onClick={() => switchCurrency("NGN")}
+            disabled={isSwitchingCurrency}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-500/30 text-xs text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer disabled:opacity-50"
+            title="We detected you are in Nigeria. Click to switch account billing currency to NGN (₦)."
+          >
+            <span>🇳🇬 Switch to NGN (₦)</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => switchCurrency(currency === "USD" ? "NGN" : "USD")}
+            disabled={isSwitchingCurrency}
+            className="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-slate-50 dark:bg-[#161922] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-xs font-mono font-medium text-slate-700 dark:text-slate-300 transition-colors cursor-pointer disabled:opacity-50"
+            title={`Active currency: ${currency}. Click to switch to ${currency === "USD" ? "NGN (₦)" : "USD ($)"}.`}
+          >
+            <span>{currency === "NGN" ? "🇳🇬 NGN (₦)" : "🇺🇸 USD ($)"}</span>
+          </button>
+        )}
 
         {/* Prepaid Wallet Balance */}
         <button
@@ -94,9 +124,10 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
           <Wallet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
           <span className="text-slate-500 dark:text-slate-400">Balance:</span>
           <span className="font-mono font-medium text-emerald-600 dark:text-emerald-400">
-            ${walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            {currencySymbol}{walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </span>
         </button>
+
 
         {/* Theme Toggle Button */}
         <button

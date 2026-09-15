@@ -18,10 +18,12 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import { DatabaseCluster } from "@/lib/types/cloud";
 
 export default function DatabasesPage() {
   const { databases, toggleDatabaseHA, destroyDatabase, createDatabase } = useCloud();
+  const { formatMoney } = useBilling();
 
   const [activeDbId, setActiveDbId] = useState<string>(databases[0]?.id || "");
   const [activeSubTab, setActiveSubTab] = useState<
@@ -30,6 +32,8 @@ export default function DatabasesPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [connectTabMode, setConnectTabMode] = useState<"snippets" | "params">("snippets");
+  const [connectSnippetLang, setConnectSnippetLang] = useState<"psql" | "nodejs" | "python" | "go">("psql");
 
   // SQL Console Mock State
   const [sqlQuery, setSqlQuery] = useState("SELECT id, name, status, created_at FROM users LIMIT 5;");
@@ -44,6 +48,28 @@ export default function DatabasesPage() {
   const [newEngine, setNewEngine] = useState<"postgresql" | "mysql" | "redis" | "mongodb">("postgresql");
 
   const activeDb = databases.find((d) => d.id === activeDbId) || databases[0];
+
+  const connectionUriDisplay = React.useMemo(() => {
+    if (!activeDb) return "";
+    if (activeDb.connectionUri && !activeDb.connectionUri.includes("@:")) {
+      return activeDb.connectionUri;
+    }
+    const host = activeDb.host || `${activeDb.name}.internal.cloudnova.net`;
+    const port = activeDb.port || 5432;
+    const user = activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "nova_admin";
+    const db = activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "main_db";
+    const pwd = activeDb.adminPasswordReveal || "••••••••";
+    const scheme =
+      activeDb.engine === "redis"
+        ? "redis"
+        : activeDb.engine === "mysql"
+        ? "mysql"
+        : activeDb.engine === "mongodb"
+        ? "mongodb"
+        : "postgresql";
+    if (activeDb.engine === "redis") return `redis://${host}:${port}/0`;
+    return `${scheme}://${user}:${pwd}@${host}:${port}/${db}?sslmode=require`;
+  }, [activeDb]);
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -131,7 +157,7 @@ export default function DatabasesPage() {
             </div>
             <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500">
               <span>{db.haEnabled ? "HA Standby Active" : "Single Node"}</span>
-              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium">+${(db.retailMonthly - db.wholesaleMonthly).toFixed(0)}/mo</span>
+              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium">+{formatMoney(db.retailMonthly - db.wholesaleMonthly, 0)}/mo</span>
             </div>
           </button>
         ))}
@@ -216,62 +242,273 @@ export default function DatabasesPage() {
           <div className="p-6">
             {/* 1. Connection Details */}
             {activeSubTab === "connection" && (
-              <div className="space-y-4 max-w-2xl">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Host</label>
-                    <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
-                      <span>{activeDb.host}</span>
-                      <button onClick={() => handleCopy(activeDb.host, "host")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                        {copiedText === "host" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Port</label>
-                    <div className="p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
-                      {activeDb.port}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Default Database</label>
-                    <div className="p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
-                      {activeDb.defaultDb}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Admin User</label>
-                    <div className="p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
-                      {activeDb.adminUser}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Admin Password</label>
-                  <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
-                    <span>{showPassword ? activeDb.adminPasswordReveal : "••••••••••••••••••••"}</span>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => setShowPassword(!showPassword)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                        {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </button>
-                      <button onClick={() => handleCopy(activeDb.adminPasswordReveal, "pwd")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                        {copiedText === "pwd" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Connection URI (Public / SSL Required)</label>
-                  <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
-                    <span className="truncate mr-2">{activeDb.connectionUri}</span>
-                    <button onClick={() => handleCopy(activeDb.connectionUri, "uri")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0">
-                      {copiedText === "uri" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+              <div className="space-y-6 max-w-3xl">
+                {/* Connect Using Mode Selection */}
+                <div>
+                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-2">
+                    Connect using
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setConnectTabMode("snippets")}
+                      className={`p-3 rounded-lg border text-left transition-all ${
+                        connectTabMode === "snippets"
+                          ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 ring-1 ring-blue-500"
+                          : "border-slate-200 dark:border-[#232736] bg-slate-50/50 dark:bg-[#11131A] hover:border-slate-300 dark:hover:border-[#33394D]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${connectTabMode === "snippets" ? "border-blue-600 bg-blue-600" : "border-slate-400"}`}>
+                          {connectTabMode === "snippets" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
+                        <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">Code snippets & CLI</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 pl-5.5">
+                        Use when connecting through PSQL, Node.js, Python, or Go SDKs with AWS SSL certificate.
+                      </p>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setConnectTabMode("params")}
+                      className={`p-3 rounded-lg border text-left transition-all ${
+                        connectTabMode === "params"
+                          ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 ring-1 ring-blue-500"
+                          : "border-slate-200 dark:border-[#232736] bg-slate-50/50 dark:bg-[#11131A] hover:border-slate-300 dark:hover:border-[#33394D]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${connectTabMode === "params" ? "border-blue-600 bg-blue-600" : "border-slate-400"}`}>
+                          {connectTabMode === "params" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
+                        <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">Endpoints & Credentials</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 pl-5.5">
+                        Raw hostname, port, database credentials, and full connection URI string.
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Security badges */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs">
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">SSL Mode</span>
+                    <span className="font-mono text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
+                      <Shield className="w-3 h-3" /> verify-full (Enforced)
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">Truststore CA</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300 font-medium block mt-0.5 truncate">
+                      AWS RDS Global Bundle
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">Region</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300 font-medium block mt-0.5 uppercase">
+                      {activeDb.region}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Code Snippets Mode */}
+                {connectTabMode === "snippets" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#232736] pb-2">
+                      <div className="flex items-center gap-2">
+                        <Terminal className="w-4 h-4 text-blue-500" />
+                        <span className="text-xs font-semibold text-slate-900 dark:text-slate-200">Programming Language & Tool</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-slate-100 dark:bg-[#11131A] p-0.5 rounded border border-slate-200 dark:border-[#232736]">
+                        {(["psql", "nodejs", "python", "go"] as const).map((lang) => (
+                          <button
+                            key={lang}
+                            type="button"
+                            onClick={() => setConnectSnippetLang(lang)}
+                            className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                              connectSnippetLang === lang
+                                ? "bg-white dark:bg-[#1E2230] text-blue-600 dark:text-blue-400 font-semibold shadow-xs"
+                                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                            }`}
+                          >
+                            {lang === "psql" ? "PSQL" : lang === "nodejs" ? "Node.js" : lang === "python" ? "Python" : "Go"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                            Step 1: Download the AWS RDS Global Certificate Bundle
+                          </label>
+                          <button
+                            onClick={() => handleCopy("curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem", "step1")}
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 text-[11px]"
+                          >
+                            {copiedText === "step1" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedText === "step1" ? "Copied" : "Copy"}</span>
+                          </button>
+                        </div>
+                        <div className="p-3 rounded bg-slate-900 text-slate-200 font-mono text-xs overflow-x-auto border border-slate-800">
+                          <code>curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem</code>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                            Step 2: Connect to the instance endpoint
+                          </label>
+                          <button
+                            onClick={() => {
+                              const snippet =
+                                connectSnippetLang === "psql"
+                                  ? `export RDSHOST="${activeDb.host}"\npsql "host=$RDSHOST port=${activeDb.port} dbname=${activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"} user=${activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"} sslmode=verify-full sslrootcert=./global-bundle.pem"`
+                                  : connectSnippetLang === "nodejs"
+                                  ? `import { Pool } from "pg";\nimport fs from "fs";\n\nconst pool = new Pool({\n  host: "${activeDb.host}",\n  port: ${activeDb.port},\n  database: "${activeDb.defaultDb || "postgres"}",\n  user: "${activeDb.adminUser || "cloudnova_admin"}",\n  password: process.env.DB_PASSWORD,\n  ssl: {\n    ca: fs.readFileSync("./global-bundle.pem").toString(),\n    rejectUnauthorized: true,\n  },\n});`
+                                  : connectSnippetLang === "python"
+                                  ? `import psycopg2\nimport os\n\nconn = psycopg2.connect(\n    host="${activeDb.host}",\n    port=${activeDb.port},\n    dbname="${activeDb.defaultDb || "postgres"}",\n    user="${activeDb.adminUser || "cloudnova_admin"}",\n    password=os.environ["DB_PASSWORD"],\n    sslmode="verify-full",\n    sslrootcert="./global-bundle.pem",\n)`
+                                  : `package main\n\nimport (\n\t"context"\n\t"os"\n\t"github.com/jackc/pgx/v5/pgxpool"\n)\n\nfunc main() {\n\tconnStr := "postgres://${activeDb.adminUser || "cloudnova_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"\n\tpool, err := pgxpool.New(context.Background(), connStr)\n\t_ = pool\n}`;
+                              handleCopy(snippet, "step2");
+                            }}
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 text-[11px]"
+                          >
+                            {copiedText === "step2" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedText === "step2" ? "Copied" : "Copy"}</span>
+                          </button>
+                        </div>
+                        <div className="p-3.5 rounded bg-slate-900 text-slate-200 font-mono text-xs overflow-x-auto border border-slate-800 leading-relaxed">
+                          {connectSnippetLang === "psql" && (
+                            <pre className="text-slate-200 whitespace-pre-wrap">
+{`export RDSHOST="${activeDb.host}"
+psql "host=$RDSHOST port=${activeDb.port} dbname=${activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"} user=${activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"} sslmode=verify-full sslrootcert=./global-bundle.pem"`}
+                            </pre>
+                          )}
+                          {connectSnippetLang === "nodejs" && (
+                            <pre className="text-slate-200 whitespace-pre-wrap">
+{`import { Pool } from "pg";
+import fs from "fs";
+
+const pool = new Pool({
+  host: "${activeDb.host}",
+  port: ${activeDb.port},
+  database: "${activeDb.defaultDb || "postgres"}",
+  user: "${activeDb.adminUser || "cloudnova_admin"}",
+  password: process.env.DB_PASSWORD,
+  ssl: {
+    ca: fs.readFileSync("./global-bundle.pem").toString(),
+    rejectUnauthorized: true,
+  },
+});`}
+                            </pre>
+                          )}
+                          {connectSnippetLang === "python" && (
+                            <pre className="text-slate-200 whitespace-pre-wrap">
+{`import psycopg2
+import os
+
+conn = psycopg2.connect(
+    host="${activeDb.host}",
+    port=${activeDb.port},
+    dbname="${activeDb.defaultDb || "postgres"}",
+    user="${activeDb.adminUser || "cloudnova_admin"}",
+    password=os.environ["DB_PASSWORD"],
+    sslmode="verify-full",
+    sslrootcert="./global-bundle.pem",
+)`}
+                            </pre>
+                          )}
+                          {connectSnippetLang === "go" && (
+                            <pre className="text-slate-200 whitespace-pre-wrap">
+{`package main
+
+import (
+\t"context"
+\t"os"
+\t"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func main() {
+\tconnStr := "postgres://${activeDb.adminUser || "cloudnova_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"
+\tpool, err := pgxpool.New(context.Background(), connStr)
+\t_ = pool
+}`}
+                            </pre>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Direct Parameters & Credentials */}
+                <div className="space-y-4 pt-2 border-t border-slate-200 dark:border-[#232736]">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">
+                      Connection Parameters
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Endpoint / Host</label>
+                      <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
+                        <span className="truncate mr-2">{activeDb.host}</span>
+                        <button onClick={() => handleCopy(activeDb.host, "host")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0">
+                          {copiedText === "host" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Port</label>
+                      <div className="p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
+                        {activeDb.port}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Default Database</label>
+                      <div className="p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
+                        {activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Admin User</label>
+                      <div className="p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
+                        {activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Admin Password</label>
+                    <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
+                      <span>{showPassword ? activeDb.adminPasswordReveal : "••••••••••••••••••••"}</span>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => setShowPassword(!showPassword)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                          {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                        <button onClick={() => handleCopy(activeDb.adminPasswordReveal, "pwd")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                          {copiedText === "pwd" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Connection URI (Public / SSL Enforced)</label>
+                    <div className="flex items-center justify-between p-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] font-mono text-xs text-slate-800 dark:text-slate-200">
+                      <span className="truncate mr-2 font-mono">{connectionUriDisplay}</span>
+                      <button onClick={() => handleCopy(connectionUriDisplay, "uri")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0">
+                        {copiedText === "uri" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

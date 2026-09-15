@@ -3,6 +3,11 @@ import type {
   BalanceResponse,
   CheckoutSessionResponse,
   CreateVirtualAccountRequest,
+  CryptoDepositInitializeRequest,
+  CryptoDepositInitializeResponse,
+  CurrencyConversionRequest,
+  CurrencyConversionResponse,
+  CurrencyFromIPResponse,
   DepositRequest,
   DepositResponse,
   InitializeCheckoutRequest,
@@ -17,6 +22,7 @@ import type {
   UsageSummaryResponse,
   VirtualAccountResponse,
 } from "./types";
+
 
 export function getBalance(): Promise<BalanceResponse> {
   return apiRequest<BalanceResponse>("/billing/balance");
@@ -89,3 +95,24 @@ export function getMarginConfig(): Promise<MarginConfigResponse> {
 export function updateMarginConfig(payload: UpdateMarginConfigRequest): Promise<MarginConfigResponse> {
   return apiRequest<MarginConfigResponse>("/billing/margin-config", { method: "PUT", body: payload });
 }
+
+export function getCurrencyFromIP(): Promise<CurrencyFromIPResponse> {
+  return apiRequest<CurrencyFromIPResponse>("/billing/currency/from-ip");
+}
+
+export function convertCurrency(payload: CurrencyConversionRequest): Promise<CurrencyConversionResponse> {
+  return apiRequest<CurrencyConversionResponse>("/billing/currency/convert", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export function initializeCryptoDeposit(
+  payload: CryptoDepositInitializeRequest
+): Promise<CryptoDepositInitializeResponse> {
+  return apiRequest<CryptoDepositInitializeResponse>("/billing/deposit/crypto/initialize", {
+    method: "POST",
+    body: payload,
+  });
+}
+

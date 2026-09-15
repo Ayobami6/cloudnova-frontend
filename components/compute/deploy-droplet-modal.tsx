@@ -5,6 +5,7 @@ import { X, Server, ShieldCheck, Check, Cpu } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
 import { REGIONS, OS_IMAGES, COMPUTE_PLANS } from "@/lib/mock-data/initial-state";
 import { DatacenterRegion, OSImageId } from "@/lib/types/cloud";
+import { useBilling } from "@/lib/store/billing-context";
 
 export function DeployDropletModal({
   isOpen,
@@ -14,6 +15,7 @@ export function DeployDropletModal({
   onClose: () => void;
 }) {
   const { createInstance, clients } = useCloud();
+  const { formatMoney } = useBilling();
 
   const [hostname, setHostname] = useState("app-server-edge");
   const [selectedRegion, setSelectedRegion] = useState<DatacenterRegion>("nyc1");
@@ -146,10 +148,10 @@ export function DeployDropletModal({
                   </div>
                   <div className="text-right">
                     <span className="text-xs font-mono font-semibold text-slate-900 dark:text-slate-100">
-                      ${plan.retailMonthly}/mo
+                      {formatMoney(plan.retailMonthly)}/mo
                     </span>
                     <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 block">
-                      ${plan.hourlyRetail.toFixed(3)}/hr
+                      {formatMoney(plan.hourlyRetail, 3)}/hr
                     </span>
                   </div>
                 </button>
@@ -191,7 +193,7 @@ export function DeployDropletModal({
             <div>
               <span className="text-[11px] text-slate-500">Projected cost:</span>
               <p className="text-sm font-mono font-semibold text-slate-900 dark:text-slate-100">
-                ${currentPlan.retailMonthly}/month ({`$${currentPlan.hourlyRetail}/hr`})
+                {formatMoney(currentPlan.retailMonthly)}/month ({formatMoney(currentPlan.hourlyRetail, 3)}/hr)
               </p>
             </div>
             <div className="flex items-center gap-2">

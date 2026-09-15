@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import { useToast } from "@/components/ui/toast";
 import { DNSRecord } from "@/lib/types/cloud";
 
@@ -56,6 +57,7 @@ export default function DomainsPage() {
     linkDomainToResource,
   } = useCloud();
   const { showToast } = useToast();
+  const { formatMoney } = useBilling();
 
   const [selectedDomainId, setSelectedDomainId] = useState<string>(domains[0]?.id || "");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -326,9 +328,9 @@ export default function DomainsPage() {
                   )}
                 </td>
                 <td className="py-3 px-4 font-mono">
-                  <span className="text-slate-900 dark:text-slate-200 font-semibold block">${dom.retailAnnual}/yr</span>
+                  <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(dom.retailAnnual)}/yr</span>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                    +${(dom.retailAnnual - dom.wholesaleAnnual).toFixed(2)} margin
+                    +{formatMoney(dom.retailAnnual - dom.wholesaleAnnual)} margin
                   </span>
                 </td>
                 <td className="py-3 px-4 text-right">
@@ -629,16 +631,16 @@ export default function DomainsPage() {
                           </div>
 
                           <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                            <span>Wholesale: ${currentWholesale.toFixed(2)}/yr</span>
+                            <span>Wholesale: {formatMoney(currentWholesale)}/yr</span>
                             <span>•</span>
                             <span className="text-slate-700 dark:text-slate-300 font-medium">
-                              Retail: ${currentRetail.toFixed(2)}/yr
+                              Retail: {formatMoney(currentRetail)}/yr
                             </span>
                             {isAvailable && (
                               <>
                                 <span>•</span>
                                 <span className="text-emerald-600 dark:text-emerald-400">
-                                  +${(currentRetail - currentWholesale).toFixed(2)} margin
+                                  +{formatMoney(currentRetail - currentWholesale)} margin
                                 </span>
                               </>
                             )}
@@ -662,7 +664,7 @@ export default function DomainsPage() {
                               ) : (
                                 <>
                                   <Sparkles className="w-3.5 h-3.5" />
-                                  <span>Register (${currentRetail.toFixed(2)}/yr)</span>
+                                  <span>Register ({formatMoney(currentRetail)}/yr)</span>
                                 </>
                               )}
                             </button>
