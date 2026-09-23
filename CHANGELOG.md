@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Next.js Edge Reverse Proxy & Production Vercel Integration (`next.config.ts`, `lib/api/config.ts`, `lib/api/http.ts`)**:
+  - Configured Next.js server-side edge rewrite (`/api/v1/:path*` -> `${BACKEND_URL}/api/v1/:path*`) eliminating cross-origin (CORS) and browser mixed-content (HTTPS frontend -> HTTP ALB backend) restrictions in production.
+  - Updated API client `API_BASE_URL` to default to relative `/api/v1`, with origin-agnostic URL construction in `buildUrl()` for SSR and CSR requests.
+  - Deployed production Next.js frontend to Vercel connected live to AWS EKS Kubernetes cluster.
 - Wired the console to the real cloudnova-api backend for Authentication, Accounts/Organizations, and Billing (including the new Paystack integration), replacing the mock-only prototype for those domains. Compute, Databases, Storage, Network, and Domains remain mock-data-driven pending their backend milestones.
   - New `lib/api/` HTTP client: a typed fetch wrapper (`lib/api/http.ts`) with Authorization header injection, RFC 7807 Problem Details error parsing, and a single-flight silent access-token refresh (via `POST /auth/refresh-token`) retried once on 401 before dropping the session.
   - `lib/store/auth-context.tsx` rewritten to call real `/auth/*` endpoints (register, verify-email-otp, resend-otp, login, forgot-password, reset-password, refresh-token, me) and to create + switch into a tenant Account on first email verification (registration only creates the User; the Account is created afterward using the company name captured at sign-up).
