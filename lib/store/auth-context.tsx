@@ -7,6 +7,7 @@ import { ApiError } from "@/lib/api/errors";
 import { SESSION_EXPIRED_EVENT } from "@/lib/api/http";
 import { clearTokens, getAccessToken, setTokens } from "@/lib/api/token-storage";
 import type { AccountRole, MeResponse } from "@/lib/api/types";
+import { auth, googleProvider, githubProvider, signInWithPopup } from "@/lib/firebase";
 
 export interface AuthUser {
   id: string;
@@ -39,6 +40,8 @@ interface AuthContextType {
    *  signature for the existing login form and as a hook for a future
    *  sessionStorage-backed "don't remember me" mode. */
   login: (email: string, password: string, rememberMe?: boolean) => Promise<ActionResult>;
+  loginWithGoogle: () => Promise<ActionResult>;
+  loginWithGithub: () => Promise<ActionResult>;
   register: (name: string, email: string, password: string) => Promise<ActionResult>;
   verifyEmailOtp: (email: string, otp: string) => Promise<ActionResult>;
   requestPasswordReset: (email: string) => Promise<ActionResult>;
@@ -135,6 +138,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: true };
     } catch (err) {
       return { success: false, error: extractErrorMessage(err, "Invalid credentials.") };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshSession]);
+
+  const loginWithGoogle = useCallback(async (): Promise<ActionResult> => {
+    setIsLoading(true);
+    try {
+      const cred = await signInWithPopup(auth, googleProvider);
+      const idToken = await cred.user.getIdToken();
+      const result = await authApi.firebaseGoogleLogin({ id_token: idToken });
+      setTokens({ accessToken: result.tokens.access_token, refreshToken: result.tokens.refresh_token });
+      await refreshSession();
+      return { success: true };
+    } catch (err: unknown) {
+      const firebaseCode = (err as { code?: string })?.code;
+      if (firebaseCode === "auth/popup-closed-by-user") {
+        return { success: false, error: "Sign-in popup was closed before completing." };
+      }
+      return { success: false, error: extractErrorMessage(err, "Google sign-in failed.") };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshSession]);
+
+  const loginWithGithub = useCallback(async (): Promise<ActionResult> => {
+    setIsLoading(true);
+    try {
+      const cred = await signInWithPopup(auth, githubProvider);
+      const idToken = await cred.user.getIdToken();
+      const result = await authApi.firebaseGithubLogin({ id_token: idToken });
+      setTokens({ accessToken: result.tokens.access_token, refreshToken: result.tokens.refresh_token });
+      await refreshSession();
+      return { success: true };
+    } catch (err: unknown) {
+      const firebaseCode = (err as { code?: string })?.code;
+      if (firebaseCode === "auth/popup-closed-by-user") {
+        return { success: false, error: "Sign-in popup was closed before completing." };
+      }
+      return { success: false, error: extractErrorMessage(err, "GitHub sign-in failed.") };
     } finally {
       setIsLoading(false);
     }
@@ -244,6 +287,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         pendingVerificationEmail,
         pendingResetEmail,
         login,
+        loginWithGoogle,
+        loginWithGithub,
         register,
         verifyEmailOtp,
         requestPasswordReset,

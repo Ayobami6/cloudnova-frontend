@@ -5,6 +5,7 @@ import type {
   AccountResponse,
   AuthSuccessResponse,
   CreateAccountRequest,
+  FirebaseSocialLoginRequest,
   ForgotPasswordRequest,
   InviteMemberRequest,
   LoginRequest,
@@ -45,6 +46,30 @@ export function resendOtp(payload: ResendOtpRequest): Promise<{ message: string 
 
 export function login(payload: LoginRequest): Promise<AuthSuccessResponse> {
   return apiRequest<AuthSuccessResponse>("/auth/login", { method: "POST", body: payload, auth: false });
+}
+
+export function firebaseLogin(payload: FirebaseSocialLoginRequest): Promise<AuthSuccessResponse> {
+  return apiRequest<AuthSuccessResponse>("/auth/firebase", {
+    method: "POST",
+    body: payload,
+    auth: false,
+  });
+}
+
+export function firebaseGoogleLogin(payload: FirebaseSocialLoginRequest): Promise<AuthSuccessResponse> {
+  return apiRequest<AuthSuccessResponse>("/auth/firebase/google", {
+    method: "POST",
+    body: payload,
+    auth: false,
+  });
+}
+
+export function firebaseGithubLogin(payload: FirebaseSocialLoginRequest): Promise<AuthSuccessResponse> {
+  return apiRequest<AuthSuccessResponse>("/auth/firebase/github", {
+    method: "POST",
+    body: payload,
+    auth: false,
+  });
 }
 
 export function forgotPassword(payload: ForgotPasswordRequest): Promise<{ message: string }> {
