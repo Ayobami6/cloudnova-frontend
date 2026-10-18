@@ -106,6 +106,11 @@ export interface RefreshTokenRequest {
   refresh_token: string;
 }
 
+export interface FirebaseSocialLoginRequest {
+  id_token: string;
+  provider?: string;
+}
+
 export interface TokenPairResponse {
   access_token: string;
   refresh_token: string;
