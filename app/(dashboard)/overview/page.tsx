@@ -1,16 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-} from "recharts";
 import { useCloud } from "@/lib/store/cloud-context";
-import { useBilling } from "@/lib/store/billing-context";
 import {
   MaterialIcon,
   PastelTypePill,
@@ -18,17 +9,8 @@ import {
   PastelVariant,
   NixtioStatusTone,
 } from "@/components/ui/material-icon";
-import {
-  PastelKpiCard,
-  SankeyBubbleCard,
-} from "@/components/ui/bento-primitives";
-
-interface MetricPoint {
-  time: string;
-  cpu: number;
-  memory: number;
-  networkMb: number;
-}
+import { PastelKpiCard } from "@/components/ui/bento-primitives";
+import { CostUsageCard } from "@/components/overview/cost-usage-card";
 
 interface UnifiedResourceRow {
   id: string;
@@ -51,19 +33,11 @@ export default function OverviewPage() {
     volumes,
     buckets,
     domains,
-    monthlyProfit,
     setTerminalInstance,
     selectedRegion,
     searchQuery,
   } = useCloud();
-  const { usage, currencySymbol, hourlyBurnRate } = useBilling();
 
-  const [isMounted, setIsMounted] = useState(false);
-  const [viewMode, setViewMode] = useState<"sankey" | "live_chart">("sankey");
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({
     "row-1": true,
   });
@@ -84,77 +58,6 @@ export default function OverviewPage() {
   const totalStorageGb =
     volumes.reduce((acc, v) => acc + v.sizeGb, 0) +
     Math.round(buckets.reduce((acc, b) => acc + b.totalSizeBytes / 1e9, 0));
-
-  // AWS Cost & Usage metrics for the overview allocation chart
-  const mtdSpend = usage?.accrued_usage_amount
-    ? parseFloat(usage.accrued_usage_amount)
-    : 422.5;
-  const projectedSpend = usage?.projected_month_end_amount
-    ? parseFloat(usage.projected_month_end_amount)
-    : Math.round(mtdSpend * 1.3 * 100) / 100 || 549.0;
-  const spendDelta = Math.round((projectedSpend - mtdSpend) * 100) / 100;
-  const spendDeltaLabel =
-    spendDelta >= 0
-      ? `+${currencySymbol}${spendDelta.toFixed(0)}`
-      : `-${currencySymbol}${Math.abs(spendDelta).toFixed(0)}`;
-
-  // AWS Service cost breakdown (Compute ~51%, DBs ~23%, Storage ~14%, Network/DNS ~12%)
-  const computeCost = Math.round(projectedSpend * 0.51 * 10) / 10;
-  const dbCost = Math.round(projectedSpend * 0.23 * 10) / 10;
-  const storageCost = Math.round(projectedSpend * 0.14 * 10) / 10;
-  const networkCost = Math.max(
-    0,
-    Math.round((projectedSpend - computeCost - dbCost - storageCost) * 10) / 10
-  );
-
-  const computeUnits =
-    instances.length > 0 ? `${instances.length} Instances` : "12 Droplets";
-  const dbUnits =
-    databases.length > 0 ? `${databases.length} Clusters` : "4 Databases";
-  const storageUnits =
-    totalStorageGb > 0 ? `${totalStorageGb} GB NVMe` : "549 GB NVMe";
-  const networkUnits =
-    domains.length > 0 ? `${domains.length} Domains` : "Anycast VPC";
-
-  // Telemetry stream for live chart toggle
-  const [telemetry, setTelemetry] = useState<MetricPoint[]>([
-    { time: "12:00", cpu: 22, memory: 48, networkMb: 120 },
-    { time: "12:05", cpu: 28, memory: 52, networkMb: 145 },
-    { time: "12:10", cpu: 25, memory: 50, networkMb: 130 },
-    { time: "12:15", cpu: 34, memory: 58, networkMb: 210 },
-    { time: "12:20", cpu: 30, memory: 55, networkMb: 190 },
-    { time: "12:25", cpu: avgCpu || 27, memory: 54, networkMb: 185 },
-  ]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTelemetry((prev) => {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        });
-        const newCpu = Math.max(
-          10,
-          Math.min(95, Math.floor(avgCpu + (Math.random() * 12 - 6)))
-        );
-        const newMem = Math.max(
-          30,
-          Math.min(85, Math.floor(52 + (Math.random() * 6 - 3)))
-        );
-        const newNet = Math.max(
-          80,
-          Math.min(450, Math.floor(180 + (Math.random() * 60 - 30)))
-        );
-        return [
-          ...prev.slice(1),
-          { time: timeStr, cpu: newCpu, memory: newMem, networkMb: newNet },
-        ];
-      });
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [avgCpu]);
 
   // Build unified resource rows matching the floating white rows in the Dribbble shot
   const allRows: UnifiedResourceRow[] = [
@@ -248,154 +151,8 @@ export default function OverviewPage() {
         />
       </div>
 
-      {/* Middle Card: Sankey Ribbon + Bubble Matrix ("Campaign Overview" style) OR Live Recharts Telemetry */}
-      {viewMode === "sankey" ? (
-        <SankeyBubbleCard
-          title="AWS Overview • Resource Allocation & Cost Forecast"
-          leftPeriodLabel="Month-to-Date Spend"
-          leftPeriodValue={`${currencySymbol}${mtdSpend.toLocaleString("en-US", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`}
-          deltaLabel={spendDeltaLabel}
-          rightPeriodLabel="Forecasted Month-End"
-          rightPeriodValue={`${currencySymbol}${projectedSpend.toLocaleString(
-            "en-US",
-            {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            }
-          )}`}
-          badgeText={`${currencySymbol}${hourlyBurnRate}/hr`}
-          periodFilter="Billing Cycle"
-          onFilterClick={() => setViewMode("live_chart")}
-          streams={[
-            {
-              leftLabel: "Compute Droplets",
-              leftValue: computeUnits,
-              rightLabel: "Compute (vCPU/RAM)",
-              rightValue: `${currencySymbol}${computeCost.toFixed(2)}`,
-              color: "#F8D568",
-              dotColor: "#F8D568",
-              ribbonThickness: 16,
-            },
-            {
-              leftLabel: "Managed Databases",
-              leftValue: dbUnits,
-              rightLabel: "Databases (RDS)",
-              rightValue: `${currencySymbol}${dbCost.toFixed(2)}`,
-              color: "#CFE0EC",
-              dotColor: "#CFE0EC",
-              ribbonThickness: 9,
-            },
-            {
-              leftLabel: "NVMe & S3 Storage",
-              leftValue: storageUnits,
-              leftHighlight: true,
-              rightLabel: "Storage & Snapshots",
-              rightValue: `${currencySymbol}${storageCost.toFixed(2)}`,
-              color: "#E5B899",
-              dotColor: "#E5B899",
-              ribbonThickness: 4,
-            },
-            {
-              leftLabel: "Anycast & Routing",
-              leftValue: networkUnits,
-              rightLabel: "Data Transfer & DNS",
-              rightValue: `${currencySymbol}${networkCost.toFixed(2)}`,
-              color: "#E6D8EA",
-              dotColor: "#E6D8EA",
-              ribbonThickness: 4,
-            },
-          ]}
-        />
-      ) : (
-        <div className="nixtio-card p-6 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-semibold text-[#1E1E1E] dark:text-white">
-                Live Cluster Telemetry Stream
-              </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#D5EBD9] text-[#4EA871] text-[11px] font-medium">
-                4s interval
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setViewMode("sankey")}
-              className="px-3.5 py-1.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-xs font-medium text-[#1E1E1E] dark:text-white hover:bg-[#222222] hover:text-white transition-colors cursor-pointer"
-            >
-              Switch to Ribbon Flow View
-            </button>
-          </div>
-
-          <div className="h-52 w-full">
-            {isMounted ? (
-              <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={telemetry}
-                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="cpuGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F8D568" stopOpacity={0.55} />
-                    <stop offset="95%" stopColor="#F8D568" stopOpacity={0.05} />
-                  </linearGradient>
-                  <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#CFE0EC" stopOpacity={0.65} />
-                    <stop offset="95%" stopColor="#CFE0EC" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="time"
-                  stroke="#8C8B87"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#8C8B87"
-                  fontSize={11}
-                  domain={[0, 100]}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#222222",
-                    borderColor: "#222222",
-                    borderRadius: "14px",
-                    fontSize: "12px",
-                    color: "#FFFFFF",
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="cpu"
-                  stroke="#E09F3E"
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#cpuGrad)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="memory"
-                  stroke="#6C9BB8"
-                  strokeWidth={2.5}
-                  fillOpacity={1}
-                  fill="url(#memGrad)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-            ) : (
-              <div className="h-full w-full flex items-center justify-center text-xs text-[#8C8B87]">
-                Loading telemetry stream...
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Middle Card: AWS-style cost & usage at a glance */}
+      <CostUsageCard />
 
       {/* Bottom Floating Pill-Row Table (Exact Dribbble Match) */}
       <div className="space-y-2.5 pt-1">
