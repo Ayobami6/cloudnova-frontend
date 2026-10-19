@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import {
   MaterialIcon,
   PastelTypePill,
@@ -55,6 +56,7 @@ export default function OverviewPage() {
     selectedRegion,
     searchQuery,
   } = useCloud();
+  const { usage, currencySymbol, hourlyBurnRate } = useBilling();
 
   const [isMounted, setIsMounted] = useState(false);
   const [viewMode, setViewMode] = useState<"sankey" | "live_chart">("sankey");
@@ -82,6 +84,37 @@ export default function OverviewPage() {
   const totalStorageGb =
     volumes.reduce((acc, v) => acc + v.sizeGb, 0) +
     Math.round(buckets.reduce((acc, b) => acc + b.totalSizeBytes / 1e9, 0));
+
+  // AWS Cost & Usage metrics for the overview allocation chart
+  const mtdSpend = usage?.accrued_usage_amount
+    ? parseFloat(usage.accrued_usage_amount)
+    : 422.5;
+  const projectedSpend = usage?.projected_month_end_amount
+    ? parseFloat(usage.projected_month_end_amount)
+    : Math.round(mtdSpend * 1.3 * 100) / 100 || 549.0;
+  const spendDelta = Math.round((projectedSpend - mtdSpend) * 100) / 100;
+  const spendDeltaLabel =
+    spendDelta >= 0
+      ? `+${currencySymbol}${spendDelta.toFixed(0)}`
+      : `-${currencySymbol}${Math.abs(spendDelta).toFixed(0)}`;
+
+  // AWS Service cost breakdown (Compute ~51%, DBs ~23%, Storage ~14%, Network/DNS ~12%)
+  const computeCost = Math.round(projectedSpend * 0.51 * 10) / 10;
+  const dbCost = Math.round(projectedSpend * 0.23 * 10) / 10;
+  const storageCost = Math.round(projectedSpend * 0.14 * 10) / 10;
+  const networkCost = Math.max(
+    0,
+    Math.round((projectedSpend - computeCost - dbCost - storageCost) * 10) / 10
+  );
+
+  const computeUnits =
+    instances.length > 0 ? `${instances.length} Instances` : "12 Droplets";
+  const dbUnits =
+    databases.length > 0 ? `${databases.length} Clusters` : "4 Databases";
+  const storageUnits =
+    totalStorageGb > 0 ? `${totalStorageGb} GB NVMe` : "549 GB NVMe";
+  const networkUnits =
+    domains.length > 0 ? `${domains.length} Domains` : "Anycast VPC";
 
   // Telemetry stream for live chart toggle
   const [telemetry, setTelemetry] = useState<MetricPoint[]>([
@@ -218,49 +251,58 @@ export default function OverviewPage() {
       {/* Middle Card: Sankey Ribbon + Bubble Matrix ("Campaign Overview" style) OR Live Recharts Telemetry */}
       {viewMode === "sankey" ? (
         <SankeyBubbleCard
-          title="Infrastructure Overview"
-          leftPeriodLabel="Aug. 2026"
-          leftPeriodValue={422}
-          deltaLabel={`+${Math.max(127, Math.round(monthlyProfit || 127))}`}
-          rightPeriodLabel="Sep. 2026"
-          rightPeriodValue={549}
-          badgeText="x 10"
-          periodFilter="Month"
+          title="AWS Overview • Resource Allocation & Cost Forecast"
+          leftPeriodLabel="Month-to-Date Spend"
+          leftPeriodValue={`${currencySymbol}${mtdSpend.toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`}
+          deltaLabel={spendDeltaLabel}
+          rightPeriodLabel="Forecasted Month-End"
+          rightPeriodValue={`${currencySymbol}${projectedSpend.toLocaleString(
+            "en-US",
+            {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }
+          )}`}
+          badgeText={`${currencySymbol}${hourlyBurnRate}/hr`}
+          periodFilter="Billing Cycle"
           onFilterClick={() => setViewMode("live_chart")}
           streams={[
             {
-              leftLabel: "Compute",
-              leftValue: 540,
-              rightLabel: "Email alerts",
-              rightValue: 279,
+              leftLabel: "Compute Droplets",
+              leftValue: computeUnits,
+              rightLabel: "Compute (vCPU/RAM)",
+              rightValue: `${currencySymbol}${computeCost.toFixed(2)}`,
               color: "#F8D568",
               dotColor: "#F8D568",
               ribbonThickness: 16,
             },
             {
-              leftLabel: "Databases",
-              leftValue: 138,
-              rightLabel: "Messaging",
-              rightValue: 107,
+              leftLabel: "Managed Databases",
+              leftValue: dbUnits,
+              rightLabel: "Databases (RDS)",
+              rightValue: `${currencySymbol}${dbCost.toFixed(2)}`,
               color: "#CFE0EC",
               dotColor: "#CFE0EC",
               ribbonThickness: 9,
             },
             {
-              leftLabel: "Storage",
-              leftValue: 549,
+              leftLabel: "NVMe & S3 Storage",
+              leftValue: storageUnits,
               leftHighlight: true,
-              rightLabel: "Surveys",
-              rightValue: 65,
+              rightLabel: "Storage & Snapshots",
+              rightValue: `${currencySymbol}${storageCost.toFixed(2)}`,
               color: "#E5B899",
               dotColor: "#E5B899",
               ribbonThickness: 4,
             },
             {
-              leftLabel: "Anycast DNS",
-              leftValue: 371,
-              rightLabel: "Voice-call",
-              rightValue: 98,
+              leftLabel: "Anycast & Routing",
+              leftValue: networkUnits,
+              rightLabel: "Data Transfer & DNS",
+              rightValue: `${currencySymbol}${networkCost.toFixed(2)}`,
               color: "#E6D8EA",
               dotColor: "#E6D8EA",
               ribbonThickness: 4,

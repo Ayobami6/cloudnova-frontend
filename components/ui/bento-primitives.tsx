@@ -373,7 +373,7 @@ export function SankeyBubbleCard({
             const bubbles = BUBBLE_PATTERNS[idx % BUBBLE_PATTERNS.length];
             return (
               <div key={idx} className="flex items-center justify-between gap-3">
-                <div className="w-28 shrink-0">
+                <div className="w-36 sm:w-44 shrink-0">
                   <span className="text-[11px] text-[#8C8B87] dark:text-slate-400 block truncate">
                     {s.rightLabel}
                   </span>
