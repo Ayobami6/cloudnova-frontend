@@ -140,14 +140,14 @@ export function DepositModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] rounded-lg shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-5">
+      <div className="bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] rounded-lg shadow-2xl w-full max-w-lg overflow-hidden p-6 space-y-5">
         {/* Modal Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="text-base font-semibold text-[#1E1E1E] dark:text-white">
               Deposit Prepaid Cloud Funds
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
               Current Billing Currency: <span className="font-semibold text-blue-600 dark:text-blue-400">{currency} ({currencySymbol})</span>
             </p>
           </div>
@@ -162,7 +162,7 @@ export function DepositModal({
         {successMessage ? (
           <div className="py-8 flex flex-col items-center justify-center space-y-2 text-center">
             <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{successMessage}</p>
+            <p className="text-sm font-medium text-[#1E1E1E] dark:text-slate-200">{successMessage}</p>
           </div>
         ) : (
           <>
@@ -177,7 +177,7 @@ export function DepositModal({
                 className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "card"
                     ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
-                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
+                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-[#E7E4DF] dark:border-[#282D3A] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <CreditCard className="w-4 h-4" />
@@ -193,7 +193,7 @@ export function DepositModal({
                 className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "bank_transfer"
                     ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
-                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
+                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-[#E7E4DF] dark:border-[#282D3A] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <Landmark className="w-4 h-4" />
@@ -209,7 +209,7 @@ export function DepositModal({
                 className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "crypto"
                     ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
-                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
+                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-[#E7E4DF] dark:border-[#282D3A] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <Coins className="w-4 h-4" />
@@ -225,7 +225,7 @@ export function DepositModal({
                 className={`p-2.5 rounded-md text-xs flex flex-col items-center gap-1.5 transition-colors ${
                   method === "other"
                     ? "bg-blue-50 dark:bg-blue-600/12 text-blue-600 dark:text-blue-400 border border-blue-500 font-semibold"
-                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736] hover:text-slate-900 dark:hover:text-slate-200"
+                    : "bg-slate-50 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-[#E7E4DF] dark:border-[#282D3A] hover:text-slate-900 dark:hover:text-slate-200"
                 }`}
               >
                 <Building2 className="w-4 h-4" />
@@ -258,8 +258,8 @@ export function DepositModal({
                         }}
                         className={`h-9 rounded-md text-xs font-mono font-medium transition-colors ${
                           selectedAmount === amt && !customAmount
-                            ? "bg-blue-600 text-white font-semibold shadow-sm"
-                            : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
+                            ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
+                            : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
                         }`}
                       >
                         {currencySymbol}{amt.toLocaleString()}
@@ -271,11 +271,11 @@ export function DepositModal({
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
                     placeholder={`Or enter custom amount (${currencySymbol})`}
-                    className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
+                    className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
                   />
                 </div>
 
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                <p className="text-[11px] text-[#8C8B87] dark:text-slate-400">
                   Redirects to Paystack secured checkout. Your balance is credited automatically once
                   payment is confirmed.
                 </p>
@@ -295,9 +295,9 @@ export function DepositModal({
             {method === "bank_transfer" && (
               <div className="space-y-3">
                 {paystackAccount ? (
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-3">
+                  <div className="p-4 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] uppercase tracking-wide text-slate-500 dark:text-slate-400 font-medium">
+                      <span className="text-[11px] uppercase tracking-wide text-[#8C8B87] dark:text-slate-400 font-medium">
                         Your Dedicated Virtual Account (NUBAN)
                       </span>
                       <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-1.5 py-0.5 rounded">
@@ -305,15 +305,15 @@ export function DepositModal({
                       </span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Bank Name</span>
-                      <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      <span className="text-[11px] text-[#8C8B87] dark:text-slate-400 block">Bank Name</span>
+                      <span className="text-sm font-semibold text-[#1E1E1E] dark:text-white">
                         {paystackAccount.bank_name}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Account Number</span>
+                      <span className="text-[11px] text-[#8C8B87] dark:text-slate-400 block">Account Number</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-mono font-semibold text-slate-900 dark:text-slate-100 tracking-wider">
+                        <span className="text-base font-mono font-semibold text-[#1E1E1E] dark:text-white tracking-wider">
                           {paystackAccount.account_number}
                         </span>
                         <button
@@ -326,17 +326,17 @@ export function DepositModal({
                       </div>
                     </div>
                     <div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Account Name</span>
-                      <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                      <span className="text-[11px] text-[#8C8B87] dark:text-slate-400 block">Account Name</span>
+                      <span className="text-sm font-medium text-[#1E1E1E] dark:text-slate-200">
                         {paystackAccount.account_name}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-[#232736]">
+                    <p className="text-[11px] text-[#8C8B87] dark:text-slate-400 pt-1 border-t border-[#E7E4DF] dark:border-[#282D3A]">
                       Transfer from any Nigerian banking app. Your prepaid wallet will be credited automatically within minutes.
                     </p>
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-dashed border-slate-300 dark:border-[#33394D] text-center space-y-3">
+                  <div className="p-4 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-dashed border-slate-300 dark:border-[#33394D] text-center space-y-3">
                     <Landmark className="w-6 h-6 text-slate-400 mx-auto" />
                     <p className="text-xs text-slate-600 dark:text-slate-400">
                       You don&apos;t have a dedicated bank transfer account yet. Provision one to get a
@@ -375,8 +375,8 @@ export function DepositModal({
                             }}
                             className={`h-9 rounded-md text-xs font-mono font-medium transition-colors ${
                               selectedAmount === amt && !customAmount
-                                ? "bg-blue-600 text-white font-semibold shadow-sm"
-                                : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
+                                ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
+                                : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
                             }`}
                           >
                             {currencySymbol}{amt.toLocaleString()}
@@ -388,7 +388,7 @@ export function DepositModal({
                         value={customAmount}
                         onChange={(e) => setCustomAmount(e.target.value)}
                         placeholder={`Or enter custom amount (${currencySymbol})`}
-                        className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
+                        className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
                       />
                     </div>
 
@@ -399,7 +399,7 @@ export function DepositModal({
                       <select
                         value={cryptoCurrency}
                         onChange={(e) => setCryptoCurrency(e.target.value)}
-                        className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                        className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                       >
                         {CRYPTO_CURRENCIES.map((c) => (
                           <option key={c.value} value={c.value}>
@@ -419,7 +419,7 @@ export function DepositModal({
                     </button>
                   </>
                 ) : (
-                  <div className="p-4 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-3">
+                  <div className="p-4 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] uppercase tracking-wide text-blue-600 dark:text-blue-400 font-semibold">
                         Awaiting Crypto Payment
@@ -430,8 +430,8 @@ export function DepositModal({
                     </div>
 
                     <div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Amount to Send</span>
-                      <span className="text-base font-mono font-bold text-slate-900 dark:text-slate-100">
+                      <span className="text-[11px] text-[#8C8B87] dark:text-slate-400 block">Amount to Send</span>
+                      <span className="text-base font-mono font-bold text-[#1E1E1E] dark:text-white">
                         {cryptoSession.pay_amount} {cryptoSession.pay_currency}
                       </span>
                       <span className="text-[11px] text-slate-500 ml-2">
@@ -440,9 +440,9 @@ export function DepositModal({
                     </div>
 
                     <div>
-                      <span className="text-[11px] text-slate-500 dark:text-slate-400 block">Deposit Address</span>
+                      <span className="text-[11px] text-[#8C8B87] dark:text-slate-400 block">Deposit Address</span>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs font-mono bg-white dark:bg-[#1E2230] p-2 rounded border border-slate-200 dark:border-[#232736] flex-1 break-all select-all font-medium text-slate-800 dark:text-slate-200">
+                        <span className="text-xs font-mono bg-white dark:bg-[#1E2230] p-2 rounded border border-[#E7E4DF] dark:border-[#282D3A] flex-1 break-all select-all font-medium text-[#1E1E1E] dark:text-slate-200">
                           {cryptoSession.pay_address}
                         </span>
                         <button
@@ -467,7 +467,7 @@ export function DepositModal({
                       </a>
                     )}
 
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-[#232736]">
+                    <p className="text-[11px] text-[#8C8B87] dark:text-slate-400 pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
                       Send exactly {cryptoSession.pay_amount} {cryptoSession.pay_currency} to this address.
                       Your prepaid wallet will be credited automatically once the network confirms the transaction.
                     </p>
@@ -501,8 +501,8 @@ export function DepositModal({
                         }}
                         className={`h-9 rounded-md text-xs font-mono font-medium transition-colors ${
                           selectedAmount === amt && !customAmount
-                            ? "bg-blue-600 text-white font-semibold shadow-sm"
-                            : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
+                            ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
+                            : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
                         }`}
                       >
                         {currencySymbol}{amt.toLocaleString()}
@@ -514,7 +514,7 @@ export function DepositModal({
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
                     placeholder={`Or enter custom amount (${currencySymbol})`}
-                    className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
+                    className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 mt-2"
                   />
                 </div>
 
@@ -523,7 +523,7 @@ export function DepositModal({
                   <select
                     value={otherProvider}
                     onChange={(e) => setOtherProvider(e.target.value as (typeof OTHER_PROVIDERS)[number])}
-                    className="w-full h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                   >
                     {OTHER_PROVIDERS.map((p) => (
                       <option key={p} value={p}>
@@ -533,10 +533,10 @@ export function DepositModal({
                   </select>
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between">
+                <div className="pt-3 border-t border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
                   <div>
                     <span className="text-[11px] text-slate-500">Total charge:</span>
-                    <p className="text-base font-mono font-semibold text-slate-900 dark:text-slate-100">
+                    <p className="text-base font-mono font-semibold text-[#1E1E1E] dark:text-white">
                       {currencySymbol}{finalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </p>
                   </div>

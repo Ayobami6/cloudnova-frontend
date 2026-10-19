@@ -110,10 +110,10 @@ function VerifyEmailContent() {
         <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3 shadow-xs">
           <Mail className="w-6 h-6" />
         </div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
           Verify Your Email
         </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+        <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
           We sent a 6-digit verification code to{" "}
           <span className="font-mono font-medium text-slate-900 dark:text-slate-200">{email}</span>
         </p>
@@ -129,7 +129,7 @@ function VerifyEmailContent() {
 
       {/* Success alert */}
       {isSuccess && (
-        <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+        <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-[#4EA871] dark:text-[#56B87C] flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>Email verified! Redirecting to CloudNova console...</span>
         </div>
@@ -150,7 +150,7 @@ function VerifyEmailContent() {
               value={digit}
               onChange={(e) => handleChange(idx, e.target.value)}
               onKeyDown={(e) => handleKeyDown(idx, e)}
-              className="w-11 h-12 sm:w-12 sm:h-14 text-center font-mono text-lg font-semibold rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xs"
+              className="w-11 h-12 sm:w-12 sm:h-14 text-center font-mono text-lg font-semibold nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] text-[#1E1E1E] dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xs"
               autoFocus={idx === 0}
             />
           ))}
@@ -159,7 +159,7 @@ function VerifyEmailContent() {
         <button
           type="submit"
           disabled={isLoading || isSuccess || digits.join("").length !== 6}
-          className="w-full h-9 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+          className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
         >
           {isLoading ? (
             <span>Verifying...</span>
@@ -175,7 +175,7 @@ function VerifyEmailContent() {
       </form>
 
       {/* Resend & Edit Email */}
-      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-[#232736]">
+      <div className="flex items-center justify-between text-xs pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
         <button
           type="button"
           onClick={handleResend}
@@ -198,7 +198,7 @@ function VerifyEmailContent() {
       </div>
 
       {resendSuccess && (
-        <p className="text-center text-xs text-emerald-600 dark:text-emerald-400">
+        <p className="text-center text-xs text-[#4EA871] dark:text-[#56B87C]">
           A new 6-digit code has been dispatched to {email}.
         </p>
       )}

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Redesigned the entire `cloudnova-frontend` UI based on the Nixtio IVR & Communication Dashboard aesthetic (Dribbble #27709197): Plus Jakarta Sans + Inter + JetBrains Mono typography, Google Material Symbols Rounded icons, Light-First warm alabaster (`#F6F6F4`) & warm stone (`#EFECE8`) surfaces, slim matte-charcoal (`#222222`) navigation rail with circular white active indicator, pastel Lavender/Powder-Blue/Marigold KPI cards, Sankey ribbon + bubble matrix telemetry chart, floating white pill-row tables, and right-hand contextual inspector with live waveform telemetry.
+
+
 ### Added
 - **Next.js Edge Reverse Proxy & Production Vercel Integration (`next.config.ts`, `lib/api/config.ts`, `lib/api/http.ts`)**:
   - Configured Next.js server-side edge rewrite (`/api/v1/:path*` -> `${BACKEND_URL}/api/v1/:path*`) eliminating cross-origin (CORS) and browser mixed-content (HTTPS frontend -> HTTP ALB backend) restrictions in production.

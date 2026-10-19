@@ -4,41 +4,127 @@
 
 @layer base {
   :root {
-    --canvas: #f8fafc;
-    --surface-subtle: #ffffff;
+    --font-jakarta: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-inter: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --rail-bg: #222222;
+    --outer-frame: #cedce9;
+    --canvas: #f6f6f4;
+    --surface-stone: #efece8;
+    --surface-subtle: #efece8;
     --surface-card: #ffffff;
-    --surface-elevated: #f1f5f9;
-    --border-subtle: #e2e8f0;
-    --border-hover: #cbd5e1;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
+    --surface-elevated: #ffffff;
+    --border-subtle: #e7e4df;
+    --border-hover: #d5d0c8;
+    --text-primary: #1e1e1e;
+    --text-secondary: #5a5a58;
+    --text-muted: #8c8b87;
+    --primary-obsidian: #222222;
     --primary-cobalt: #2563eb;
-    --primary-hover: #1d4ed8;
+    --primary-hover: #111111;
+    --pastel-lavender: #e6d8ea;
+    --pastel-blue: #cfe0ec;
+    --pastel-yellow: #f8d568;
+    --pastel-sand: #e5b899;
+    --status-completed: #4ea871;
+    --status-pending: #e09f3e;
+    --status-failed: #d94e4e;
   }
 
   .dark {
-    --canvas: #090a0f;
-    --surface-subtle: #11131a;
-    --surface-card: #161922;
-    --surface-elevated: #1e2230;
-    --border-subtle: #232736;
-    --border-hover: #33394d;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --primary-cobalt: #2563eb;
-    --primary-hover: #1d4ed8;
+    --rail-bg: #14161b;
+    --outer-frame: #090a0d;
+    --canvas: #0f1115;
+    --surface-stone: #161920;
+    --surface-subtle: #161920;
+    --surface-card: #1c2029;
+    --surface-elevated: #232834;
+    --border-subtle: #282d3a;
+    --border-hover: #383f52;
+    --text-primary: #f4f5f7;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --primary-obsidian: #f4f5f7;
+    --primary-cobalt: #3b82f6;
+    --primary-hover: #ffffff;
+    --pastel-lavender: rgba(230, 216, 234, 0.16);
+    --pastel-blue: rgba(207, 224, 236, 0.16);
+    --pastel-yellow: rgba(248, 213, 104, 0.18);
+    --pastel-sand: rgba(229, 184, 153, 0.16);
+    --status-completed: #56b87c;
+    --status-pending: #ebb04d;
+    --status-failed: #ef6363;
   }
 
   body {
     background-color: var(--canvas);
     color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    font-family: var(--font-jakarta), var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.15s ease, color 0.15s ease;
   }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-jakarta), sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  code, pre, .font-mono {
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+}
+
+/* Material Symbols Rounded Configuration */
+.material-symbols-rounded {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 24;
+  user-select: none;
+}
+
+.material-symbols-rounded.outlined {
+  font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 24;
+}
+
+/* Nixtio Dashboard Surface Primitives */
+.nixtio-card {
+  background-color: var(--surface-card);
+  border-radius: 26px;
+  box-shadow: 0 2px 14px -4px rgba(30, 30, 30, 0.04);
+}
+
+.nixtio-stone-panel {
+  background-color: var(--surface-stone);
+  border-radius: 28px;
+}
+
+.nixtio-floating-row {
+  background-color: var(--surface-card);
+  border-radius: 18px;
+  box-shadow: 0 1px 6px rgba(30, 30, 30, 0.025);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nixtio-floating-row:hover {
+  box-shadow: 0 4px 14px rgba(30, 30, 30, 0.06);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Custom Scrollbars */
@@ -48,12 +134,12 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--canvas);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: var(--border-subtle);
-  border-radius: 3px;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

@@ -54,7 +54,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#090A0F] text-slate-900 dark:text-slate-100 transition-colors duration-150 selection:bg-blue-600/30 selection:text-blue-200">
+    <div className="min-h-screen bg-[#F6F6F4] dark:bg-[#0F1115] text-[#1E1E1E] dark:text-white transition-colors duration-150 selection:bg-blue-600/30 selection:text-blue-200">
       <LandingNavbar />
 
       {/* Hero Section */}
@@ -65,13 +65,13 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
             {/* Release Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 text-xs font-mono text-blue-600 dark:text-blue-400 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#CFE0EC] dark:bg-[#CFE0EC]/20 border border-[#CFE0EC] text-xs font-mono text-[#1E1E1E] dark:text-[#CFE0EC] shadow-xs">
               <Sparkles className="w-3.5 h-3.5" />
               <span>CloudNova 2.4 — Global Anycast Mesh & 100Gbps Fabric</span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-slate-900 dark:text-slate-100 leading-[1.12]">
+            <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-[#1E1E1E] dark:text-white leading-[1.12]">
               Next-Generation Cloud Compute & Data at{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-500 dark:from-blue-400 dark:via-sky-300 dark:to-indigo-300">
                 Planetary Scale
@@ -87,14 +87,14 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
                 href="/register"
-                className="w-full sm:w-auto h-11 px-6 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                className="w-full sm:w-auto h-11 px-6 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
               >
                 <span>Deploy with $200 Free Credit</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/overview"
-                className="w-full sm:w-auto h-11 px-5 rounded-md bg-white dark:bg-[#161922] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full sm:w-auto h-11 px-5 rounded-md bg-white dark:bg-[#1C2029] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <Terminal className="w-4 h-4 text-slate-400" />
                 <span>Explore Live Console Demo</span>
@@ -121,18 +121,18 @@ export default function LandingPage() {
           </div>
 
           {/* Hero Interactive Stream / Console Mockup */}
-          <div className="mt-16 rounded-xl bg-white dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] shadow-2xl overflow-hidden max-w-5xl mx-auto">
+          <div className="mt-16 rounded-xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] shadow-2xl overflow-hidden max-w-5xl mx-auto">
             {/* Window bar */}
-            <div className="h-10 bg-slate-50 dark:bg-[#161922] border-b border-slate-200 dark:border-[#232736] px-4 flex items-center justify-between">
+            <div className="h-10 bg-[#F6F6F4] dark:bg-[#161920] border-b border-[#E7E4DF] dark:border-[#282D3A] px-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
                 <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
                 <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-                <span className="text-xs font-mono text-slate-500 dark:text-slate-400 ml-2">
+                <span className="text-xs font-mono text-[#8C8B87] dark:text-slate-400 ml-2">
                   console.cloudnova.io — Live Telemetry
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-600 dark:text-emerald-400">
+              <div className="flex items-center gap-2 text-[11px] font-mono text-[#4EA871] dark:text-[#56B87C]">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>8 / 8 Regions Connected</span>
               </div>
@@ -140,33 +140,33 @@ export default function LandingPage() {
 
             {/* Mock Dashboard Grid */}
             <div className="p-6 grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50/50 dark:bg-[#090A0F]/50">
-              <div className="p-4 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Active Compute</span>
-                <div className="mt-2 text-2xl font-semibold font-mono text-slate-900 dark:text-slate-100">
+              <div className="p-4 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+                <span className="text-xs font-medium text-[#8C8B87] dark:text-slate-400 uppercase">Active Compute</span>
+                <div className="mt-2 text-2xl font-semibold font-mono text-[#1E1E1E] dark:text-white">
                   4 Droplets
                 </div>
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 block">100% Health Score</span>
+                <span className="text-[11px] text-[#4EA871] dark:text-[#56B87C] mt-1 block">100% Health Score</span>
               </div>
 
-              <div className="p-4 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Managed Databases</span>
-                <div className="mt-2 text-2xl font-semibold font-mono text-slate-900 dark:text-slate-100">
+              <div className="p-4 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+                <span className="text-xs font-medium text-[#8C8B87] dark:text-slate-400 uppercase">Managed Databases</span>
+                <div className="mt-2 text-2xl font-semibold font-mono text-[#1E1E1E] dark:text-white">
                   2 Clusters
                 </div>
                 <span className="text-[11px] text-blue-600 dark:text-blue-400 mt-1 block">PgBouncer Active</span>
               </div>
 
-              <div className="p-4 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">NVMe + S3 Storage</span>
-                <div className="mt-2 text-2xl font-semibold font-mono text-slate-900 dark:text-slate-100">
+              <div className="p-4 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+                <span className="text-xs font-medium text-[#8C8B87] dark:text-slate-400 uppercase">NVMe + S3 Storage</span>
+                <div className="mt-2 text-2xl font-semibold font-mono text-[#1E1E1E] dark:text-white">
                   3.35 TB
                 </div>
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 block">Zero Egress Tax</span>
+                <span className="text-[11px] text-[#4EA871] dark:text-[#56B87C] mt-1 block">Zero Egress Tax</span>
               </div>
 
-              <div className="p-4 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Global Uptime SLA</span>
-                <div className="mt-2 text-2xl font-semibold font-mono text-emerald-600 dark:text-emerald-400">
+              <div className="p-4 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+                <span className="text-xs font-medium text-[#8C8B87] dark:text-slate-400 uppercase">Global Uptime SLA</span>
+                <div className="mt-2 text-2xl font-semibold font-mono text-[#4EA871] dark:text-[#56B87C]">
                   99.995%
                 </div>
                 <span className="text-[11px] text-slate-500 mt-1 block">DDoS Shield Engaged</span>
@@ -177,11 +177,11 @@ export default function LandingPage() {
       </section>
 
       {/* Telemetry Metrics Band */}
-      <section className="py-12 border-y border-slate-200 dark:border-[#232736] bg-white dark:bg-[#0E1017]">
+      <section className="py-12 border-y border-[#E7E4DF] dark:border-[#282D3A] bg-white dark:bg-[#0E1017]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="space-y-1">
-              <div className="text-3xl sm:text-4xl font-mono font-bold text-slate-900 dark:text-slate-100">
+              <div className="text-3xl sm:text-4xl font-mono font-bold text-[#1E1E1E] dark:text-white">
                 8 Regions
               </div>
               <p className="text-xs text-slate-500 font-medium">Americas, Europe & Asia-Pacific</p>
@@ -193,13 +193,13 @@ export default function LandingPage() {
               <p className="text-xs text-slate-500 font-medium">Global Anycast edge latency</p>
             </div>
             <div className="space-y-1">
-              <div className="text-3xl sm:text-4xl font-mono font-bold text-emerald-600 dark:text-emerald-400">
+              <div className="text-3xl sm:text-4xl font-mono font-bold text-[#4EA871] dark:text-[#56B87C]">
                 99.995%
               </div>
               <p className="text-xs text-slate-500 font-medium">Contractually backed SLA</p>
             </div>
             <div className="space-y-1">
-              <div className="text-3xl sm:text-4xl font-mono font-bold text-slate-900 dark:text-slate-100">
+              <div className="text-3xl sm:text-4xl font-mono font-bold text-[#1E1E1E] dark:text-white">
                 $0.00
               </div>
               <p className="text-xs text-slate-500 font-medium">Zero outbound data transfer tax</p>
@@ -212,11 +212,11 @@ export default function LandingPage() {
       <section id="compute" className="py-24 max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 text-xs font-mono border border-blue-200 dark:border-blue-500/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6D8EA] dark:bg-[#E6D8EA]/20 text-[#1E1E1E] dark:text-[#E6D8EA] text-xs font-mono border border-[#E6D8EA]">
               <Server className="w-3.5 h-3.5" />
               <span>Dedicated KVM Cloud Compute</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1E1E] dark:text-white">
               High-Velocity Droplets with AMD EPYC & NVIDIA GPUs
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -249,8 +249,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-[#232736]">
+          <div className="rounded-xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E7E4DF] dark:border-[#282D3A]">
               <span className="text-xs font-mono font-medium text-slate-500">Hardware Fleet Configuration</span>
               <span className="text-[10px] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                 10Gbps Line Rate
@@ -258,25 +258,25 @@ export default function LandingPage() {
             </div>
 
             <div className="space-y-3 text-xs">
-              <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex items-center justify-between">
+              <div className="p-3.5 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
                 <div>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 block">Standard General Purpose</span>
+                  <span className="font-semibold text-[#1E1E1E] dark:text-white block">Standard General Purpose</span>
                   <span className="text-slate-500 text-[11px]">2 vCPU • 4 GB RAM • 50 GB NVMe</span>
                 </div>
                 <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">$18.00/mo</span>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex items-center justify-between">
+              <div className="p-3.5 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
                 <div>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 block">Compute-Optimized (AMD Genoa)</span>
+                  <span className="font-semibold text-[#1E1E1E] dark:text-white block">Compute-Optimized (AMD Genoa)</span>
                   <span className="text-slate-500 text-[11px]">8 vCPU • 16 GB RAM • 160 GB NVMe</span>
                 </div>
                 <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">$64.00/mo</span>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex items-center justify-between">
+              <div className="p-3.5 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
                 <div>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 block">AI & GPU Acceleration</span>
+                  <span className="font-semibold text-[#1E1E1E] dark:text-white block">AI & GPU Acceleration</span>
                   <span className="text-slate-500 text-[11px]">16 vCPU • 64 GB RAM • 24GB RTX A5000</span>
                 </div>
                 <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">$340.00/mo</span>
@@ -287,35 +287,35 @@ export default function LandingPage() {
       </section>
 
       {/* Pillar 2: Managed Databases */}
-      <section id="databases" className="py-24 bg-white dark:bg-[#0E1017] border-y border-slate-200 dark:border-[#232736]">
+      <section id="databases" className="py-24 bg-white dark:bg-[#0E1017] border-y border-[#E7E4DF] dark:border-[#282D3A]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Database Card UI */}
-            <div className="order-2 lg:order-1 rounded-xl bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] p-6 shadow-xl space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-[#232736]">
+            <div className="order-2 lg:order-1 rounded-xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] p-6 shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[#E7E4DF] dark:border-[#282D3A]">
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">
                     pg-primary-cluster.internal
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10px] font-mono text-[#4EA871] dark:text-[#56B87C] bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                   HA Cluster Active
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-3 text-xs">
-                <div className="p-3 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
+                <div className="p-3 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A]">
                   <span className="text-slate-500 text-[10px] uppercase">Engine</span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 block mt-0.5">PostgreSQL 16.2</span>
+                  <span className="font-semibold text-[#1E1E1E] dark:text-white block mt-0.5">PostgreSQL 16.2</span>
                 </div>
-                <div className="p-3 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
+                <div className="p-3 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A]">
                   <span className="text-slate-500 text-[10px] uppercase">Pooler</span>
                   <span className="font-semibold text-blue-600 dark:text-blue-400 block mt-0.5">PgBouncer (1.2k)</span>
                 </div>
-                <div className="p-3 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
+                <div className="p-3 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A]">
                   <span className="text-slate-500 text-[10px] uppercase">PITR Backup</span>
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400 block mt-0.5">Continuous</span>
+                  <span className="font-semibold text-[#4EA871] dark:text-[#56B87C] block mt-0.5">Continuous</span>
                 </div>
               </div>
 
@@ -326,11 +326,11 @@ export default function LandingPage() {
 
             {/* Description */}
             <div className="order-1 lg:order-2 space-y-6">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 text-xs font-mono border border-blue-200 dark:border-blue-500/20">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6D8EA] dark:bg-[#E6D8EA]/20 text-[#1E1E1E] dark:text-[#E6D8EA] text-xs font-mono border border-[#E6D8EA]">
                 <Database className="w-3.5 h-3.5" />
                 <span>Zero-Maintenance Data Tier</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1E1E] dark:text-white">
                 Enterprise Managed PostgreSQL, MySQL & Redis
               </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -370,11 +370,11 @@ export default function LandingPage() {
       <section id="storage" className="py-24 max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 text-xs font-mono border border-blue-200 dark:border-blue-500/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6D8EA] dark:bg-[#E6D8EA]/20 text-[#1E1E1E] dark:text-[#E6D8EA] text-xs font-mono border border-[#E6D8EA]">
               <HardDrive className="w-3.5 h-3.5" />
               <span>Unified Storage Fabric</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1E1E] dark:text-white">
               Elastic NVMe Volumes & S3 Spaces Without Egress Markups
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -407,8 +407,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-white dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-[#232736]">
+          <div className="rounded-xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E7E4DF] dark:border-[#282D3A]">
               <span className="text-xs font-mono font-medium text-slate-500">Storage Performance Benchmarks</span>
               <span className="text-[10px] font-mono text-blue-600 dark:text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
                 PCIe Gen4 NVMe
@@ -421,7 +421,7 @@ export default function LandingPage() {
                   <span>Random Read IOPS (4K)</span>
                   <span className="font-mono font-semibold text-blue-600 dark:text-blue-400">120,000 IOPS</span>
                 </div>
-                <div className="w-full bg-slate-100 dark:bg-[#161922] h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-[#EFECE8] dark:bg-[#161920] h-2 rounded-full overflow-hidden">
                   <div className="bg-blue-600 h-2 rounded-full w-[92%]" />
                 </div>
               </div>
@@ -429,15 +429,15 @@ export default function LandingPage() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs text-slate-700 dark:text-slate-300">
                   <span>Sequential Throughput</span>
-                  <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">1.85 GB/s</span>
+                  <span className="font-mono font-semibold text-[#4EA871] dark:text-[#56B87C]">1.85 GB/s</span>
                 </div>
-                <div className="w-full bg-slate-100 dark:bg-[#161922] h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-[#EFECE8] dark:bg-[#161920] h-2 rounded-full overflow-hidden">
                   <div className="bg-emerald-500 h-2 rounded-full w-[88%]" />
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] space-y-1">
-                <span className="font-semibold text-slate-900 dark:text-slate-100 block">S3 Presigned URLs</span>
+              <div className="p-3.5 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-1">
+                <span className="font-semibold text-[#1E1E1E] dark:text-white block">S3 Presigned URLs</span>
                 <p className="text-[11px] text-slate-500">
                   Generate secure, time-bounded direct upload and download URLs with custom HMAC authorization tokens.
                 </p>
@@ -448,17 +448,17 @@ export default function LandingPage() {
       </section>
 
       {/* Global Datacenter Regions Map */}
-      <section className="py-20 bg-white dark:bg-[#0E1017] border-y border-slate-200 dark:border-[#232736]">
+      <section className="py-20 bg-white dark:bg-[#0E1017] border-y border-[#E7E4DF] dark:border-[#282D3A]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 text-xs font-mono border border-blue-200 dark:border-blue-500/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6D8EA] dark:bg-[#E6D8EA]/20 text-[#1E1E1E] dark:text-[#E6D8EA] text-xs font-mono border border-[#E6D8EA]">
               <Globe className="w-3.5 h-3.5" />
               <span>Global Anycast PoPs</span>
             </div>
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white sm:text-4xl">
               Planetary Edge Network
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-[#8C8B87] dark:text-slate-400">
               Low-latency edge connectivity with direct BGP peering to major internet exchanges in North America, Europe, and Asia.
             </p>
           </div>
@@ -467,19 +467,19 @@ export default function LandingPage() {
             {REGIONS.map((r) => (
               <div
                 key={r.id}
-                className="p-4 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] hover:border-blue-500/50 transition-colors shadow-xs"
+                className="p-4 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] hover:border-blue-500/50 transition-colors shadow-xs"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-lg">{r.flag}</span>
-                  <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                  <span className="font-mono text-xs text-[#4EA871] dark:text-[#56B87C] font-semibold">
                     {r.pingMs}ms
                   </span>
                 </div>
                 <div className="mt-2">
-                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 block">{r.name}</span>
+                  <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white block">{r.name}</span>
                   <span className="text-[11px] text-slate-500">{r.country}</span>
                 </div>
-                <div className="mt-2 pt-2 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between text-[10px] font-mono text-slate-400">
+                <div className="mt-2 pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between text-[10px] font-mono text-slate-400">
                   <span>{r.id.toUpperCase()}</span>
                   <span className="text-emerald-500">ONLINE</span>
                 </div>
@@ -496,44 +496,44 @@ export default function LandingPage() {
       <InteractiveCliPreview />
 
       {/* Customer Testimonials & Social Proof */}
-      <section className="py-20 border-t border-slate-200 dark:border-[#232736] bg-white dark:bg-[#0E1017]">
+      <section className="py-20 border-t border-[#E7E4DF] dark:border-[#282D3A] bg-white dark:bg-[#0E1017]">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
               Trusted by High-Throughput Engineering Teams
             </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-[#8C8B87] dark:text-slate-400">
               From fast-scaling AI labs to real-time financial data engines, see why architects choose CloudNova.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-4">
+            <div className="p-6 rounded-xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-4">
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 &ldquo;We run 18,000 requests per second across our API gateways. On AWS, our monthly cross-AZ and outbound transfer charges exceeded our actual EC2 bill. Moving to CloudNova eliminated $38,000/mo in pure transit overhead.&rdquo;
               </p>
-              <div className="pt-2 border-t border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 block">David Zhao</span>
+              <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
+                <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white block">David Zhao</span>
                 <span className="text-[11px] text-slate-500">Chief Architect, DataStream IO</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-xl bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-4">
+            <div className="p-6 rounded-xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-4">
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 &ldquo;The sub-20s droplet spin-up times revolutionized our CI/CD pipeline. Our integration test suites provision fresh ephemeral KVM microVMs per pull request, saving 12 developer hours every single week.&rdquo;
               </p>
-              <div className="pt-2 border-t border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 block">Elena Rostova</span>
+              <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
+                <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white block">Elena Rostova</span>
                 <span className="text-[11px] text-slate-500">Head of Platform, Voxel Gaming Engine</span>
               </div>
             </div>
 
-            <div className="p-6 rounded-xl bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] space-y-4">
+            <div className="p-6 rounded-xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-4">
               <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 &ldquo;Point-in-time recovery on their Managed PostgreSQL saved our database from an erroneous migration without losing a single customer transaction. Their support is responsive, technical, and top tier.&rdquo;
               </p>
-              <div className="pt-2 border-t border-slate-200 dark:border-[#232736]">
-                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100 block">Marcus Vance</span>
+              <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
+                <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white block">Marcus Vance</span>
                 <span className="text-[11px] text-slate-500">VP of Infrastructure, Hyperscale AI</span>
               </div>
             </div>
@@ -542,13 +542,13 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ Accordion */}
-      <section className="py-20 border-t border-slate-200 dark:border-[#232736]">
+      <section className="py-20 border-t border-[#E7E4DF] dark:border-[#282D3A]">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 space-y-8">
           <div className="text-center space-y-3">
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
               Frequently Asked Questions
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-[#8C8B87] dark:text-slate-400">
               Everything you need to know about billing, technical specs, and SLAs.
             </p>
           </div>
@@ -557,13 +557,13 @@ export default function LandingPage() {
             {faqs.map((faq, idx) => (
               <div
                 key={idx}
-                className="rounded-lg bg-white dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] overflow-hidden transition-colors"
+                className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden transition-colors"
               >
                 <button
                   onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
                   className="w-full p-4 flex items-center justify-between text-left cursor-pointer"
                 >
-                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                  <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">
                     {faq.q}
                   </span>
                   <ChevronDown
@@ -584,28 +584,28 @@ export default function LandingPage() {
       </section>
 
       {/* Final Call to Action Banner */}
-      <section className="py-20 border-t border-slate-200 dark:border-[#232736] bg-gradient-to-b from-blue-600/5 to-transparent">
+      <section className="py-20 border-t border-[#E7E4DF] dark:border-[#282D3A] bg-gradient-to-b from-blue-600/5 to-transparent">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center space-y-6">
-          <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-blue-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] flex items-center justify-center mx-auto shadow-lg shadow-blue-500/30">
             <Zap className="w-6 h-6" />
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1E1E] dark:text-white">
             Start Deploying on CloudNova in Under 30 Seconds
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          <p className="text-sm text-[#8C8B87] dark:text-slate-400 max-w-xl mx-auto">
             Experience true calm cloud infrastructure with zero egress markups, instant KVM droplet boot times, and $200 in free starting credits.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
               href="/register"
-              className="w-full sm:w-auto h-11 px-8 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              className="w-full sm:w-auto h-11 px-8 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
             >
               <span>Create Account ($200 Credit)</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/overview"
-              className="w-full sm:w-auto h-11 px-6 rounded-md bg-white dark:bg-[#161922] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full sm:w-auto h-11 px-6 rounded-md bg-white dark:bg-[#1C2029] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <span>Explore Live Console Demo</span>
             </Link>

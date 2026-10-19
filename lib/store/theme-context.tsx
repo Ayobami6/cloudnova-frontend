@@ -13,17 +13,15 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>("dark");
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<ThemeMode>("light");
 
   useEffect(() => {
-    setMounted(true);
     const savedTheme = localStorage.getItem("cloudnova-theme") as ThemeMode | null;
     if (savedTheme === "light" || savedTheme === "dark") {
       setThemeState(savedTheme);
       applyTheme(savedTheme);
     } else {
-      applyTheme("dark");
+      applyTheme("light");
     }
   }, []);
 
