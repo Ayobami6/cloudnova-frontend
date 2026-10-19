@@ -64,16 +64,16 @@ export default function NetworkPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h1 className="text-xl font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
             Networking & Zero-Trust Security
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
             Stateful packet filtering, Layer 4/7 load balancers, private VPC subnets, and Anycast Floating IPs.
           </p>
         </div>
 
         {/* Sub-Tabs Selector */}
-        <div className="flex items-center rounded-md bg-slate-100 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] p-0.5 text-xs">
+        <div className="flex items-center rounded-full bg-[#EFECE8] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] p-0.5 text-xs">
           {[
             { id: "firewalls", label: "Firewalls" },
             { id: "loadbalancers", label: "Load Balancers" },
@@ -86,7 +86,7 @@ export default function NetworkPage() {
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
               className={`px-3 py-1.5 rounded-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? "bg-blue-600 text-white shadow-sm"
+                  ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
               }`}
             >
@@ -107,15 +107,15 @@ export default function NetworkPage() {
                 onClick={() => setSelectedFirewallId(fw.id)}
                 className={`p-4 rounded-lg text-left transition-colors border ${
                   activeFirewall.id === fw.id
-                    ? "bg-white dark:bg-[#161922] border-blue-500 shadow-xs"
-                    : "bg-slate-50 dark:bg-[#11131A] border-slate-200 dark:border-[#232736] hover:bg-white dark:hover:bg-[#161922] hover:border-slate-300 dark:hover:border-[#33394D]"
+                    ? "bg-white dark:bg-[#1C2029] border-blue-500 shadow-xs"
+                    : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#161922] hover:border-slate-300 dark:hover:border-[#33394D]"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-xs text-slate-900 dark:text-slate-200">{fw.name}</span>
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 </div>
-                <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                <div className="mt-2 text-[11px] text-[#8C8B87] dark:text-slate-400">
                   {fw.rules.length} rules • {fw.attachedInstanceIds.length} attached droplets
                 </div>
               </button>
@@ -123,8 +123,8 @@ export default function NetworkPage() {
           </div>
 
           {/* Firewall Detail Card */}
-          <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden">
-            <div className="p-4 border-b border-slate-200 dark:border-[#232736] flex items-center justify-between bg-slate-50 dark:bg-[#11131A]">
+          <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
+            <div className="p-4 border-b border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between bg-[#F6F6F4] dark:bg-[#161920]">
               <div>
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">{activeFirewall.name}</h3>
                 <span className="text-[11px] text-slate-500">Default policy: Drop all unmatching ingress</span>
@@ -132,7 +132,7 @@ export default function NetworkPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsAddRuleOpen(true)}
-                  className="h-8 px-3 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  className="h-8 px-3 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Rule</span>
@@ -148,7 +148,7 @@ export default function NetworkPage() {
 
             {/* Rules Table */}
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
+              <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
                 <tr>
                   <th className="py-2.5 px-4">Direction</th>
                   <th className="py-2.5 px-4">Rule Description</th>
@@ -158,14 +158,14 @@ export default function NetworkPage() {
                   <th className="py-2.5 px-4 text-right">Delete</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
+              <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
                 {activeFirewall.rules.map((r) => (
                   <tr key={r.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02]">
                     <td className="py-3 px-4">
                       <span className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border ${
                         r.type === "inbound"
                           ? "bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-600/20"
-                          : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20"
+                          : "bg-emerald-50 dark:bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] border-emerald-200 dark:border-emerald-500/20"
                       }`}>
                         {r.type}
                       </span>
@@ -174,11 +174,11 @@ export default function NetworkPage() {
                     <td className="py-3 px-4 font-mono text-slate-700 dark:text-slate-300">
                       {r.protocol.toUpperCase()} : {r.ports}
                     </td>
-                    <td className="py-3 px-4 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                    <td className="py-3 px-4 font-mono text-[#8C8B87] dark:text-slate-400 text-[11px]">
                       {r.sources.join(", ")}
                     </td>
                     <td className="py-3 px-4">
-                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded font-medium">
+                      <span className="text-[10px] font-mono text-[#4EA871] dark:text-[#56B87C] bg-emerald-500/10 px-1.5 py-0.5 rounded font-medium">
                         ACCEPT
                       </span>
                     </td>
@@ -200,9 +200,9 @@ export default function NetworkPage() {
 
       {/* 2. Load Balancers */}
       {activeTab === "loadbalancers" && (
-        <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden">
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
+            <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
               <tr>
                 <th className="py-2.5 px-4">Load Balancer Name</th>
                 <th className="py-2.5 px-4">VIP Address</th>
@@ -212,17 +212,17 @@ export default function NetworkPage() {
                 <th className="py-2.5 px-4">Target Droplets</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
+            <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
               {loadBalancers.map((lb) => (
                 <tr key={lb.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02]">
                   <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-200">{lb.name}</td>
                   <td className="py-3 px-4 font-mono text-slate-700 dark:text-slate-300">{lb.ip}</td>
-                  <td className="py-3 px-4 font-mono text-slate-500 dark:text-slate-400">{lb.protocol} : {lb.port}</td>
+                  <td className="py-3 px-4 font-mono text-[#8C8B87] dark:text-slate-400">{lb.protocol} : {lb.port}</td>
                   <td className="py-3 px-4 capitalize text-slate-700 dark:text-slate-300">{lb.algorithm.replace("_", " ")}</td>
                   <td className="py-3 px-4">
-                    <span className="text-emerald-600 dark:text-emerald-400 text-xs font-medium">✓ Auto Let&apos;s Encrypt</span>
+                    <span className="text-[#4EA871] dark:text-[#56B87C] text-xs font-medium">✓ Auto Let&apos;s Encrypt</span>
                   </td>
-                  <td className="py-3 px-4 text-slate-500 dark:text-slate-400">{lb.targetInstanceIds.length} active backends</td>
+                  <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400">{lb.targetInstanceIds.length} active backends</td>
                 </tr>
               ))}
             </tbody>
@@ -232,9 +232,9 @@ export default function NetworkPage() {
 
       {/* 3. VPC Networks */}
       {activeTab === "vpcs" && (
-        <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden">
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
+            <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
               <tr>
                 <th className="py-2.5 px-4">VPC Name</th>
                 <th className="py-2.5 px-4">Region</th>
@@ -243,11 +243,11 @@ export default function NetworkPage() {
                 <th className="py-2.5 px-4">Connected Droplets</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
+            <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
               {vpcs.map((v) => (
                 <tr key={v.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02]">
                   <td className="py-3 px-4 font-semibold text-slate-900 dark:text-slate-200">{v.name}</td>
-                  <td className="py-3 px-4 font-mono text-slate-500 dark:text-slate-400 uppercase">{v.region}</td>
+                  <td className="py-3 px-4 font-mono text-[#8C8B87] dark:text-slate-400 uppercase">{v.region}</td>
                   <td className="py-3 px-4 font-mono text-slate-900 dark:text-slate-200">{v.cidr}</td>
                   <td className="py-3 px-4">
                     {v.isDefault ? (
@@ -268,9 +268,9 @@ export default function NetworkPage() {
 
       {/* 4. Floating Anycast IPs */}
       {activeTab === "floatingips" && (
-        <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden">
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
+            <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
               <tr>
                 <th className="py-2.5 px-4">Reserved Static IP</th>
                 <th className="py-2.5 px-4">Datacenter Region</th>
@@ -278,16 +278,16 @@ export default function NetworkPage() {
                 <th className="py-2.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
+            <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
               {floatingIps.map((fip) => {
                 const assigned = instances.find((i) => i.id === fip.assignedInstanceId);
                 return (
                   <tr key={fip.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02]">
                     <td className="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-slate-200">{fip.ip}</td>
-                    <td className="py-3 px-4 font-mono uppercase text-slate-500 dark:text-slate-400">{fip.region}</td>
+                    <td className="py-3 px-4 font-mono uppercase text-[#8C8B87] dark:text-slate-400">{fip.region}</td>
                     <td className="py-3 px-4">
                       {assigned ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 font-medium">
+                        <span className="text-[#4EA871] dark:text-[#56B87C] flex items-center gap-1.5 font-medium">
                           <Server className="w-3.5 h-3.5" />
                           {assigned.name}
                         </span>
@@ -296,7 +296,7 @@ export default function NetworkPage() {
                       )}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <button className="h-7 px-2.5 rounded bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-[11px] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
+                      <button className="h-7 px-2.5 rounded bg-[#EFECE8] dark:bg-[#232834] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A] text-[11px] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer">
                         Reassign IP
                       </button>
                     </td>
@@ -310,34 +310,34 @@ export default function NetworkPage() {
 
       {/* 5. DDoS Shield */}
       {activeTab === "ddos" && (
-        <div className="p-6 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] space-y-4">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-[#232736]">
+        <div className="p-6 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] space-y-4">
+          <div className="flex items-center justify-between pb-4 border-b border-[#E7E4DF] dark:border-[#282D3A]">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
                 <Shield className="w-4 h-4 text-emerald-500" />
                 CloudNova DDoS Shield Active
               </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
                 Upstream Anycast BGP scrubbing centers inspect all inbound ingress at Layer 3/4/7.
               </p>
             </div>
-            <span className="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+            <span className="text-xs font-mono font-semibold text-[#4EA871] dark:text-[#56B87C] bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
               100% OPERATIONAL
             </span>
           </div>
 
           <div className="grid grid-cols-3 gap-4 text-xs">
-            <div className="p-4 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736]">
+            <div className="p-4 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
               <span className="text-slate-500 block">Threats Blocked (Last 24h)</span>
-              <span className="text-xl font-mono font-semibold text-slate-900 dark:text-slate-100 mt-1 block">14,280</span>
+              <span className="text-xl font-mono font-semibold text-[#1E1E1E] dark:text-white mt-1 block">14,280</span>
             </div>
-            <div className="p-4 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736]">
+            <div className="p-4 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
               <span className="text-slate-500 block">Peak Mitigated Volume</span>
-              <span className="text-xl font-mono font-semibold text-slate-900 dark:text-slate-100 mt-1 block">82.4 Gbps</span>
+              <span className="text-xl font-mono font-semibold text-[#1E1E1E] dark:text-white mt-1 block">82.4 Gbps</span>
             </div>
-            <div className="p-4 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736]">
+            <div className="p-4 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
               <span className="text-slate-500 block">Scrubbing Latency Added</span>
-              <span className="text-xl font-mono font-semibold text-emerald-600 dark:text-emerald-400 mt-1 block">&lt; 1.2ms</span>
+              <span className="text-xl font-mono font-semibold text-[#4EA871] dark:text-[#56B87C] mt-1 block">&lt; 1.2ms</span>
             </div>
           </div>
         </div>
@@ -346,8 +346,8 @@ export default function NetworkPage() {
       {/* Add Rule Modal */}
       {isAddRuleOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] rounded-lg shadow-2xl w-full max-w-md p-6 space-y-4">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Add Firewall Rule</h3>
+          <div className="bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] rounded-lg shadow-2xl w-full max-w-md p-6 space-y-4">
+            <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white">Add Firewall Rule</h3>
             <form onSubmit={handleAddRuleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Rule Label</label>
@@ -355,7 +355,7 @@ export default function NetworkPage() {
                   type="text"
                   value={ruleLabel}
                   onChange={(e) => setRuleLabel(e.target.value)}
-                  className="w-full h-9 px-3 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="w-full h-9 px-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
@@ -365,7 +365,7 @@ export default function NetworkPage() {
                   <select
                     value={ruleType}
                     onChange={(e) => setRuleType(e.target.value as "inbound" | "outbound")}
-                    className="w-full h-9 px-3 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full h-9 px-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                   >
                     <option value="inbound">Inbound (Ingress)</option>
                     <option value="outbound">Outbound (Egress)</option>
@@ -376,7 +376,7 @@ export default function NetworkPage() {
                   <select
                     value={ruleProtocol}
                     onChange={(e) => setRuleProtocol(e.target.value as "tcp" | "udp" | "icmp" | "all")}
-                    className="w-full h-9 px-3 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full h-9 px-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                   >
                     <option value="tcp">TCP</option>
                     <option value="udp">UDP</option>
@@ -391,7 +391,7 @@ export default function NetworkPage() {
                   type="text"
                   value={rulePorts}
                   onChange={(e) => setRulePorts(e.target.value)}
-                  className="w-full h-9 px-3 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="w-full h-9 px-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
@@ -401,7 +401,7 @@ export default function NetworkPage() {
                   type="text"
                   value={ruleSources}
                   onChange={(e) => setRuleSources(e.target.value)}
-                  className="w-full h-9 px-3 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs font-mono text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="w-full h-9 px-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
                   required
                 />
               </div>
@@ -409,13 +409,13 @@ export default function NetworkPage() {
                 <button
                   type="button"
                   onClick={() => setIsAddRuleOpen(false)}
-                  className="h-8 px-3.5 rounded-md bg-slate-100 dark:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] cursor-pointer"
+                  className="h-8 px-3.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-8 px-4 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold cursor-pointer shadow-sm"
+                  className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm"
                 >
                   Add Rule
                 </button>

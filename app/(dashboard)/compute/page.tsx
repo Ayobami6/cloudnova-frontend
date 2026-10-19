@@ -1,21 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Server,
-  Plus,
-  Terminal,
-  Power,
-  RotateCw,
-  Trash2,
-  Copy,
-  Check,
-  Cpu,
-  Layers,
-} from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
 import { useBilling } from "@/lib/store/billing-context";
 import { DeployDropletModal } from "@/components/compute/deploy-droplet-modal";
+import {
+  MaterialIcon,
+  PastelTypePill,
+  StatusIndicator,
+  PastelVariant,
+} from "@/components/ui/material-icon";
+import {
+  PastelKpiCard,
+  SegmentedPillTabs,
+} from "@/components/ui/bento-primitives";
 
 export default function ComputePage() {
   const {
@@ -31,6 +29,7 @@ export default function ComputePage() {
   const [isDeployOpen, setIsDeployOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "off">("all");
+  const [selectedIds, setSelectedIds] = useState<Record<string, boolean>>({});
 
   const handleCopyIp = (ip: string, id: string) => {
     navigator.clipboard.writeText(ip);
@@ -48,247 +47,257 @@ export default function ComputePage() {
     return matchesRegion && matchesStatus && matchesSearch;
   });
 
+  const activeCount = filteredInstances.filter((i) => i.status === "active").length;
+  const totalVcpus = filteredInstances.reduce((acc, i) => acc + i.plan.vcpu, 0);
+  const totalRam = filteredInstances.reduce((acc, i) => acc + i.plan.ramGb, 0);
+
   return (
-    <div className="space-y-6">
-      {/* Header Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Top 3 Pastel KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <PastelKpiCard
+          label="Active KVM Droplets"
+          value={`${activeCount} / ${filteredInstances.length}`}
+          subtitle="Sub-18s boot times"
+          variant="lavender"
+          actionLabel="Deploy"
+          onAction={() => setIsDeployOpen(true)}
+        />
+        <PastelKpiCard
+          label="Provisioned vCPUs"
+          value={`${totalVcpus} Cores`}
+          subtitle="AMD EPYC Genoa"
+          variant="blue"
+          actionLabel="Check"
+          onAction={() => setStatusFilter("active")}
+        />
+        <PastelKpiCard
+          label="Allocated ECC Memory"
+          value={`${totalRam} GB`}
+          subtitle="DDR5 NVMe Fabric"
+          variant="yellow"
+          actionLabel="Check"
+          onAction={() => setStatusFilter("all")}
+        />
+      </div>
+
+      {/* Header & Filter Controls Card */}
+      <div className="nixtio-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            Compute Droplets
-            <span className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#161922] px-2 py-0.5 rounded border border-slate-200 dark:border-[#232736]">
+          <h2 className="text-base font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
+            <span>Compute Droplets</span>
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-[#5A5A58] dark:text-slate-300">
               {filteredInstances.length} nodes
             </span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Dedicated KVM cloud virtual machines with NVMe SSD storage and 10Gbps interconnect.
+          </h2>
+          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
+            Dedicated KVM cloud virtual machines with PCIe Gen4 NVMe storage and 10Gbps Anycast interconnect.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Status Filter Tabs */}
-          <div className="flex items-center rounded-md bg-slate-100 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] p-0.5 text-xs">
-            <button
-              onClick={() => setStatusFilter("all")}
-              className={`px-3 py-1 rounded-sm transition-colors ${
-                statusFilter === "all" ? "bg-blue-600 text-white font-medium" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setStatusFilter("active")}
-              className={`px-3 py-1 rounded-sm transition-colors ${
-                statusFilter === "active" ? "bg-blue-600 text-white font-medium" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-              }`}
-            >
-              Active
-            </button>
-            <button
-              onClick={() => setStatusFilter("off")}
-              className={`px-3 py-1 rounded-sm transition-colors ${
-                statusFilter === "off" ? "bg-blue-600 text-white font-medium" : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-              }`}
-            >
-              Off
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <SegmentedPillTabs
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { id: "all", label: "All", badge: instances.length },
+              { id: "active", label: "Active" },
+              { id: "off", label: "Off" },
+            ]}
+          />
 
           <button
+            type="button"
             onClick={() => setIsDeployOpen(true)}
-            className="h-9 px-3.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <MaterialIcon name="add" size={16} />
             <span>Deploy Droplet</span>
           </button>
         </div>
       </div>
 
-      {/* Droplet Table */}
-      <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
-              <tr>
-                <th className="py-2.5 px-4">Droplet Name & OS</th>
-                <th className="py-2.5 px-4">Status</th>
-                <th className="py-2.5 px-4">IP Addresses</th>
-                <th className="py-2.5 px-4">Hardware Specs</th>
-                <th className="py-2.5 px-4">Live CPU / RAM</th>
-                <th className="py-2.5 px-4">Retail Price (Margin)</th>
-                <th className="py-2.5 px-4 text-right">Quick Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
-              {filteredInstances.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500 text-xs">
-                    No compute droplets found matching your current filter criteria.
-                  </td>
-                </tr>
-              ) : (
-                filteredInstances.map((inst) => (
-                  <tr key={inst.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02] transition-colors">
-                    {/* Name & OS */}
-                    <td className="py-3 px-4">
-                      <div className="flex items-start gap-2.5">
-                        <div className="w-7 h-7 rounded bg-slate-100 dark:bg-[#1E2230] border border-slate-200 dark:border-[#232736] flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
-                          <Server className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <div>
-                          <span className="font-semibold text-slate-900 dark:text-slate-200 block">{inst.name}</span>
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400">{inst.image}</span>
-                          <div className="flex items-center gap-1 mt-1">
-                            {inst.tags.map((t) => (
-                              <span
-                                key={t}
-                                className="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-[#1E2230] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-[#232736]"
-                              >
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Status Dot */}
-                    <td className="py-3 px-4">
-                      <div className="inline-flex items-center gap-1.5">
-                        <span
-                          className={`w-2 h-2 rounded-full ${
-                            inst.status === "active"
-                              ? "bg-emerald-500"
-                              : inst.status === "rebooting" || inst.status === "provisioning"
-                              ? "bg-amber-500 animate-pulse"
-                              : "bg-rose-500"
-                          }`}
-                        />
-                        <span className="text-xs text-slate-700 dark:text-slate-300 capitalize">{inst.status}</span>
-                      </div>
-                    </td>
-
-                    {/* IP Addresses */}
-                    <td className="py-3 px-4 font-mono text-[11px]">
-                      <div className="flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
-                        <span>{inst.ipv4}</span>
-                        <button
-                          onClick={() => handleCopyIp(inst.ipv4, inst.id)}
-                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5"
-                          title="Copy Public IPv4"
-                        >
-                          {copiedId === inst.id ? (
-                            <Check className="w-3 h-3 text-emerald-500" />
-                          ) : (
-                            <Copy className="w-3 h-3" />
-                          )}
-                        </button>
-                      </div>
-                      <span className="text-slate-500 text-[10px] block">
-                        VPC: {inst.privateIpv4} • {inst.region.toUpperCase()}
-                      </span>
-                    </td>
-
-                    {/* Specs */}
-                    <td className="py-3 px-4 text-slate-700 dark:text-slate-300">
-                      <span className="font-medium block text-slate-900 dark:text-slate-200">{inst.plan.name}</span>
-                      <span className="text-[11px] text-slate-500">
-                        {inst.plan.vcpu} vCPU • {inst.plan.ramGb} GB RAM • {inst.plan.diskGb} GB NVMe
-                      </span>
-                    </td>
-
-                    {/* Live Gauges */}
-                    <td className="py-3 px-4 space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 w-7">CPU</span>
-                        <div className="w-20 bg-slate-100 dark:bg-[#11131A] rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className="bg-blue-500 h-1.5 rounded-full"
-                            style={{ width: `${inst.currentCpu}%` }}
-                          />
-                        </div>
-                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">{inst.currentCpu}%</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 w-7">RAM</span>
-                        <div className="w-20 bg-slate-100 dark:bg-[#11131A] rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className="bg-emerald-500 h-1.5 rounded-full"
-                            style={{ width: `${inst.currentRamPercent}%` }}
-                          />
-                        </div>
-                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
-                          {inst.currentRamPercent}%
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Retail Pricing */}
-                    <td className="py-3 px-4 font-mono text-xs">
-                      <span className="text-slate-900 dark:text-slate-200 font-semibold block">
-                        {formatMoney(inst.plan.retailMonthly)}/mo
-                      </span>
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block font-medium">
-                        +{formatMoney(inst.plan.retailMonthly - inst.plan.wholesaleMonthly)} profit
-                      </span>
-                    </td>
-
-                    {/* Quick Actions */}
-                    <td className="py-3 px-4 text-right">
-                      <div className="inline-flex items-center gap-1.5">
-                        <button
-                          onClick={() => setTerminalInstance(inst)}
-                          className="h-7 px-2.5 rounded bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-[11px] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white inline-flex items-center gap-1 transition-colors cursor-pointer"
-                          title="Open Web Terminal"
-                        >
-                          <Terminal className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                          <span>Console</span>
-                        </button>
-
-                        {inst.status === "active" ? (
-                          <>
-                            <button
-                              onClick={() => powerAction(inst.id, "reboot")}
-                              className="h-7 w-7 rounded bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-300 flex items-center justify-center transition-colors"
-                              title="Graceful Reboot"
-                            >
-                              <RotateCw className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => powerAction(inst.id, "off")}
-                              className="h-7 w-7 rounded bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 flex items-center justify-center transition-colors"
-                              title="Power Off"
-                            >
-                              <Power className="w-3 h-3" />
-                            </button>
-                          </>
-                        ) : (
-                          <button
-                            onClick={() => powerAction(inst.id, "on")}
-                            className="h-7 w-7 rounded bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center justify-center transition-colors"
-                            title="Power On"
-                          >
-                            <Power className="w-3 h-3" />
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => destroyInstance(inst.id)}
-                          className="h-7 w-7 rounded bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center transition-colors"
-                          title="Destroy Droplet"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Floating White Pill-Row Table */}
+      <div className="space-y-2.5">
+        <div className="grid grid-cols-12 items-center px-4 py-1.5 text-xs font-medium text-[#5A5A58] dark:text-slate-400">
+          <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+            <span className="w-4 h-4 rounded bg-[#222222] dark:bg-white text-white dark:text-[#1E1E1E] inline-flex items-center justify-center">
+              <MaterialIcon name="remove" size={13} />
+            </span>
+            <span>Droplet & OS</span>
+          </div>
+          <div className="hidden md:block md:col-span-2">IPv4 & Region</div>
+          <div className="col-span-3 sm:col-span-2">Specs</div>
+          <div className="hidden sm:block sm:col-span-2">Status & Load</div>
+          <div className="col-span-2 sm:col-span-1">Price</div>
+          <div className="col-span-3 sm:col-span-2 text-right pr-2">Actions</div>
         </div>
+
+        {filteredInstances.length === 0 ? (
+          <div className="nixtio-card p-10 text-center text-xs text-[#8C8B87]">
+            No compute droplets found matching your current filter criteria.
+          </div>
+        ) : (
+          filteredInstances.map((inst, idx) => {
+            const isChecked = !!selectedIds[inst.id];
+            const pillVariant: PastelVariant =
+              idx % 3 === 0 ? "lavender" : idx % 3 === 1 ? "blue" : "yellow";
+
+            return (
+              <div
+                key={inst.id}
+                className="nixtio-floating-row grid grid-cols-12 items-center px-4 py-3.5 text-xs gap-2"
+              >
+                {/* Checkbox + Pastel Pill + Hostname */}
+                <div className="col-span-4 sm:col-span-3 flex items-center gap-2.5 min-w-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setSelectedIds((p) => ({ ...p, [inst.id]: !p[inst.id] }))
+                    }
+                    className={`w-4 h-4 rounded flex items-center justify-center shrink-0 cursor-pointer ${
+                      isChecked
+                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E]"
+                        : "border border-[#D5D0C8] dark:border-[#383F52]"
+                    }`}
+                  >
+                    {isChecked && <MaterialIcon name="check" size={12} />}
+                  </button>
+
+                  <PastelTypePill
+                    icon="dns"
+                    label={inst.region.toUpperCase()}
+                    variant={pillVariant}
+                    size="sm"
+                  />
+
+                  <div className="min-w-0">
+                    <span className="font-semibold text-[#1E1E1E] dark:text-white block truncate">
+                      {inst.name}
+                    </span>
+                    <span className="text-[11px] text-[#8C8B87] block truncate">
+                      {inst.image}
+                    </span>
+                  </div>
+                </div>
+
+                {/* IPv4 */}
+                <div className="hidden md:block md:col-span-2 font-mono text-[11px]">
+                  <div className="flex items-center gap-1.5 text-[#1E1E1E] dark:text-slate-200">
+                    <span className="truncate">{inst.ipv4}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyIp(inst.ipv4, inst.id)}
+                      className="text-[#8C8B87] hover:text-[#1E1E1E] dark:hover:text-white cursor-pointer"
+                      title="Copy IPv4"
+                    >
+                      <MaterialIcon
+                        name={copiedId === inst.id ? "check" : "content_copy"}
+                        size={14}
+                      />
+                    </button>
+                  </div>
+                  <span className="text-[10px] text-[#8C8B87] block">
+                    VPC: {inst.privateIpv4}
+                  </span>
+                </div>
+
+                {/* Hardware Specs */}
+                <div className="col-span-3 sm:col-span-2 text-[#5A5A58] dark:text-slate-300">
+                  <span className="font-semibold text-[#1E1E1E] dark:text-white block">
+                    {inst.plan.name}
+                  </span>
+                  <span className="text-[11px] text-[#8C8B87]">
+                    {inst.plan.vcpu} vCPU • {inst.plan.ramGb}GB
+                  </span>
+                </div>
+
+                {/* Status & CPU */}
+                <div className="hidden sm:block sm:col-span-2">
+                  <StatusIndicator
+                    status={
+                      inst.status === "active"
+                        ? "completed"
+                        : inst.status === "provisioning" || inst.status === "rebooting"
+                        ? "pending"
+                        : "failed"
+                    }
+                    label={
+                      inst.status === "active"
+                        ? `Active (${inst.currentCpu}%)`
+                        : inst.status
+                    }
+                  />
+                </div>
+
+                {/* Price */}
+                <div className="col-span-2 sm:col-span-1 font-mono">
+                  <span className="font-semibold text-[#1E1E1E] dark:text-white block">
+                    {formatMoney(inst.plan.retailMonthly)}/m
+                  </span>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="col-span-3 sm:col-span-2 flex items-center justify-end gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setTerminalInstance(inst)}
+                    className="h-8 px-3 rounded-full bg-[#EFECE8] hover:bg-[#222222] hover:text-white dark:bg-[#232834] dark:hover:bg-white dark:hover:text-[#1E1E1E] text-[#1E1E1E] dark:text-slate-200 text-[11px] font-medium inline-flex items-center gap-1 transition-colors cursor-pointer"
+                    title="Open Web Console"
+                  >
+                    <MaterialIcon name="terminal" size={14} />
+                    <span className="hidden lg:inline">Console</span>
+                  </button>
+
+                  {inst.status === "active" ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => powerAction(inst.id, "reboot")}
+                        className="w-8 h-8 rounded-full bg-[#EFECE8] dark:bg-[#232834] hover:bg-[#F8D568] text-[#1E1E1E] dark:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Reboot"
+                      >
+                        <MaterialIcon name="restart_alt" size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => powerAction(inst.id, "off")}
+                        className="w-8 h-8 rounded-full bg-[#EFECE8] dark:bg-[#232834] hover:bg-[#E6D8EA] text-[#1E1E1E] dark:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Power Off"
+                      >
+                        <MaterialIcon name="power_settings_new" size={16} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => powerAction(inst.id, "on")}
+                      className="w-8 h-8 rounded-full bg-[#D5EBD9] text-[#4EA871] flex items-center justify-center transition-colors cursor-pointer"
+                      title="Power On"
+                    >
+                      <MaterialIcon name="power_settings_new" size={16} />
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => destroyInstance(inst.id)}
+                    className="w-8 h-8 rounded-full bg-[#FADBD8]/60 hover:bg-[#D94E4E] text-[#D94E4E] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                    title="Destroy Droplet"
+                  >
+                    <MaterialIcon name="delete" size={16} />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
-      <DeployDropletModal isOpen={isDeployOpen} onClose={() => setIsDeployOpen(false)} />
+      <DeployDropletModal
+        isOpen={isDeployOpen}
+        onClose={() => setIsDeployOpen(false)}
+      />
     </div>
   );
 }

@@ -2,64 +2,73 @@
 
 import React from "react";
 import Link from "next/link";
-import { Cloud, ShieldCheck, Zap, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/lib/store/theme-context";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen w-full flex bg-slate-50 dark:bg-[#090A0F] text-slate-900 dark:text-slate-100 transition-colors duration-150">
-      {/* Left side: Enterprise Brand & Infrastructure Telemetry (Desktop only) */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-white dark:bg-[#0E1017] border-r border-slate-200 dark:border-[#232736] relative overflow-hidden">
-        {/* Subtle grid background */}
-        <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.04] dark:opacity-[0.07] pointer-events-none" />
-
+    <div className="min-h-screen w-full flex bg-[#F6F6F4] dark:bg-[#0F1115] text-[#1E1E1E] dark:text-[#F4F5F7] p-3 sm:p-5 gap-5 transition-colors duration-150">
+      {/* Left side: Matte Charcoal + Pastel Bento Showcase (Desktop only) */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-10 bg-[#222222] dark:bg-[#14161B] text-white rounded-[32px] relative overflow-hidden shadow-xl">
         {/* Top: Brand */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <Cloud className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center shadow-sm">
+              <MaterialIcon name="cloud_done" size={22} />
             </div>
             <div>
-              <span className="font-semibold text-lg tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <span className="font-semibold text-lg tracking-tight text-white flex items-center gap-2">
                 CloudNova
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-600/20">
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#F8D568] text-[#1E1E1E] font-semibold">
                   GLOBAL CLOUD
                 </span>
               </span>
-              <p className="text-xs text-slate-500 font-normal">Next-Gen Developer Cloud Infrastructure</p>
+              <p className="text-xs text-white/65 font-normal">
+                Next-Gen Developer Cloud Infrastructure
+              </p>
             </div>
           </Link>
         </div>
 
-        {/* Middle: Architecture Quote & Telemetry */}
+        {/* Middle: Pastel KPI Mini Cards + Quote */}
         <div className="relative z-10 max-w-lg space-y-6 my-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-mono">
-            <Zap className="w-3.5 h-3.5" />
-            <span>Planetary Anycast Mesh • 100Gbps Spine</span>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-3.5 rounded-2xl bg-[#E6D8EA] text-[#1E1E1E]">
+              <span className="text-[11px] font-medium block opacity-80">KVM Boot</span>
+              <span className="text-xl font-bold tabular-nums mt-0.5 block">18.4s</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-[#CFE0EC] text-[#1E1E1E]">
+              <span className="text-[11px] font-medium block opacity-80">Global PoPs</span>
+              <span className="text-xl font-bold tabular-nums mt-0.5 block">8 Regions</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-[#F8D568] text-[#1E1E1E]">
+              <span className="text-[11px] font-medium block opacity-80">Egress Tax</span>
+              <span className="text-xl font-bold tabular-nums mt-0.5 block">$0.00</span>
+            </div>
           </div>
 
-          <blockquote className="text-xl font-medium tracking-tight text-slate-800 dark:text-slate-200 leading-relaxed">
+          <blockquote className="text-xl font-medium tracking-tight text-white/95 leading-relaxed">
             &ldquo;CloudNova reduced our p99 database response times from 140ms to 18ms across 8 continents, while completely eliminating our monthly AWS egress tax.&rdquo;
           </blockquote>
 
-          <div className="flex items-center gap-3 pt-2">
-            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-[#1E2230] border border-slate-300 dark:border-[#2E3547] flex items-center justify-center text-xs font-semibold text-slate-700 dark:text-slate-300">
-              MV
+          <div className="flex items-center gap-3 pt-1">
+            <div className="w-10 h-10 rounded-full bg-[#CFE0EC] text-[#1E1E1E] flex items-center justify-center text-xs font-bold">
+              AR
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Marcus Vance</p>
-              <p className="text-xs text-slate-500">VP of Infrastructure, Hyperscale AI Labs</p>
+              <p className="text-sm font-semibold text-white">Alexandra Rose</p>
+              <p className="text-xs text-white/60">VP of Infrastructure, Hyperscale AI Labs</p>
             </div>
           </div>
         </div>
 
         {/* Bottom: SLA Guarantees */}
-        <div className="relative z-10 pt-8 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between text-xs text-slate-500">
-          <div className="flex items-center gap-6">
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+        <div className="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
+          <div className="flex items-center gap-5">
+            <span className="flex items-center gap-1.5 text-[#4EA871]">
+              <MaterialIcon name="verified" size={16} />
               99.995% Uptime SLA
             </span>
             <span>•</span>
@@ -72,43 +81,43 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* Right side: Auth Form Container */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-12">
-        {/* Top Header Controls */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 nixtio-stone-panel">
         <div className="flex items-center justify-between w-full max-w-md mx-auto">
           <Link href="/" className="lg:hidden inline-flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-              <Cloud className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center">
+              <MaterialIcon name="cloud_done" size={18} />
             </div>
-            <span className="font-semibold text-base text-slate-900 dark:text-slate-100">CloudNova</span>
+            <span className="font-semibold text-base text-[#1E1E1E] dark:text-white">
+              CloudNova
+            </span>
           </Link>
           <div className="ml-auto">
             <button
+              type="button"
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-md bg-white dark:bg-[#161922] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-10 h-10 rounded-full bg-white dark:bg-[#1C2029] text-[#1E1E1E] dark:text-slate-200 flex items-center justify-center shadow-2xs cursor-pointer"
               title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
               aria-label="Toggle Theme"
             >
-              {theme === "dark" ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+              <MaterialIcon name={theme === "dark" ? "light_mode" : "dark_mode"} size={18} />
             </button>
           </div>
         </div>
 
-        {/* Center: Children Form */}
-        <div className="w-full max-w-md mx-auto my-auto py-8">
-          {children}
+        <div className="w-full max-w-md mx-auto my-auto py-6">
+          <div className="nixtio-card p-6 sm:p-8">{children}</div>
         </div>
 
-        {/* Bottom Footer Links */}
-        <div className="w-full max-w-md mx-auto text-center text-xs text-slate-500 space-x-4">
-          <Link href="/" className="hover:text-slate-700 dark:hover:text-slate-300">
+        <div className="w-full max-w-md mx-auto text-center text-xs text-[#8C8B87] space-x-4">
+          <Link href="/" className="hover:text-[#1E1E1E] dark:hover:text-white">
             Landing Page
           </Link>
           <span>•</span>
-          <span className="hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer">
+          <span className="hover:text-[#1E1E1E] dark:hover:text-white cursor-pointer">
             Privacy Policy
           </span>
           <span>•</span>
-          <span className="hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer">
+          <span className="hover:text-[#1E1E1E] dark:hover:text-white cursor-pointer">
             System Status
           </span>
         </div>

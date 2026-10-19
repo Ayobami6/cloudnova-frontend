@@ -20,24 +20,24 @@ export function PricingCalculator() {
   const savingsPercent = Math.round(((awsEquivalent - novaMonthly) / awsEquivalent) * 100);
 
   return (
-    <section id="pricing" className="py-20 border-t border-slate-200 dark:border-[#232736] relative">
+    <section id="pricing" className="py-20 border-t border-[#E7E4DF] dark:border-[#282D3A] relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 text-xs font-mono border border-blue-200 dark:border-blue-500/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6D8EA] dark:bg-[#E6D8EA]/20 text-[#1E1E1E] dark:text-[#E6D8EA] text-xs font-mono border border-[#E6D8EA]">
             <Calculator className="w-3.5 h-3.5" />
             <span>Interactive Infrastructure Sizing</span>
           </div>
-          <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
+          <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white sm:text-4xl">
             Predictable, Zero-Egress Cloud Pricing
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-sm text-[#8C8B87] dark:text-slate-400">
             No surprise bandwidth bills, no complex reservations. Scale freely with per-second metering and transparent monthly caps.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Sliders Box */}
-          <div className="lg:col-span-7 bg-white dark:bg-[#11131A] p-6 sm:p-8 rounded-xl border border-slate-200 dark:border-[#232736] shadow-xs space-y-6 flex flex-col justify-between">
+          <div className="lg:col-span-7 bg-white dark:bg-[#1C2029] p-6 sm:p-8 rounded-[26px] border border-[#E7E4DF]/70 dark:border-[#282D3A] shadow-xs space-y-6 flex flex-col justify-between">
             <div className="space-y-6">
               {/* vCPU */}
               <div className="space-y-2">
@@ -139,8 +139,8 @@ export function PricingCalculator() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between text-xs text-slate-500">
-              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+            <div className="pt-4 border-t border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between text-xs text-slate-500">
+              <span className="flex items-center gap-1.5 text-[#4EA871] dark:text-[#56B87C] font-medium">
                 <Check className="w-3.5 h-3.5" />
                 No minimum commit required
               </span>
@@ -149,11 +149,11 @@ export function PricingCalculator() {
           </div>
 
           {/* Pricing Comparison Card */}
-          <div className="lg:col-span-5 bg-white dark:bg-[#11131A] p-6 sm:p-8 rounded-xl border border-slate-200 dark:border-[#232736] shadow-xs flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-5 bg-white dark:bg-[#1C2029] p-6 sm:p-8 rounded-[26px] border border-[#E7E4DF]/70 dark:border-[#282D3A] shadow-xs flex flex-col justify-between relative overflow-hidden">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase tracking-wider text-slate-500">Estimated Cost</span>
-                <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] border border-emerald-500/20">
                   <TrendingDown className="w-3 h-3" />
                   Save {savingsPercent}%
                 </span>
@@ -161,7 +161,7 @@ export function PricingCalculator() {
 
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl sm:text-5xl font-mono font-bold text-slate-900 dark:text-slate-100">
+                  <span className="text-4xl sm:text-5xl font-mono font-bold text-[#1E1E1E] dark:text-white">
                     ${novaMonthly.toFixed(2)}
                   </span>
                   <span className="text-slate-500 font-medium text-sm">/ month</span>
@@ -172,7 +172,7 @@ export function PricingCalculator() {
               </div>
 
               {/* Comparison vs AWS */}
-              <div className="p-4 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736] space-y-2.5 text-xs">
+              <div className="p-4 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-500">
                   <span>Equivalent AWS EC2 + EBS:</span>
                   <span className="font-mono line-through text-slate-400">${awsEquivalent.toFixed(2)}/mo</span>
@@ -181,7 +181,7 @@ export function PricingCalculator() {
                   <span>AWS Data Transfer Egress Tax:</span>
                   <span className="font-mono text-rose-500">+~$0.09 / GB</span>
                 </div>
-                <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400 font-semibold pt-1 border-t border-slate-200 dark:border-[#232736]">
+                <div className="flex justify-between items-center text-[#4EA871] dark:text-[#56B87C] font-semibold pt-1 border-t border-[#E7E4DF] dark:border-[#282D3A]">
                   <span>CloudNova Outbound Egress:</span>
                   <span className="font-mono">$0.00 (Unlimited Free)</span>
                 </div>
@@ -203,10 +203,10 @@ export function PricingCalculator() {
               </div>
             </div>
 
-            <div className="pt-6 mt-6 border-t border-slate-200 dark:border-[#232736]">
+            <div className="pt-6 mt-6 border-t border-[#E7E4DF] dark:border-[#282D3A]">
               <Link
                 href="/register"
-                className="w-full h-10 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+                className="w-full h-10 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
               >
                 <span>Deploy Configuration ($200 Credit)</span>
                 <ArrowRight className="w-4 h-4" />

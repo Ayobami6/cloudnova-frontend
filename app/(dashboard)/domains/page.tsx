@@ -256,13 +256,13 @@ export default function DomainsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h1 className="text-xl font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
             Domains & Anycast DNS
-            <span className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-[#161922] px-2 py-0.5 rounded border border-slate-200 dark:border-[#232736]">
+            <span className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-[#EFECE8] dark:bg-[#161920] px-2 py-0.5 rounded border border-[#E7E4DF] dark:border-[#282D3A]">
               {domains.length} zones
             </span>
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
             Global Anycast DNS routing, automated DNSSEC, free Let&apos;s Encrypt SSL, and 1-click cloud resource binding.
           </p>
         </div>
@@ -272,7 +272,7 @@ export default function DomainsPage() {
             setIsRegisterOpen(true);
             setRegisterError(null);
           }}
-          className="h-9 px-3.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+          className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Register Domain</span>
@@ -280,9 +280,9 @@ export default function DomainsPage() {
       </div>
 
       {/* Domain Portfolio Table */}
-      <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden">
+      <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
+          <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
             <tr>
               <th className="py-2.5 px-4">Domain Name</th>
               <th className="py-2.5 px-4">Security & SSL</th>
@@ -292,19 +292,19 @@ export default function DomainsPage() {
               <th className="py-2.5 px-4 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
+          <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
             {domains.map((dom) => (
               <tr key={dom.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02] transition-colors">
                 <td className="py-3 px-4">
                   <span className="font-semibold text-slate-900 dark:text-slate-200 block">{dom.name}</span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5 font-medium">
+                  <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] flex items-center gap-1 mt-0.5 font-medium">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     Anycast Active
                   </span>
                 </td>
                 <td className="py-3 px-4">
                   <div className="flex items-center gap-2 text-[11px] text-slate-700 dark:text-slate-300">
-                    <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
+                    <span className="flex items-center gap-1 text-[#4EA871] dark:text-[#56B87C] font-medium">
                       <Lock className="w-3 h-3" /> SSL 90d
                     </span>
                     <span className="text-slate-400">•</span>
@@ -313,13 +313,13 @@ export default function DomainsPage() {
                     </span>
                   </div>
                 </td>
-                <td className="py-3 px-4 text-slate-500 dark:text-slate-400 text-[11px]">
+                <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400 text-[11px]">
                   <span>{dom.expiresAt}</span>
                   <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Auto-renew enabled</span>
                 </td>
                 <td className="py-3 px-4">
                   {dom.linkedResourceId ? (
-                    <span className="text-slate-800 dark:text-slate-200 flex items-center gap-1.5 font-mono text-[11px]">
+                    <span className="text-[#1E1E1E] dark:text-slate-200 flex items-center gap-1.5 font-mono text-[11px]">
                       <Server className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                       {dom.linkedResourceId}
                     </span>
@@ -329,7 +329,7 @@ export default function DomainsPage() {
                 </td>
                 <td className="py-3 px-4 font-mono">
                   <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(dom.retailAnnual)}/yr</span>
-                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                  <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] font-medium">
                     +{formatMoney(dom.retailAnnual - dom.wholesaleAnnual)} margin
                   </span>
                 </td>
@@ -338,8 +338,8 @@ export default function DomainsPage() {
                     onClick={() => setSelectedDomainId(dom.id)}
                     className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${
                       activeDomain?.id === dom.id
-                        ? "bg-blue-600 text-white font-semibold shadow-sm"
-                        : "bg-slate-100 dark:bg-[#1E2230] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736]"
+                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
+                        : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
                     }`}
                   >
                     Manage DNS
@@ -353,10 +353,10 @@ export default function DomainsPage() {
 
       {/* Active DNS Zone Editor */}
       {activeDomain && (
-        <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden p-6 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-[#232736]">
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E7E4DF] dark:border-[#282D3A]">
             <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
                 DNS Zone Editor: <span className="text-blue-600 dark:text-blue-400 font-mono">{activeDomain.name}</span>
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
@@ -371,7 +371,7 @@ export default function DomainsPage() {
                 onChange={(e) => {
                   if (e.target.value) handle1ClickLink(e.target.value);
                 }}
-                className="h-8 px-2.5 rounded bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200"
+                className="h-8 px-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200"
                 defaultValue=""
               >
                 <option value="" disabled>Point to Droplet or S3...</option>
@@ -386,13 +386,13 @@ export default function DomainsPage() {
           </div>
 
           {/* Add Record Form */}
-          <form onSubmit={handleAddRecord} className="p-3 bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] rounded-md grid grid-cols-5 gap-3 items-end">
+          <form onSubmit={handleAddRecord} className="p-3 bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] rounded-md grid grid-cols-5 gap-3 items-end">
             <div>
               <label className="text-[11px] text-slate-600 dark:text-slate-400 block mb-1 font-medium">Type</label>
               <select
                 value={recType}
                 onChange={(e) => setRecType(e.target.value as "A" | "AAAA" | "CNAME" | "MX" | "TXT")}
-                className="w-full h-8 px-2 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200"
               >
                 <option value="A">A (IPv4)</option>
                 <option value="AAAA">AAAA (IPv6)</option>
@@ -407,7 +407,7 @@ export default function DomainsPage() {
                 type="text"
                 value={recName}
                 onChange={(e) => setRecName(e.target.value)}
-                className="w-full h-8 px-2 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs font-mono text-slate-800 dark:text-slate-200"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-slate-200"
                 required
               />
             </div>
@@ -417,7 +417,7 @@ export default function DomainsPage() {
                 type="text"
                 value={recValue}
                 onChange={(e) => setRecValue(e.target.value)}
-                className="w-full h-8 px-2 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs font-mono text-slate-800 dark:text-slate-200"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-slate-200"
                 required
               />
             </div>
@@ -427,13 +427,13 @@ export default function DomainsPage() {
                 type="number"
                 value={recTtl}
                 onChange={(e) => setRecTtl(Number(e.target.value))}
-                className="w-full h-8 px-2 rounded bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs font-mono text-slate-800 dark:text-slate-200"
+                className="w-full h-8 px-2 rounded bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-slate-200"
               />
             </div>
             <div>
               <button
                 type="submit"
-                className="w-full h-8 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+                className="w-full h-8 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
               >
                 Add Record
               </button>
@@ -441,8 +441,8 @@ export default function DomainsPage() {
           </form>
 
           {/* Records Table */}
-          <table className="w-full text-left text-xs border border-slate-200 dark:border-[#232736] rounded-md overflow-hidden">
-            <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
+          <table className="w-full text-left text-xs border border-[#E7E4DF] dark:border-[#282D3A] rounded-md overflow-hidden">
+            <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
               <tr>
                 <th className="py-2.5 px-3">Type</th>
                 <th className="py-2.5 px-3">Name</th>
@@ -451,7 +451,7 @@ export default function DomainsPage() {
                 <th className="py-2.5 px-3 text-right">Delete</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-[#232736] font-mono text-xs">
+            <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] font-mono text-xs">
               {activeDomain.records.map((r) => (
                 <tr key={r.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02]">
                   <td className="py-2.5 px-3">
@@ -480,15 +480,15 @@ export default function DomainsPage() {
       {/* Register & Verify Domain Modal */}
       {isRegisterOpen && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] rounded-xl shadow-2xl w-full max-w-xl p-6 space-y-5">
+          <div className="bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] rounded-xl shadow-2xl w-full max-w-xl p-6 space-y-5">
             {/* Modal Header */}
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <h3 className="text-base font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
                   <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span>Register & Verify Domain</span>
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
                   Real-time Route 53 registrar verification with automated Anycast DNS and WHOIS privacy.
                 </p>
               </div>
@@ -528,7 +528,7 @@ export default function DomainsPage() {
                     value={searchDomain}
                     onChange={(e) => setSearchDomain(e.target.value)}
                     placeholder="e.g. yourstartup or yourstartup.com"
-                    className="w-full h-10 pl-9 pr-8 rounded-lg bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs font-mono text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                    className="w-full h-10 pl-9 pr-8 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
                   />
                   {searchDomain && (
                     <button
@@ -544,7 +544,7 @@ export default function DomainsPage() {
                   type="button"
                   onClick={() => verifyAvailability(searchDomain)}
                   disabled={isVerifyingAll || searchDomain.trim().length < 2}
-                  className="h-10 px-3.5 rounded-lg bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#272D3F] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
+                  className="h-10 px-3.5 rounded-lg bg-[#EFECE8] dark:bg-[#232834] hover:bg-slate-200 dark:hover:bg-[#272D3F] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isVerifyingAll ? "animate-spin text-blue-500" : ""}`} />
                   <span>Verify All</span>
@@ -565,7 +565,7 @@ export default function DomainsPage() {
 
               <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
                 {currentCandidates.length === 0 ? (
-                  <div className="p-6 text-center rounded-lg border border-dashed border-slate-200 dark:border-[#232736] text-xs text-slate-400">
+                  <div className="p-6 text-center rounded-lg border border-dashed border-[#E7E4DF] dark:border-[#282D3A] text-xs text-slate-400">
                     Type a domain name above to verify availability
                   </div>
                 ) : (
@@ -591,15 +591,15 @@ export default function DomainsPage() {
                           isAvailable
                             ? "bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-300 dark:border-emerald-500/30"
                             : isUnavailable
-                            ? "bg-slate-50 dark:bg-[#11131A] border-slate-200 dark:border-[#232736] opacity-75"
+                            ? "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] opacity-75"
                             : isChecking
                             ? "bg-blue-50/30 dark:bg-blue-950/10 border-blue-200 dark:border-blue-500/20"
-                            : "bg-slate-50 dark:bg-[#11131A] border-slate-200 dark:border-[#232736]"
+                            : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A]"
                         }`}
                       >
                         <div className="space-y-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs font-mono font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+                            <span className="text-xs font-mono font-bold text-[#1E1E1E] dark:text-white tracking-tight">
                               {domainKey}
                             </span>
 
@@ -612,7 +612,7 @@ export default function DomainsPage() {
                             )}
                             {isAvailable && (
                               <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-500/30">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                <CheckCircle2 className="w-3 h-3 text-[#4EA871] dark:text-[#56B87C]" />
                                 Available
                               </span>
                             )}
@@ -630,7 +630,7 @@ export default function DomainsPage() {
                             )}
                           </div>
 
-                          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                          <div className="text-[11px] text-[#8C8B87] dark:text-slate-400 flex items-center gap-2">
                             <span>Wholesale: {formatMoney(currentWholesale)}/yr</span>
                             <span>•</span>
                             <span className="text-slate-700 dark:text-slate-300 font-medium">
@@ -639,7 +639,7 @@ export default function DomainsPage() {
                             {isAvailable && (
                               <>
                                 <span>•</span>
-                                <span className="text-emerald-600 dark:text-emerald-400">
+                                <span className="text-[#4EA871] dark:text-[#56B87C]">
                                   +{formatMoney(currentRetail - currentWholesale)} margin
                                 </span>
                               </>
@@ -654,7 +654,7 @@ export default function DomainsPage() {
                               type="button"
                               onClick={() => handleRegister(domainKey, item.tld, currentWholesale, currentRetail)}
                               disabled={isCurrentlyRegistering || isRegistering !== null}
-                              className="h-8 px-3.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {isCurrentlyRegistering ? (
                                 <>
@@ -672,7 +672,7 @@ export default function DomainsPage() {
                             <button
                               type="button"
                               disabled
-                              className="h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] text-slate-400 dark:text-slate-500 text-xs font-medium cursor-not-allowed"
+                              className="h-8 px-3 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-slate-400 dark:text-slate-500 text-xs font-medium cursor-not-allowed"
                             >
                               Taken
                             </button>
@@ -680,7 +680,7 @@ export default function DomainsPage() {
                             <button
                               type="button"
                               disabled
-                              className="h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] text-slate-400 text-xs font-medium cursor-not-allowed flex items-center gap-1.5"
+                              className="h-8 px-3 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-slate-400 text-xs font-medium cursor-not-allowed flex items-center gap-1.5"
                             >
                               <Loader2 className="w-3 h-3 animate-spin" />
                               <span>Checking</span>
@@ -689,7 +689,7 @@ export default function DomainsPage() {
                             <button
                               type="button"
                               onClick={() => verifyAvailability(domainKey)}
-                              className="h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#272D3F] text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer"
+                              className="h-8 px-3 rounded-full bg-[#EFECE8] dark:bg-[#232834] hover:bg-slate-200 dark:hover:bg-[#272D3F] text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer"
                             >
                               Verify
                             </button>
@@ -703,15 +703,15 @@ export default function DomainsPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="pt-2 border-t border-slate-200 dark:border-[#232736] flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-[11px] text-[#8C8B87] dark:text-slate-400">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Includes free WHOIS Privacy, SSL, and Route 53 Anycast DNS.</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsRegisterOpen(false)}
-                className="h-8 px-4 rounded-md bg-slate-100 dark:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] cursor-pointer"
+                className="h-8 px-4 rounded-full bg-[#EFECE8] dark:bg-[#232834] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] cursor-pointer"
               >
                 Close
               </button>

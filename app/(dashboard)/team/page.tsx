@@ -1,11 +1,16 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Users, Plus, Trash2, Mail, Building2, Loader2, AlertCircle, CheckCircle2, ArrowRightLeft } from "lucide-react";
 import * as authApi from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/errors";
 import { useAuth } from "@/lib/store/auth-context";
 import type { AccountResponse, AccountRole, MemberResponse } from "@/lib/api/types";
+import {
+  MaterialIcon,
+  PastelTypePill,
+  StatusIndicator,
+} from "@/components/ui/material-icon";
+import { PastelKpiCard } from "@/components/ui/bento-primitives";
 
 const ROLES: AccountRole[] = ["OWNER", "ADMIN", "DEVELOPER", "BILLING_VIEWER"];
 const MANAGE_ROLES = new Set<AccountRole>(["OWNER", "ADMIN"]);
@@ -98,7 +103,10 @@ export default function TeamPage() {
     setIsInviting(true);
     setError(null);
     try {
-      await authApi.inviteMember(user.accountId, { email: inviteEmail.trim(), role: inviteRole });
+      await authApi.inviteMember(user.accountId, {
+        email: inviteEmail.trim(),
+        role: inviteRole,
+      });
       setNotice(`Invitation sent to ${inviteEmail.trim()}.`);
       setInviteEmail("");
     } catch (err) {
@@ -141,69 +149,92 @@ export default function TeamPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-          <Users className="w-5 h-5" /> Team & Organizations
-        </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Manage the organizations you belong to and who has access to {user?.company || "your account"}.
-        </p>
+    <div className="space-y-5">
+      {/* Top 3 Pastel KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <PastelKpiCard
+          label="Organizations"
+          value={accounts.length || 1}
+          subtitle="Multi-tenant isolation"
+          variant="lavender"
+          actionLabel="Refresh"
+          onAction={loadData}
+        />
+        <PastelKpiCard
+          label="Team Members"
+          value={members.length || 1}
+          subtitle="RBAC enforced"
+          variant="blue"
+          actionLabel="Check"
+          onAction={loadData}
+        />
+        <PastelKpiCard
+          label="Active Role"
+          value={user?.role || "OWNER"}
+          subtitle={user?.company || "Primary Tenant"}
+          variant="yellow"
+          actionLabel="Active"
+          onAction={loadData}
+        />
       </div>
 
       {error && (
-        <div className="p-3 rounded-md bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-xs text-rose-600 dark:text-rose-400 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="nixtio-card p-4 text-xs text-[#D94E4E] flex items-center gap-2">
+          <MaterialIcon name="error" size={18} />
           <span>{error}</span>
         </div>
       )}
       {notice && (
-        <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="nixtio-card p-4 text-xs text-[#4EA871] flex items-center gap-2">
+          <MaterialIcon name="check_circle" size={18} />
           <span>{notice}</span>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Organizations */}
-        <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] space-y-4">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Building2 className="w-4 h-4" /> Your Organizations
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Organizations Card */}
+        <div className="nixtio-card p-6 space-y-4">
+          <h2 className="text-base font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
+            <MaterialIcon name="apartment" size={18} />
+            <span>Your Organizations</span>
           </h2>
 
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {isLoading && accounts.length === 0 && (
-              <p className="text-xs text-slate-400">Loading...</p>
+              <p className="text-xs text-[#8C8B87]">Loading organizations...</p>
             )}
             {accounts.map((acct) => {
               const isActive = acct.id === user?.accountId;
               return (
                 <div
                   key={acct.id}
-                  className={`flex items-center justify-between p-3 rounded-md border text-xs ${
+                  className={`flex items-center justify-between p-3.5 rounded-2xl text-xs ${
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-600/10 border-blue-200 dark:border-blue-500/30"
-                      : "bg-slate-50 dark:bg-[#11131A] border-slate-200 dark:border-[#232736]"
+                      ? "bg-[#E6D8EA]/60 dark:bg-[#E6D8EA]/15"
+                      : "bg-[#F6F6F4] dark:bg-[#161920]"
                   }`}
                 >
-                  <div>
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">{acct.name}</span>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{acct.account_number}</p>
+                  <div className="flex items-center gap-3">
+                    <PastelTypePill
+                      icon="domain"
+                      label={acct.account_number}
+                      variant={isActive ? "lavender" : "blue"}
+                      size="sm"
+                    />
+                    <span className="font-semibold text-[#1E1E1E] dark:text-white">
+                      {acct.name}
+                    </span>
                   </div>
                   {isActive ? (
-                    <span className="text-[10px] font-mono uppercase text-blue-600 dark:text-blue-400 font-semibold">Active</span>
+                    <StatusIndicator status="completed" label="Active" />
                   ) : (
                     <button
+                      type="button"
                       onClick={() => handleSwitchAccount(acct.id)}
                       disabled={switchingAccountId === acct.id}
-                      className="h-7 px-2.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-[#1E2230] dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-slate-700 dark:text-slate-300 flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
+                      className="h-8 px-3.5 rounded-full bg-white dark:bg-[#232834] text-xs font-medium text-[#1E1E1E] dark:text-white shadow-2xs hover:bg-[#222222] hover:text-white transition-colors cursor-pointer disabled:opacity-50"
                     >
-                      {switchingAccountId === acct.id ? (
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <ArrowRightLeft className="w-3 h-3" />
-                      )}
-                      <span>Switch</span>
+                      Switch
                     </button>
                   )}
                 </div>
@@ -211,76 +242,90 @@ export default function TeamPage() {
             })}
           </div>
 
-          <form onSubmit={handleCreateOrg} className="pt-3 border-t border-slate-200 dark:border-[#232736] flex gap-2">
+          <form
+            onSubmit={handleCreateOrg}
+            className="pt-3 border-t border-[#E7E4DF] dark:border-[#282D3A] flex gap-2"
+          >
             <input
               type="text"
               value={newOrgName}
               onChange={(e) => setNewOrgName(e.target.value)}
               placeholder="New organization name"
-              className="flex-1 h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500"
+              className="flex-1 h-10 px-4 rounded-full bg-[#F6F6F4] dark:bg-[#161920] text-xs text-[#1E1E1E] dark:text-white placeholder-[#8C8B87] focus:outline-none"
             />
             <button
               type="submit"
               disabled={isCreatingOrg || !newOrgName.trim()}
-              className="h-9 px-3.5 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer"
+              className="h-10 px-5 rounded-full bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] text-xs font-medium disabled:opacity-50 cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Create</span>
+              Create
             </button>
           </form>
 
-          <form onSubmit={handleAcceptInvitation} className="pt-3 border-t border-slate-200 dark:border-[#232736] flex gap-2">
+          <form
+            onSubmit={handleAcceptInvitation}
+            className="pt-3 border-t border-[#E7E4DF] dark:border-[#282D3A] flex gap-2"
+          >
             <input
               type="text"
               value={invitationToken}
               onChange={(e) => setInvitationToken(e.target.value)}
               placeholder="Paste invitation token"
-              className="flex-1 h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500"
+              className="flex-1 h-10 px-4 rounded-full bg-[#F6F6F4] dark:bg-[#161920] text-xs text-[#1E1E1E] dark:text-white placeholder-[#8C8B87] focus:outline-none"
             />
             <button
               type="submit"
               disabled={isAccepting || !invitationToken.trim()}
-              className="h-9 px-3.5 rounded-md bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] disabled:opacity-50 text-slate-700 dark:text-slate-300 text-xs font-semibold shrink-0 transition-colors cursor-pointer"
+              className="h-10 px-5 rounded-full bg-[#CFE0EC] text-[#1E1E1E] text-xs font-medium disabled:opacity-50 cursor-pointer"
             >
               Accept
             </button>
           </form>
         </div>
 
-        {/* Members */}
-        <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] space-y-4">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Mail className="w-4 h-4" /> Team Members
+        {/* Members Card */}
+        <div className="nixtio-card p-6 space-y-4">
+          <h2 className="text-base font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
+            <MaterialIcon name="group" size={18} />
+            <span>Team Members</span>
           </h2>
 
-          <div className="space-y-2">
-            {isLoading && members.length === 0 && <p className="text-xs text-slate-400">Loading...</p>}
+          <div className="space-y-2.5">
             {!isLoading && members.length === 0 && (
-              <p className="text-xs text-slate-400">No members found for the active organization.</p>
+              <p className="text-xs text-[#8C8B87]">
+                No members found for the active organization.
+              </p>
             )}
             {members.map((m) => (
               <div
                 key={m.id}
-                className="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs"
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] text-xs"
               >
-                <div>
-                  <span className="font-mono text-slate-700 dark:text-slate-300">{m.user_id.slice(0, 8)}</span>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {m.role} • joined {new Date(m.joined_at).toLocaleDateString()}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <PastelTypePill
+                    icon="person"
+                    label={m.role}
+                    variant={m.role === "OWNER" ? "yellow" : "blue"}
+                    size="sm"
+                  />
+                  <div>
+                    <span className="font-mono font-semibold text-[#1E1E1E] dark:text-white">
+                      {m.user_id.slice(0, 8)}
+                    </span>
+                    <p className="text-[11px] text-[#8C8B87]">
+                      Joined {new Date(m.joined_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
                 {canManage && m.user_id !== user?.id && (
                   <button
+                    type="button"
                     onClick={() => handleRemoveMember(m.user_id)}
                     disabled={removingUserId === m.user_id}
-                    className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 p-1.5 rounded transition-colors cursor-pointer disabled:opacity-50"
+                    className="w-8 h-8 rounded-full bg-[#FADBD8]/60 text-[#D94E4E] flex items-center justify-center cursor-pointer disabled:opacity-50"
                     aria-label="Remove member"
                   >
-                    {removingUserId === m.user_id ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-3.5 h-3.5" />
-                    )}
+                    <MaterialIcon name="delete" size={15} />
                   </button>
                 )}
               </div>
@@ -288,19 +333,22 @@ export default function TeamPage() {
           </div>
 
           {canManage && (
-            <form onSubmit={handleInvite} className="pt-3 border-t border-slate-200 dark:border-[#232736] space-y-2">
+            <form
+              onSubmit={handleInvite}
+              className="pt-3 border-t border-[#E7E4DF] dark:border-[#282D3A] space-y-2.5"
+            >
               <div className="flex gap-2">
                 <input
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="teammate@company.com"
-                  className="flex-1 h-9 px-3 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                  className="flex-1 h-10 px-4 rounded-full bg-[#F6F6F4] dark:bg-[#161920] text-xs text-[#1E1E1E] dark:text-white placeholder-[#8C8B87] focus:outline-none"
                 />
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value as AccountRole)}
-                  className="h-9 px-2 rounded-md bg-slate-50 dark:bg-[#11131A] border border-slate-200 dark:border-[#232736] text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="h-10 px-4 rounded-full bg-[#F6F6F4] dark:bg-[#161920] text-xs font-medium text-[#1E1E1E] dark:text-white focus:outline-none"
                 >
                   {ROLES.map((r) => (
                     <option key={r} value={r}>
@@ -312,9 +360,9 @@ export default function TeamPage() {
               <button
                 type="submit"
                 disabled={isInviting || !inviteEmail.trim()}
-                className="w-full h-9 rounded-md bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="w-full h-10 rounded-full bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] text-xs font-medium flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
               >
-                {isInviting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                <MaterialIcon name="send" size={15} />
                 <span>Send Invitation</span>
               </button>
             </form>

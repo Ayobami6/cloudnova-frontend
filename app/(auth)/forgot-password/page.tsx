@@ -121,10 +121,10 @@ export default function ForgotPasswordPage() {
             <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3 shadow-xs">
               <KeyRound className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            <h1 className="text-2xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
               Reset Your Password
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
               Enter your registered work email to receive a secure 6-digit OTP verification code.
             </p>
           </div>
@@ -147,7 +147,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="alex.chen@cloudnova.io"
                   required
-                  className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-9 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span>Sending Code...</span>
@@ -177,10 +177,10 @@ export default function ForgotPasswordPage() {
             <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3 shadow-xs">
               <Lock className="w-6 h-6" />
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            <h1 className="text-2xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
               Enter Reset Code & New Password
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
               Verify the 6-digit OTP code sent to{" "}
               <span className="font-mono font-medium text-slate-900 dark:text-slate-200">{email}</span>
             </p>
@@ -194,7 +194,7 @@ export default function ForgotPasswordPage() {
           )}
 
           {isSuccess && (
-            <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+            <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-[#4EA871] dark:text-[#56B87C] flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>Password successfully updated! Redirecting to Sign In...</span>
             </div>
@@ -217,7 +217,7 @@ export default function ForgotPasswordPage() {
                     value={digit}
                     onChange={(e) => handleDigitChange(idx, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(idx, e)}
-                    className="w-10 h-11 sm:w-11 sm:h-12 text-center font-mono text-base font-semibold rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
+                    className="w-10 h-11 sm:w-11 sm:h-12 text-center font-mono text-base font-semibold nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] text-[#1E1E1E] dark:text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs"
                     autoFocus={idx === 0}
                   />
                 ))}
@@ -235,7 +235,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Min 8 chars, 1 uppercase, 1 symbol"
                   required
-                  className="w-full h-9 pl-9 pr-10 rounded-md bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full h-9 pl-9 pr-10 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                 />
                 <button
                   type="button"
@@ -258,7 +258,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat new password"
                   required
-                  className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                 />
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading || isSuccess}
-              className="w-full h-9 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span>Updating Password...</span>
@@ -280,7 +280,7 @@ export default function ForgotPasswordPage() {
           </form>
 
           {/* Resend & Back */}
-          <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-[#232736]">
+          <div className="flex items-center justify-between text-xs pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
             <button
               type="button"
               onClick={handleResend}

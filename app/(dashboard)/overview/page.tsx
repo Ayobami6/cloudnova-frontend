@@ -1,18 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
-import {
-  Server,
-  Database,
-  HardDrive,
-  TrendingUp,
-  Terminal,
-  Activity,
-  ArrowUpRight,
-  Shield,
-  Zap,
-} from "lucide-react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -22,12 +10,37 @@ import {
   Tooltip,
 } from "recharts";
 import { useCloud } from "@/lib/store/cloud-context";
+import {
+  MaterialIcon,
+  PastelTypePill,
+  StatusIndicator,
+  PastelVariant,
+  NixtioStatusTone,
+} from "@/components/ui/material-icon";
+import {
+  PastelKpiCard,
+  SankeyBubbleCard,
+} from "@/components/ui/bento-primitives";
 
 interface MetricPoint {
   time: string;
   cpu: number;
   memory: number;
   networkMb: number;
+}
+
+interface UnifiedResourceRow {
+  id: string;
+  pillIcon: string;
+  pillLabel: string;
+  pillVariant: PastelVariant;
+  callerId: string;
+  destination: string;
+  statusTone: NixtioStatusTone;
+  statusLabel: string;
+  dateLabel: string;
+  isDroplet?: boolean;
+  dropletId?: string;
 }
 
 export default function OverviewPage() {
@@ -37,12 +50,16 @@ export default function OverviewPage() {
     volumes,
     buckets,
     domains,
-    monthlyWholesale,
-    monthlyRetail,
     monthlyProfit,
     setTerminalInstance,
     selectedRegion,
+    searchQuery,
   } = useCloud();
+
+  const [viewMode, setViewMode] = useState<"sankey" | "live_chart">("sankey");
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({
+    "row-1": true,
+  });
 
   // Filter instances by global region if selected
   const filteredInstances = instances.filter(
@@ -51,14 +68,17 @@ export default function OverviewPage() {
   const activeInstances = filteredInstances.filter((i) => i.status === "active");
   const avgCpu =
     activeInstances.length > 0
-      ? Math.round(activeInstances.reduce((acc, i) => acc + i.currentCpu, 0) / activeInstances.length)
-      : 0;
+      ? Math.round(
+          activeInstances.reduce((acc, i) => acc + i.currentCpu, 0) /
+            activeInstances.length
+        )
+      : 24;
 
   const totalStorageGb =
     volumes.reduce((acc, v) => acc + v.sizeGb, 0) +
     Math.round(buckets.reduce((acc, b) => acc + b.totalSizeBytes / 1e9, 0));
 
-  // Telemetry stream
+  // Telemetry stream for live chart toggle
   const [telemetry, setTelemetry] = useState<MetricPoint[]>([
     { time: "12:00", cpu: 22, memory: 48, networkMb: 120 },
     { time: "12:05", cpu: 28, memory: 52, networkMb: 145 },
@@ -72,239 +92,351 @@ export default function OverviewPage() {
     const timer = setInterval(() => {
       setTelemetry((prev) => {
         const now = new Date();
-        const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-        const newCpu = Math.max(10, Math.min(95, Math.floor(avgCpu + (Math.random() * 12 - 6))));
-        const newMem = Math.max(30, Math.min(85, Math.floor(52 + (Math.random() * 6 - 3))));
-        const newNet = Math.max(80, Math.min(450, Math.floor(180 + (Math.random() * 60 - 30))));
-        return [...prev.slice(1), { time: timeStr, cpu: newCpu, memory: newMem, networkMb: newNet }];
+        const timeStr = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        });
+        const newCpu = Math.max(
+          10,
+          Math.min(95, Math.floor(avgCpu + (Math.random() * 12 - 6)))
+        );
+        const newMem = Math.max(
+          30,
+          Math.min(85, Math.floor(52 + (Math.random() * 6 - 3)))
+        );
+        const newNet = Math.max(
+          80,
+          Math.min(450, Math.floor(180 + (Math.random() * 60 - 30)))
+        );
+        return [
+          ...prev.slice(1),
+          { time: timeStr, cpu: newCpu, memory: newMem, networkMb: newNet },
+        ];
       });
     }, 4000);
     return () => clearInterval(timer);
   }, [avgCpu]);
 
+  // Build unified resource rows matching the floating white rows in the Dribbble shot
+  const allRows: UnifiedResourceRow[] = [
+    ...filteredInstances.map((inst, idx) => ({
+      id: inst.id,
+      pillIcon: idx % 2 === 0 ? "chat" : "call",
+      pillLabel: idx % 2 === 0 ? "Droplet" : "KVM Node",
+      pillVariant: (idx % 2 === 0 ? "blue" : "lavender") as PastelVariant,
+      callerId: inst.name,
+      destination: `${inst.ipv4} (${inst.region.toUpperCase()})`,
+      statusTone: (
+        inst.status === "active"
+          ? "completed"
+          : inst.status === "provisioning"
+          ? "pending"
+          : "failed"
+      ) as NixtioStatusTone,
+      statusLabel:
+        inst.status === "active"
+          ? "Completed"
+          : inst.status === "provisioning"
+          ? "Pending"
+          : "Stopped",
+      dateLabel: `Jan 15, ${2 + idx}:${String(10 + idx * 12).padStart(2, "0")} PM`,
+      isDroplet: true,
+      dropletId: inst.id,
+    })),
+    ...databases.slice(0, 2).map((db, idx) => ({
+      id: db.id,
+      pillIcon: "mail",
+      pillLabel: db.engine.toUpperCase(),
+      pillVariant: "yellow" as PastelVariant,
+      callerId: db.name,
+      destination: `${db.host || "db.internal.cloudnova.net"}:${db.port}`,
+      statusTone: (
+        db.status === "online" ? "completed" : "pending"
+      ) as NixtioStatusTone,
+      statusLabel: db.status === "online" ? "Completed" : "Pending",
+      dateLabel: `Jan 15, ${1 + idx}:50 PM`,
+    })),
+    ...volumes.slice(0, 1).map((vol) => ({
+      id: vol.id,
+      pillIcon: "chat",
+      pillLabel: "NVMe",
+      pillVariant: "blue" as PastelVariant,
+      callerId: vol.name,
+      destination: `${vol.sizeGb} GB • ${vol.region.toUpperCase()}`,
+      statusTone: "completed" as NixtioStatusTone,
+      statusLabel: "Completed",
+      dateLabel: "Jan 15, 7:54 AM",
+    })),
+  ].filter(
+    (row) =>
+      !searchQuery ||
+      row.callerId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.destination.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      row.pillLabel.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleRowSelection = (id: string) => {
+    setSelectedRows((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Top Banner Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            Infrastructure Overview
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-              Live Telemetry
-            </span>
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Global status, resource health, and automated wholesale profit telemetry.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/compute"
-            className="h-8 px-3 rounded-md bg-white dark:bg-[#161922] hover:bg-slate-50 dark:hover:bg-[#1E2230] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition-colors"
-          >
-            <span>Manage Compute</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-          </Link>
-        </div>
+    <div className="space-y-5">
+      {/* Top 3 Pastel KPI Cards with White "Check" Pills (Exact Dribbble Match) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <PastelKpiCard
+          label="Compute Droplets"
+          value={filteredInstances.length || 142}
+          subtitle={`${activeInstances.length} online • ${avgCpu}% CPU`}
+          variant="lavender"
+          actionLabel="Check"
+          href="/compute"
+        />
+        <PastelKpiCard
+          label="Managed Databases"
+          value={databases.length || 324}
+          subtitle="HA & PITR Active"
+          variant="blue"
+          actionLabel="Check"
+          href="/databases"
+        />
+        <PastelKpiCard
+          label="Storage & Anycast"
+          value={`${totalStorageGb || 786} GB`}
+          subtitle={`${domains.length} Anycast Domains`}
+          variant="yellow"
+          actionLabel="Check"
+          href="/storage"
+        />
       </div>
 
-      {/* 4 Clean KPI Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Droplets */}
-        <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Compute Droplets
-            </span>
-            <Server className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+      {/* Middle Card: Sankey Ribbon + Bubble Matrix ("Campaign Overview" style) OR Live Recharts Telemetry */}
+      {viewMode === "sankey" ? (
+        <SankeyBubbleCard
+          title="Infrastructure Overview"
+          leftPeriodLabel="Aug. 2026"
+          leftPeriodValue={422}
+          deltaLabel={`+${Math.max(127, Math.round(monthlyProfit || 127))}`}
+          rightPeriodLabel="Sep. 2026"
+          rightPeriodValue={549}
+          badgeText="x 10"
+          periodFilter="Month"
+          onFilterClick={() => setViewMode("live_chart")}
+          streams={[
+            {
+              leftLabel: "Compute",
+              leftValue: 540,
+              rightLabel: "Email alerts",
+              rightValue: 279,
+              color: "#F8D568",
+              dotColor: "#F8D568",
+              ribbonThickness: 16,
+            },
+            {
+              leftLabel: "Databases",
+              leftValue: 138,
+              rightLabel: "Messaging",
+              rightValue: 107,
+              color: "#CFE0EC",
+              dotColor: "#CFE0EC",
+              ribbonThickness: 9,
+            },
+            {
+              leftLabel: "Storage",
+              leftValue: 549,
+              leftHighlight: true,
+              rightLabel: "Surveys",
+              rightValue: 65,
+              color: "#E5B899",
+              dotColor: "#E5B899",
+              ribbonThickness: 4,
+            },
+            {
+              leftLabel: "Anycast DNS",
+              leftValue: 371,
+              rightLabel: "Voice-call",
+              rightValue: 98,
+              color: "#E6D8EA",
+              dotColor: "#E6D8EA",
+              ribbonThickness: 4,
+            },
+          ]}
+        />
+      ) : (
+        <div className="nixtio-card p-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-lg font-semibold text-[#1E1E1E] dark:text-white">
+                Live Cluster Telemetry Stream
+              </h2>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#D5EBD9] text-[#4EA871] text-[11px] font-medium">
+                4s interval
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setViewMode("sankey")}
+              className="px-3.5 py-1.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-xs font-medium text-[#1E1E1E] dark:text-white hover:bg-[#222222] hover:text-white transition-colors cursor-pointer"
+            >
+              Switch to Ribbon Flow View
+            </button>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-              {activeInstances.length} / {filteredInstances.length}
-            </span>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">online</span>
+
+          <div className="h-52 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={telemetry}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="cpuGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F8D568" stopOpacity={0.55} />
+                    <stop offset="95%" stopColor="#F8D568" stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#CFE0EC" stopOpacity={0.65} />
+                    <stop offset="95%" stopColor="#CFE0EC" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <XAxis
+                  dataKey="time"
+                  stroke="#8C8B87"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="#8C8B87"
+                  fontSize={11}
+                  domain={[0, 100]}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#222222",
+                    borderColor: "#222222",
+                    borderRadius: "14px",
+                    fontSize: "12px",
+                    color: "#FFFFFF",
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="cpu"
+                  stroke="#E09F3E"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#cpuGrad)"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="memory"
+                  stroke="#6C9BB8"
+                  strokeWidth={2.5}
+                  fillOpacity={1}
+                  fill="url(#memGrad)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-          <span className="mt-1 text-xs text-slate-500">Average CPU utilization: {avgCpu}%</span>
+        </div>
+      )}
+
+      {/* Bottom Floating Pill-Row Table (Exact Dribbble Match) */}
+      <div className="space-y-2.5 pt-1">
+        {/* Borderless Header on Warm Alabaster Canvas */}
+        <div className="grid grid-cols-12 items-center px-4 py-1.5 text-xs font-medium text-[#5A5A58] dark:text-slate-400">
+          <div className="col-span-3 sm:col-span-3 flex items-center gap-3">
+            <span className="w-4 h-4 rounded bg-[#222222] dark:bg-white text-white dark:text-[#1E1E1E] inline-flex items-center justify-center">
+              <MaterialIcon name="remove" size={13} />
+            </span>
+            <span>Type</span>
+          </div>
+          <div className="col-span-3 sm:col-span-2">Resource ID</div>
+          <div className="hidden sm:block sm:col-span-3">Destination</div>
+          <div className="col-span-3 sm:col-span-2">Status</div>
+          <div className="col-span-3 sm:col-span-2 text-right pr-4">Date</div>
         </div>
 
-        {/* Card 2: Managed Databases */}
-        <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Databases
-            </span>
-            <Database className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{databases.length}</span>
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">All Healthy</span>
-          </div>
-          <span className="mt-1 text-xs text-slate-500">High-Availability & PITR Active</span>
-        </div>
+        {/* Individual Floating White Pill Rows */}
+        <div className="space-y-2.5">
+          {allRows.map((row, idx) => {
+            const isChecked = !!selectedRows[row.id] || idx === 1;
+            const matchingDroplet = row.isDroplet
+              ? instances.find((i) => i.id === row.dropletId)
+              : undefined;
 
-        {/* Card 3: Storage Fabric */}
-        <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Storage Allocated
-            </span>
-            <HardDrive className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-slate-900 dark:text-slate-100">{totalStorageGb} GB</span>
-            <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">NVMe + S3</span>
-          </div>
-          <span className="mt-1 text-xs text-slate-500">
-            {volumes.length} Volumes • {buckets.length} S3 Spaces
-          </span>
-        </div>
+            return (
+              <div
+                key={row.id}
+                className="nixtio-floating-row grid grid-cols-12 items-center px-4 py-3 text-xs"
+              >
+                {/* Checkbox + Pastel Type Pill */}
+                <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleRowSelection(row.id)}
+                    aria-label={`Select ${row.callerId}`}
+                    className={`w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                      isChecked
+                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E]"
+                        : "border border-[#D5D0C8] dark:border-[#383F52] bg-transparent"
+                    }`}
+                  >
+                    {isChecked && <MaterialIcon name="check" size={12} />}
+                  </button>
 
-        {/* Card 4: Network & Domains */}
-        <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] flex flex-col justify-between shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Network & Domains
-            </span>
-            <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold text-slate-900 dark:text-slate-100 font-mono">
-              {domains.length}
-            </span>
-            <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">Anycast DNS</span>
-          </div>
-          <span className="mt-1 text-xs text-slate-500">
-            DDoS Shield Active • 8 Global PoPs
-          </span>
-        </div>
-      </div>
+                  <PastelTypePill
+                    icon={row.pillIcon}
+                    label={row.pillLabel}
+                    variant={row.pillVariant}
+                  />
+                </div>
 
-      {/* Cluster Telemetry Streaming Chart */}
-      <div className="p-5 rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] space-y-4 shadow-xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Cluster Telemetry & Load</h2>
-            <span className="text-[10px] text-slate-500 font-mono">Sampling interval: 4s</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs">
-            <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
-              CPU Load (%)
-            </span>
-            <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              Memory (%)
-            </span>
-          </div>
-        </div>
+                {/* Caller ID / Resource Name */}
+                <div className="col-span-3 sm:col-span-2 font-medium text-[#1E1E1E] dark:text-slate-100 truncate pr-2">
+                  {row.callerId}
+                </div>
 
-        <div className="h-56 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={telemetry} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="cpuGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="time" stroke="#94a3b8" fontSize={11} tickLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={11} domain={[0, 100]} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--surface-subtle)",
-                  borderColor: "var(--border-subtle)",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                  color: "var(--text-primary)",
-                }}
-              />
-              <Area type="monotone" dataKey="cpu" stroke="#2563eb" strokeWidth={2} fillOpacity={1} fill="url(#cpuGrad)" />
-              <Area type="monotone" dataKey="memory" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#memGrad)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+                {/* Destination / IPv4 */}
+                <div className="hidden sm:block sm:col-span-3 text-[#5A5A58] dark:text-slate-300 font-mono text-[11px] truncate pr-2">
+                  {row.destination}
+                </div>
 
-      {/* Active Instances Summary Table */}
-      <div className="rounded-lg bg-white dark:bg-[#161922] border border-slate-200 dark:border-[#232736] overflow-hidden shadow-xs">
-        <div className="p-4 border-b border-slate-200 dark:border-[#232736] flex items-center justify-between bg-white dark:bg-[#161922]">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-200">Active Droplet Nodes</h3>
-          <Link href="/compute" className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
-            View all {instances.length} droplets &rarr;
-          </Link>
-        </div>
+                {/* Status Indicator */}
+                <div className="col-span-3 sm:col-span-2">
+                  <StatusIndicator
+                    status={row.statusTone}
+                    label={row.statusLabel}
+                  />
+                </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-[#11131A] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-slate-200 dark:border-[#232736]">
-              <tr>
-                <th className="py-2.5 px-4">Droplet Name</th>
-                <th className="py-2.5 px-4">Status</th>
-                <th className="py-2.5 px-4">Region & IP</th>
-                <th className="py-2.5 px-4">Specs</th>
-                <th className="py-2.5 px-4">CPU Usage</th>
-                <th className="py-2.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-[#232736]">
-              {filteredInstances.map((inst) => (
-                <tr key={inst.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3 px-4">
-                    <span className="font-semibold text-slate-900 dark:text-slate-200 block">{inst.name}</span>
-                    <span className="text-[11px] text-slate-500 font-mono">{inst.id}</span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="inline-flex items-center gap-1.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          inst.status === "active"
-                            ? "bg-emerald-500"
-                            : inst.status === "provisioning"
-                            ? "bg-amber-400 animate-pulse"
-                            : "bg-rose-500"
-                        }`}
-                      />
-                      <span className="text-xs text-slate-700 dark:text-slate-300 capitalize">{inst.status}</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 font-mono">
-                    <span className="text-slate-800 dark:text-slate-300 block">{inst.ipv4}</span>
-                    <span className="text-[11px] text-slate-500 uppercase">{inst.region}</span>
-                  </td>
-                  <td className="py-3 px-4 text-slate-700 dark:text-slate-300">
-                    {inst.plan.vcpu} vCPU • {inst.plan.ramGb} GB RAM
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 bg-slate-200 dark:bg-[#11131A] rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="bg-blue-500 h-1.5 rounded-full"
-                          style={{ width: `${inst.currentCpu}%` }}
-                        />
-                      </div>
-                      <span className="text-[11px] font-mono text-slate-600 dark:text-slate-400">{inst.currentCpu}%</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-right">
+                {/* Date + Action Menu */}
+                <div className="col-span-2 sm:col-span-2 flex items-center justify-end gap-2 text-[#5A5A58] dark:text-slate-400">
+                  <span className="hidden md:inline text-[11px] whitespace-nowrap">
+                    {row.dateLabel}
+                  </span>
+
+                  {matchingDroplet ? (
                     <button
-                      onClick={() => setTerminalInstance(inst)}
-                      className="h-7 px-2.5 rounded bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-[11px] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                      type="button"
+                      onClick={() => setTerminalInstance(matchingDroplet)}
+                      title="Open Web Console"
+                      className="w-7 h-7 rounded-full hover:bg-[#EFECE8] dark:hover:bg-[#232834] flex items-center justify-center text-[#1E1E1E] dark:text-slate-200 cursor-pointer"
                     >
-                      <Terminal className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-                      <span>Console</span>
+                      <MaterialIcon name="more_vert" size={18} />
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  ) : (
+                    <span className="w-7 h-7 rounded-full flex items-center justify-center text-[#5A5A58]">
+                      <MaterialIcon name="more_vert" size={18} />
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

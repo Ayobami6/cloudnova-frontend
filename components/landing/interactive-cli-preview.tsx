@@ -73,31 +73,31 @@ curl -X POST https://api.cloudnova.io/v2/droplets \\
   };
 
   return (
-    <section id="developers" className="py-20 border-t border-slate-200 dark:border-[#232736]">
+    <section id="developers" className="py-20 border-t border-[#E7E4DF] dark:border-[#282D3A]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Description */}
           <div className="lg:w-1/2 space-y-5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-600/10 text-blue-600 dark:text-blue-400 text-xs font-mono border border-blue-200 dark:border-blue-500/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E6D8EA] dark:bg-[#E6D8EA]/20 text-[#1E1E1E] dark:text-[#E6D8EA] text-xs font-mono border border-[#E6D8EA]">
               <Code className="w-3.5 h-3.5" />
               <span>Developer-First Automation</span>
             </div>
 
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white sm:text-4xl">
               Everything as Code. Zero Console Lock-in.
             </h2>
 
-            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-sm text-[#8C8B87] dark:text-slate-400 leading-relaxed">
               Every feature visible in the CloudNova console is 100% exposed via open REST APIs, official Terraform / OpenTofu providers, and a lightning-fast Rust CLI. Automate cluster provisioning, Anycast DNS zone propagation, and volume attachments into your GitHub Actions CI/CD workflows.
             </p>
 
             <div className="grid grid-cols-2 gap-4 pt-2 text-xs">
-              <div className="p-3 rounded-lg bg-white dark:bg-[#11131A] border border-slate-200 dark:border-[#232736]">
-                <span className="font-semibold text-slate-900 dark:text-slate-100 block">Sub-20s Boot Times</span>
+              <div className="p-3 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+                <span className="font-semibold text-[#1E1E1E] dark:text-white block">Sub-20s Boot Times</span>
                 <span className="text-slate-500 mt-0.5 block">KVM hardware microVMs boot cold to SSH prompt in under 20 seconds.</span>
               </div>
-              <div className="p-3 rounded-lg bg-white dark:bg-[#11131A] border border-slate-200 dark:border-[#232736]">
-                <span className="font-semibold text-slate-900 dark:text-slate-100 block">Cloud-Init Ready</span>
+              <div className="p-3 nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+                <span className="font-semibold text-[#1E1E1E] dark:text-white block">Cloud-Init Ready</span>
                 <span className="text-slate-500 mt-0.5 block">Inject user data scripts, SSH authorized keys, and Nix flakes natively.</span>
               </div>
             </div>
@@ -121,7 +121,7 @@ curl -X POST https://api.cloudnova.io/v2/droplets \\
                     onClick={() => setActiveTab("cli")}
                     className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
                       activeTab === "cli"
-                        ? "bg-blue-600 text-white font-semibold"
+                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
@@ -131,7 +131,7 @@ curl -X POST https://api.cloudnova.io/v2/droplets \\
                     onClick={() => setActiveTab("terraform")}
                     className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
                       activeTab === "terraform"
-                        ? "bg-blue-600 text-white font-semibold"
+                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
@@ -141,7 +141,7 @@ curl -X POST https://api.cloudnova.io/v2/droplets \\
                     onClick={() => setActiveTab("curl")}
                     className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
                       activeTab === "curl"
-                        ? "bg-blue-600 text-white font-semibold"
+                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold"
                         : "text-slate-400 hover:text-slate-200"
                     }`}
                   >
