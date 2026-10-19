@@ -94,6 +94,53 @@ function DeltaPill({ pct }: { pct: number | null }) {
  * the current month's usage summary); renders an empty state when no
  * usage has been billed yet.
  */
+interface BarShapeProps {
+  fill?: string;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  payload?: MonthRow;
+  dataKey?: string;
+}
+
+/**
+ * Custom SVG shape that gives stacked bars rounded top corners (Nixtio design system)
+ * for whichever segment is at the top of the stack for each month.
+ */
+function RoundedStackedBar(props: BarShapeProps) {
+  const { fill, x = 0, y = 0, width = 0, height = 0, payload, dataKey } = props;
+  if (!height || height <= 0 || width <= 0) return null;
+
+  // Find all active categories in this row with a positive value
+  const activeKeys = CATEGORIES.map((c) => c.key).filter(
+    (k) => (payload ? (payload[k] || 0) > 0 : false)
+  );
+
+  // If this category is the top-most non-zero segment in the stack, give it rounded top corners
+  const isTop =
+    activeKeys.length === 0 ||
+    activeKeys[activeKeys.length - 1] === dataKey;
+
+  const r = isTop ? Math.min(8, width / 2, height) : 0;
+
+  if (r <= 0) {
+    return <rect x={x} y={y} width={width} height={height} fill={fill} />;
+  }
+
+  // Smooth SVG path with rounded top corners
+  const path = `
+    M ${x},${y + height}
+    L ${x},${y + r}
+    Q ${x},${y} ${x + r},${y}
+    L ${x + width - r},${y}
+    Q ${x + width},${y} ${x + width},${y + r}
+    L ${x + width},${y + height}
+    Z
+  `;
+  return <path d={path} fill={fill} />;
+}
+
 export function CostUsageCard() {
   const { usage, invoices, currencySymbol, hourlyBurnRate } = useBilling();
   const [isMounted, setIsMounted] = useState(false);
@@ -222,7 +269,7 @@ export function CostUsageCard() {
             {isMounted && (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={rows} margin={{ top: 8, right: 4, left: -12, bottom: 0 }} barSize={36}>
-                  <CartesianGrid vertical={false} stroke="#E7E4DF" strokeDasharray="3 3" />
+                  <CartesianGrid vertical={false} stroke="#E7E4DF" strokeDasharray="3 3" className="stroke-[#E7E4DF] dark:stroke-[#282D3A]" />
                   <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={11} stroke="#8C8B87" />
                   <YAxis
                     tickLine={false}
@@ -244,14 +291,14 @@ export function CostUsageCard() {
                     itemStyle={{ color: "#FFFFFF" }}
                     labelStyle={{ color: "#B8B4AE" }}
                   />
-                  {CATEGORIES.map((c, idx) => (
+                  {CATEGORIES.map((c) => (
                     <Bar
                       key={c.key}
                       dataKey={c.key}
                       name={c.label}
                       stackId="cost"
                       fill={c.color}
-                      radius={idx === CATEGORIES.length - 1 ? [6, 6, 0, 0] : [0, 0, 0, 0]}
+                      shape={(barProps: any) => <RoundedStackedBar {...barProps} dataKey={c.key} />}
                     />
                   ))}
                 </BarChart>
