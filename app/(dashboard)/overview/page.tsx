@@ -56,7 +56,12 @@ export default function OverviewPage() {
     searchQuery,
   } = useCloud();
 
+  const [isMounted, setIsMounted] = useState(false);
   const [viewMode, setViewMode] = useState<"sankey" | "live_chart">("sankey");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({
     "row-1": true,
   });
@@ -284,7 +289,8 @@ export default function OverviewPage() {
           </div>
 
           <div className="h-52 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+            {isMounted ? (
+              <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={telemetry}
                 margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -340,6 +346,11 @@ export default function OverviewPage() {
                 />
               </AreaChart>
             </ResponsiveContainer>
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-xs text-[#8C8B87]">
+                Loading telemetry stream...
+              </div>
+            )}
           </div>
         </div>
       )}
