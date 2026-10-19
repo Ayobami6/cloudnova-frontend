@@ -1,16 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { useAuth } from "@/lib/store/auth-context";
 import { useCloud } from "@/lib/store/cloud-context";
 import { useBilling } from "@/lib/store/billing-context";
-
-const TELEMETRY_BARS = [
-  18, 28, 14, 34, 22, 16, 30, 12, 24, 36, 18, 14, 26, 20, 32, 14, 22, 28, 16,
-  38, 24, 18, 30, 44, 20, 14, 28, 22, 34, 16, 24, 18, 26, 14, 20, 12,
-];
 
 export function RightInspectorPanel({
   onOpenDeploy,
@@ -19,7 +14,7 @@ export function RightInspectorPanel({
 }) {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { instances, setTerminalInstance } = useCloud();
+  const { instances, databases, volumes, setTerminalInstance } = useCloud();
   const {
     setIsDepositModalOpen,
     walletBalance,
@@ -28,22 +23,8 @@ export function RightInspectorPanel({
     balance,
   } = useBilling();
 
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [playheadIndex, setPlayheadIndex] = useState(23);
-  const [speedMultiplier, setSpeedMultiplier] = useState<"1x" | "2x">("1x");
   const [isSignoutConfirmOpen, setIsSignoutConfirmOpen] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState(false);
-
-  useEffect(() => {
-    if (!isPlaying) return;
-    const interval = setInterval(
-      () => {
-        setPlayheadIndex((prev) => (prev + 1) % TELEMETRY_BARS.length);
-      },
-      speedMultiplier === "2x" ? 600 : 1200
-    );
-    return () => clearInterval(interval);
-  }, [isPlaying, speedMultiplier]);
 
   const displayName = user?.name || "CloudNova Operator";
   const email = user?.email || "operator@cloudnova.io";
@@ -61,6 +42,10 @@ export function RightInspectorPanel({
       .join("")
       .toUpperCase()
       .slice(0, 2) || "CN";
+
+  const activeInstancesCount = instances.filter(
+    (i) => i.status === "active"
+  ).length;
 
   const activeInstance =
     instances.find((i) => i.status === "active") || instances[0];
@@ -80,8 +65,6 @@ export function RightInspectorPanel({
   const handleSignOut = () => {
     logout();
   };
-
-  const formattedSecond = String(playheadIndex + 10).padStart(2, "0");
 
   return (
     <aside className="hidden xl:flex flex-col justify-between w-[320px] 2xl:w-[348px] shrink-0 my-4 mr-4 p-6 nixtio-stone-panel text-[#1E1E1E] dark:text-[#F4F5F7] overflow-y-auto">
@@ -303,119 +286,94 @@ export function RightInspectorPanel({
         </div>
       </div>
 
-      {/* Bottom Section: Real-time Telemetry & Infrastructure Pulse */}
-      <div className="pt-5 mt-5 border-t border-[#E2DDD6] dark:border-[#282D3A] space-y-3">
+      {/* Bottom Section: Resource Fleet & Health Overview */}
+      <div className="pt-5 mt-5 border-t border-[#E2DDD6] dark:border-[#282D3A] space-y-3.5">
+        {/* Header with Health Pulse and Hourly Burn Rate */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#4EA871] animate-pulse" />
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4EA871] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4EA871]" />
+            </span>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1E1E1E] dark:text-white">
-              Fleet Telemetry
+              Fleet Overview
             </h3>
           </div>
-          <span className="text-[11px] font-mono font-medium text-[#7A7975] dark:text-slate-400">
+          <span className="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] text-[#1E1E1E] dark:text-slate-300">
             {currencySymbol}{hourlyBurnRate}/hr
           </span>
         </div>
 
-        {/* Vertical Bar Waveform Visualization with Red Playhead */}
-        <div className="relative pt-2 pb-4">
-          <div className="h-12 flex items-center justify-between gap-[2px]">
-            {TELEMETRY_BARS.map((height, idx) => {
-              const isCurrent = idx === playheadIndex;
-              const isPast = idx < playheadIndex;
-              return (
-                <div
-                  key={idx}
-                  className="relative flex flex-col items-center justify-center h-full flex-1"
-                >
-                  {isCurrent && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#D94E4E] absolute -top-1" />
-                  )}
-                  <div
-                    style={{ height: `${height}px` }}
-                    className={`w-[2px] rounded-full transition-all duration-300 ${
-                      isCurrent
-                        ? "bg-[#D94E4E] w-[2.5px]"
-                        : isPast
-                        ? "bg-[#5A5A58] dark:bg-slate-300"
-                        : "bg-[#B8B4AE] dark:bg-slate-600"
-                    }`}
-                  />
-                  {isCurrent && (
-                    <span className="absolute -bottom-3.5 text-[9px] font-mono font-medium text-[#5A5A58] dark:text-slate-300">
-                      00:{formattedSecond}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+        {/* Resources Metrics Cards Grid */}
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          {/* Compute Droplets */}
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[#8C8B87]">
+              <span className="text-[10px] uppercase font-semibold">Droplets</span>
+              <MaterialIcon name="dns" size={14} className="text-[#4EA871]" />
+            </div>
+            <div className="mt-2 flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-[#1E1E1E] dark:text-white tabular-nums">
+                {activeInstancesCount}
+              </span>
+              <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">
+                / {instances.length} active
+              </span>
+            </div>
           </div>
 
-          {/* Horizontal ruler ticks under waveform */}
-          <div className="mt-2 h-1.5 border-b border-x border-[#D5D0C8] dark:border-[#282D3A] flex justify-between">
-            <span className="w-[1px] h-1.5 bg-[#D5D0C8] dark:bg-[#282D3A]" />
-            <span className="w-[1px] h-1.5 bg-[#D5D0C8] dark:bg-[#282D3A]" />
-            <span className="w-[1px] h-1.5 bg-[#D5D0C8] dark:bg-[#282D3A]" />
+          {/* Databases & Storage */}
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] flex flex-col justify-between">
+            <div className="flex items-center justify-between text-[#8C8B87]">
+              <span className="text-[10px] uppercase font-semibold">Storage & DB</span>
+              <MaterialIcon name="storage" size={14} className="text-[#3B82F6]" />
+            </div>
+            <div className="mt-2 flex items-baseline gap-1.5">
+              <span className="text-base font-bold text-[#1E1E1E] dark:text-white tabular-nums">
+                {databases.length + volumes.length}
+              </span>
+              <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">
+                units
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Telemetry Stream Controls Bar */}
-        <div className="flex items-center justify-between pt-1 text-[#1E1E1E] dark:text-white">
-          <button
-            type="button"
-            onClick={() => setSpeedMultiplier((s) => (s === "1x" ? "2x" : "1x"))}
-            className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] text-[#5A5A58] dark:text-slate-300 hover:text-[#1E1E1E] cursor-pointer"
-          >
-            {speedMultiplier}
-          </button>
-
-          <div className="flex items-center gap-3">
+        {/* Primary Droplet Quick Console / Launch Bar */}
+        {activeInstance ? (
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4EA871] shrink-0" />
+                <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white truncate">
+                  {activeInstance.name}
+                </span>
+              </div>
+              <p className="text-[10px] font-mono text-[#8C8B87] dark:text-slate-400 truncate pl-3">
+                {activeInstance.ipv4 || activeInstance.region}
+              </p>
+            </div>
             <button
               type="button"
-              onClick={() =>
-                setPlayheadIndex(
-                  (prev) => (prev - 5 + TELEMETRY_BARS.length) % TELEMETRY_BARS.length
-                )
-              }
-              aria-label="Rewind stream 10s"
-              className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-300 dark:hover:text-white cursor-pointer"
+              onClick={() => setTerminalInstance(activeInstance)}
+              title="Launch Droplet Web Terminal Console"
+              className="h-7 px-2.5 rounded-full bg-[#EFECE8] hover:bg-[#E2DDD6] dark:bg-[#282D3A] dark:hover:bg-[#32394A] text-[#1E1E1E] dark:text-white flex items-center gap-1 text-[11px] font-medium transition-colors cursor-pointer shrink-0"
             >
-              <MaterialIcon name="replay_10" size={18} />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsPlaying(!isPlaying)}
-              aria-label={isPlaying ? "Pause telemetry pulse" : "Resume telemetry pulse"}
-              className="w-7 h-7 rounded-full bg-[#222222] dark:bg-white text-white dark:text-[#1E1E1E] flex items-center justify-center cursor-pointer shadow-2xs"
-            >
-              <MaterialIcon name={isPlaying ? "pause" : "play_arrow"} size={16} />
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                setPlayheadIndex((prev) => (prev + 5) % TELEMETRY_BARS.length)
-              }
-              aria-label="Forward stream 10s"
-              className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-300 dark:hover:text-white cursor-pointer"
-            >
-              <MaterialIcon name="forward_10" size={18} />
+              <MaterialIcon name="terminal" size={14} />
+              <span>Console</span>
             </button>
           </div>
+        ) : null}
 
-          <button
-            type="button"
-            onClick={() => {
-              if (activeInstance) setTerminalInstance(activeInstance);
-            }}
-            title="Open Droplet Web Console"
-            aria-label="Web Terminal Console"
-            className="w-7 h-7 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] text-[#222222] dark:text-white flex items-center justify-center hover:opacity-75 cursor-pointer"
-          >
-            <MaterialIcon name="terminal" size={15} />
-          </button>
-        </div>
+        {/* Action Button: Deploy New Droplet */}
+        <button
+          type="button"
+          onClick={onOpenDeploy}
+          className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-100 text-white dark:text-[#1E1E1E] flex items-center justify-center gap-1.5 transition-all text-xs font-semibold shadow-2xs cursor-pointer"
+        >
+          <MaterialIcon name="add" size={16} />
+          <span>Deploy New Droplet</span>
+        </button>
       </div>
     </aside>
   );

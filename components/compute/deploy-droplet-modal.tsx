@@ -7,6 +7,17 @@ import { DatacenterRegion, OSImageId } from "@/lib/types/cloud";
 import { useBilling } from "@/lib/store/billing-context";
 import { MaterialIcon } from "@/components/ui/material-icon";
 
+const HARDWARE_TIERS = [
+  { id: "all", label: "All Plans" },
+  { id: "basic", label: "Basic" },
+  { id: "general", label: "General Purpose" },
+  { id: "cpu-optimized", label: "CPU-Optimized" },
+  { id: "memory-optimized", label: "Memory-Optimized" },
+  { id: "gpu-ai", label: "GPU AI" },
+] as const;
+
+type HardwareTierFilter = (typeof HARDWARE_TIERS)[number]["id"];
+
 export function DeployDropletModal({
   isOpen,
   onClose,
@@ -14,20 +25,39 @@ export function DeployDropletModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { createInstance, clients } = useCloud();
+  const { createInstance, clients, plans } = useCloud();
   const { formatMoney } = useBilling();
+
+  const availablePlans = plans && plans.length > 0 ? plans : COMPUTE_PLANS;
 
   const [hostname, setHostname] = useState("app-server-edge");
   const [selectedRegion, setSelectedRegion] = useState<DatacenterRegion>("nyc1");
   const [selectedImage, setSelectedImage] = useState<OSImageId>("ubuntu-24-04");
-  const [selectedPlanId, setSelectedPlanId] = useState<string>("plan-std-4g");
+  const [selectedPlanId, setSelectedPlanId] = useState<string>("basic-1x1");
+  const [selectedTier, setSelectedTier] = useState<HardwareTierFilter>("all");
   const [tags, setTags] = useState("production, web");
   const [selectedClient, setSelectedClient] = useState<string>("");
+
+  const filteredPlans = React.useMemo(() => {
+    if (selectedTier === "all") return availablePlans;
+    return availablePlans.filter((p) => p.tier === selectedTier);
+  }, [availablePlans, selectedTier]);
+
+  const handleTierChange = (tier: HardwareTierFilter) => {
+    setSelectedTier(tier);
+    const inTier = tier === "all" ? availablePlans : availablePlans.filter((p) => p.tier === tier);
+    if (inTier.length > 0 && !inTier.some((p) => p.id === selectedPlanId)) {
+      setSelectedPlanId(inTier[0].id);
+    }
+  };
 
   if (!isOpen) return null;
 
   const currentPlan =
-    COMPUTE_PLANS.find((p) => p.id === selectedPlanId) || COMPUTE_PLANS[2];
+    filteredPlans.find((p) => p.id === selectedPlanId) ||
+    availablePlans.find((p) => p.id === selectedPlanId) ||
+    filteredPlans[0] ||
+    availablePlans[0];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +65,7 @@ export function DeployDropletModal({
       name: hostname.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"),
       region: selectedRegion,
       image: selectedImage,
-      planId: selectedPlanId,
+      planId: currentPlan.id,
       tags,
       enableBackups: false,
       enableMonitoring: true,
@@ -148,37 +178,66 @@ export function DeployDropletModal({
           </div>
 
           {/* 3. Hardware Plan */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-[#1E1E1E] dark:text-slate-200">
-              3. Hardware Specification
-            </label>
-            <div className="space-y-2">
-              {COMPUTE_PLANS.map((plan) => (
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+              <label className="text-xs font-semibold text-[#1E1E1E] dark:text-slate-200">
+                3. Hardware Specification
+              </label>
+              <span className="text-[11px] text-[#8C8B87]">
+                {filteredPlans.length} {filteredPlans.length === 1 ? "plan" : "plans"} available
+              </span>
+            </div>
+
+            {/* Hardware Tier Filter Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {HARDWARE_TIERS.map((tier) => (
+                <button
+                  key={tier.id}
+                  type="button"
+                  onClick={() => handleTierChange(tier.id)}
+                  className={`h-7 px-3 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${
+                    selectedTier === tier.id
+                      ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E]"
+                      : "bg-[#EFECE8] dark:bg-[#232834] text-[#5A5A58] dark:text-slate-300 hover:text-[#1E1E1E] dark:hover:text-white"
+                  }`}
+                >
+                  {tier.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-2 max-h-72 sm:max-h-80 overflow-y-auto pr-1">
+              {filteredPlans.map((plan) => (
                 <button
                   key={plan.id}
                   type="button"
                   onClick={() => setSelectedPlanId(plan.id)}
                   className={`w-full p-3.5 rounded-2xl text-left flex items-center justify-between transition-all cursor-pointer ${
-                    selectedPlanId === plan.id
+                    currentPlan?.id === plan.id
                       ? "bg-[#F8D568] text-[#1E1E1E] ring-2 ring-[#222222] shadow-2xs"
                       : "bg-white dark:bg-[#1C2029] text-[#5A5A58] dark:text-slate-300 hover:bg-[#EFECE8]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-white/80 text-[#1E1E1E] flex items-center justify-center">
+                    <span className="w-8 h-8 rounded-full bg-white/80 text-[#1E1E1E] flex items-center justify-center shrink-0">
                       <MaterialIcon name="memory" size={16} />
                     </span>
                     <div>
-                      <span className="text-xs font-semibold block">
-                        {plan.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold block">
+                          {plan.name}
+                        </span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-[#5A5A58] dark:text-slate-300 uppercase">
+                          {plan.tier}
+                        </span>
+                      </div>
                       <span className="text-[11px] opacity-80 block mt-0.5">
                         {plan.vcpu} vCPU • {plan.ramGb} GB RAM • {plan.diskGb} GB NVMe •{" "}
                         {plan.transferTb} TB Transfer
                       </span>
                     </div>
                   </div>
-                  <div className="text-right font-mono">
+                  <div className="text-right font-mono shrink-0">
                     <span className="text-xs font-bold block">
                       {formatMoney(plan.retailMonthly)}/mo
                     </span>
