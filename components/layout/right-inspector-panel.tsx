@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { useAuth } from "@/lib/store/auth-context";
 import { useCloud } from "@/lib/store/cloud-context";
 import { useBilling } from "@/lib/store/billing-context";
 
-const WAVEFORM_BARS = [
+const TELEMETRY_BARS = [
   18, 28, 14, 34, 22, 16, 30, 12, 24, 36, 18, 14, 26, 20, 32, 14, 22, 28, 16,
   38, 24, 18, 30, 44, 20, 14, 28, 22, 34, 16, 24, 18, 26, 14, 20, 12,
 ];
@@ -16,217 +17,310 @@ export function RightInspectorPanel({
 }: {
   onOpenDeploy: () => void;
 }) {
-  const { user } = useAuth();
-  const { instances, alerts, setTerminalInstance } = useCloud();
-  const { setIsDepositModalOpen, walletBalance, currencySymbol } = useBilling();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const { instances, setTerminalInstance } = useCloud();
+  const {
+    setIsDepositModalOpen,
+    walletBalance,
+    currencySymbol,
+    hourlyBurnRate,
+    balance,
+  } = useBilling();
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [playheadIndex, setPlayheadIndex] = useState(23);
   const [speedMultiplier, setSpeedMultiplier] = useState<"1x" | "2x">("1x");
+  const [isSignoutConfirmOpen, setIsSignoutConfirmOpen] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
 
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(
       () => {
-        setPlayheadIndex((prev) => (prev + 1) % WAVEFORM_BARS.length);
+        setPlayheadIndex((prev) => (prev + 1) % TELEMETRY_BARS.length);
       },
       speedMultiplier === "2x" ? 600 : 1200
     );
     return () => clearInterval(interval);
   }, [isPlaying, speedMultiplier]);
 
-  const displayName = user?.name || "Alexandra Rose";
-  const activeInstance = instances.find((i) => i.status === "active") || instances[0];
+  const displayName = user?.name || "CloudNova Operator";
+  const email = user?.email || "operator@cloudnova.io";
+  const organizationName = user?.company || "Primary Team";
+  const roleName = user?.role || "OWNER";
+  const accountNumber =
+    user?.accountNumber ||
+    balance?.account_number ||
+    (user?.accountId ? `acct_${user.accountId.slice(0, 8)}` : "acct_live_01");
 
-  const feedEntries = [
-    {
-      time: "1:12",
-      actor: "Client:",
-      avatarBg: "bg-[#CFE0EC]",
-      icon: "person",
-      text:
-        alerts[0]?.message ||
-        "Provisioned high-availability KVM compute droplet and attached NVMe volume.",
-    },
-    {
-      time: "1:31",
-      actor: "Manager:",
-      avatarBg: "bg-[#E5B899]",
-      icon: "support_agent",
-      text:
-        alerts[1]?.message ||
-        "Understood, automated Anycast DNS routing and Layer-7 load balancing active.",
-    },
-    {
-      time: "2:11",
-      actor: "Client:",
-      avatarBg: "bg-[#E6D8EA]",
-      icon: "verified_user",
-      text: `Wallet balance verified (${currencySymbol}${walletBalance.toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-      })}). All ${instances.length} nodes healthy and optimized.`,
-    },
-  ];
+  const initials =
+    displayName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "CN";
+
+  const activeInstance =
+    instances.find((i) => i.status === "active") || instances[0];
+
+  const handleCopyAccountId = () => {
+    if (accountNumber) {
+      navigator.clipboard?.writeText(accountNumber);
+      setCopiedAccount(true);
+      setTimeout(() => setCopiedAccount(false), 2000);
+    }
+  };
+
+  const handleEditProfile = () => {
+    router.push("/team");
+  };
+
+  const handleSignOut = () => {
+    logout();
+  };
 
   const formattedSecond = String(playheadIndex + 10).padStart(2, "0");
 
   return (
     <aside className="hidden xl:flex flex-col justify-between w-[320px] 2xl:w-[348px] shrink-0 my-4 mr-4 p-6 nixtio-stone-panel text-[#1E1E1E] dark:text-[#F4F5F7] overflow-y-auto">
-      {/* Top Profile & Quick Action Pills */}
+      {/* Top Profile & User Identity Section */}
       <div>
-        <div className="flex items-center justify-end">
+        {/* Top Mini Actions */}
+        <div className="flex items-center justify-between pb-1">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8C8B87] dark:text-slate-400">
+            Active Profile
+          </span>
           <button
             type="button"
-            onClick={() => setIsDepositModalOpen(true)}
-            aria-label="Account options"
-            className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-400 dark:hover:text-white cursor-pointer"
+            onClick={handleEditProfile}
+            title="Manage Team & Account Settings"
+            className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
           >
-            <MaterialIcon name="more_horiz" size={20} />
+            <MaterialIcon name="settings" size={18} />
           </button>
         </div>
 
-        <div className="flex flex-col items-center text-center -mt-2">
-          {/* Circular Avatar with Green Status Dot */}
+        {/* Profile Card Header */}
+        <div className="flex flex-col items-center text-center mt-2">
+          {/* Circular Avatar with Active Green Status Dot */}
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-[#CFE0EC] dark:bg-[#232834] flex items-center justify-center overflow-hidden shadow-sm border-2 border-white dark:border-[#282D3A]">
-              <svg viewBox="0 0 80 80" className="w-full h-full">
-                <rect width="80" height="80" fill="#BFD2E0" />
-                <circle cx="40" cy="30" r="14" fill="#D99B78" />
-                <path
-                  d="M18 76 C18 55, 62 55, 62 76 Z"
-                  fill="#E87A5D"
+            <div className="w-20 h-20 rounded-full bg-[#CFE0EC] dark:bg-[#232834] flex items-center justify-center font-bold text-xl text-[#1E1E1E] dark:text-white overflow-hidden shadow-sm border-2 border-white dark:border-[#282D3A]">
+              {user?.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.avatarUrl}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
                 />
-                <path
-                  d="M26 26 C26 14, 54 14, 54 26 C50 20, 30 20, 26 26 Z"
-                  fill="#2B2118"
-                />
-              </svg>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#CFE0EC] to-[#B8D2E4] dark:from-[#282D3A] dark:to-[#1C2029]">
+                  <span className="tracking-wide">{initials}</span>
+                </div>
+              )}
             </div>
-            <span className="w-3.5 h-3.5 rounded-full bg-[#4EA871] border-2 border-[#EFECE8] dark:border-[#161920] absolute bottom-1 right-1" />
+            <span
+              title="Session Active & Authenticated"
+              className="w-4 h-4 rounded-full bg-[#4EA871] border-2 border-[#EFECE8] dark:border-[#161920] absolute bottom-0.5 right-0.5 shadow-2xs"
+            />
           </div>
 
           <h2 className="mt-3 text-base font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
             {displayName}
           </h2>
 
-          <p className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-[#8C8B87] dark:text-slate-400">
-            <MaterialIcon name="label" size={14} className="text-[#8C8B87]" />
-            <span>
-              Node type:{" "}
-              <strong className="font-semibold text-[#5A5A58] dark:text-slate-200">
-                { user?.role || "Callback" }
-              </strong>
-            </span>
+          <p className="text-xs text-[#7A7975] dark:text-slate-400 truncate max-w-[260px]">
+            {email}
           </p>
 
-          {/* 3 Signature Pastel Pill Buttons (Yellow Star, Lavender Call/Deploy, Blue Chat/Terminal) */}
-          <div className="mt-4 flex items-center justify-center gap-2.5 w-full">
+          {/* Organization & Role Pill */}
+          <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-[#1C2029] text-[11px] font-medium text-[#5A5A58] dark:text-slate-300 shadow-2xs border border-[#E7E4DF]/60 dark:border-[#282D3A]">
+            <MaterialIcon
+              name="domain"
+              size={13}
+              className="text-[#8C8B87] dark:text-slate-400"
+            />
+            <span className="font-semibold text-[#1E1E1E] dark:text-white">
+              {organizationName}
+            </span>
+            <span className="text-[#B8B4AE] dark:text-slate-600">•</span>
+            <span className="text-[10px] uppercase font-bold text-[#E58A3C]">
+              {roleName}
+            </span>
+          </div>
+
+          {/* 3 Pastel Action Pills: Edit Profile, Deposit Wallet, Sign Out */}
+          <div className="mt-4 grid grid-cols-3 gap-2 w-full">
+            {/* Edit Profile */}
+            <button
+              type="button"
+              onClick={handleEditProfile}
+              title="Edit Profile & Organizations"
+              className="h-9 px-2 rounded-full bg-[#F8D568] hover:brightness-95 text-[#1E1E1E] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs text-xs font-semibold"
+            >
+              <MaterialIcon name="edit" size={15} />
+              <span>Edit</span>
+            </button>
+
+            {/* Deposit Wallet */}
             <button
               type="button"
               onClick={() => setIsDepositModalOpen(true)}
-              title="Top Up Prepaid Wallet"
-              className="h-9 px-5 rounded-full bg-[#F8D568] text-[#1E1E1E] flex items-center justify-center hover:brightness-95 transition-all cursor-pointer shadow-2xs"
+              title="Top up prepaid cloud balance"
+              className="h-9 px-2 rounded-full bg-[#E6D8EA] hover:brightness-95 text-[#1E1E1E] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs text-xs font-semibold"
             >
-              <MaterialIcon name="star" size={17} />
+              <MaterialIcon name="account_balance_wallet" size={15} />
+              <span>Funds</span>
             </button>
 
+            {/* Sign Out */}
             <button
               type="button"
-              onClick={onOpenDeploy}
-              title="Deploy New Compute Droplet"
-              className="h-9 px-5 rounded-full bg-[#E6D8EA] text-[#1E1E1E] flex items-center justify-center hover:brightness-95 transition-all cursor-pointer shadow-2xs"
+              onClick={() => setIsSignoutConfirmOpen(true)}
+              title="Sign out of your session"
+              className="h-9 px-2 rounded-full bg-[#CFE0EC] hover:bg-[#FADBD8] hover:text-[#D94E4E] text-[#1E1E1E] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs text-xs font-semibold"
             >
-              <MaterialIcon name="call" size={17} />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (activeInstance) setTerminalInstance(activeInstance);
-              }}
-              title="Open Web Console Terminal"
-              className="h-9 px-5 rounded-full bg-[#CFE0EC] text-[#1E1E1E] flex items-center justify-center hover:brightness-95 transition-all cursor-pointer shadow-2xs"
-            >
-              <MaterialIcon name="chat" size={17} />
+              <MaterialIcon name="logout" size={15} />
+              <span>Exit</span>
             </button>
           </div>
         </div>
+
+        {/* Confirmation modal for Sign Out if clicked */}
+        {isSignoutConfirmOpen && (
+          <div className="mt-3 p-3.5 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] shadow-md space-y-2 text-xs">
+            <p className="font-medium text-[#1E1E1E] dark:text-white">
+              Sign out from this device?
+            </p>
+            <div className="flex items-center gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="flex-1 h-7 rounded-full bg-[#D94E4E] text-white font-medium hover:bg-[#C03E3E] transition-colors cursor-pointer"
+              >
+                Sign Out
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSignoutConfirmOpen(false)}
+                className="flex-1 h-7 rounded-full bg-[#EFECE8] dark:bg-[#282D3A] text-[#1E1E1E] dark:text-slate-200 font-medium hover:brightness-95 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="my-5 h-[1px] bg-[#E2DDD6] dark:bg-[#282D3A]" />
 
-        {/* Middle Section: "Summarize" Live Feed */}
-        <div className="space-y-4">
+        {/* Middle Section: Account & Security Overview */}
+        <div className="space-y-3.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">
-              Summarize
+              Account Details
             </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  if (activeInstance) setTerminalInstance(activeInstance);
-                }}
-                title="Export Telemetry Log"
-                className="w-5 h-5 rounded-full bg-[#222222] dark:bg-white text-white dark:text-[#1E1E1E] flex items-center justify-center cursor-pointer"
-              >
-                <MaterialIcon name="arrow_downward" size={13} />
-              </button>
-              <button
-                type="button"
-                onClick={onOpenDeploy}
-                aria-label="More summary actions"
-                className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-400 cursor-pointer"
-              >
-                <MaterialIcon name="more_horiz" size={18} />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleCopyAccountId}
+              title="Copy Account Identifier"
+              className="text-[11px] text-[#4EA871] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+            >
+              <MaterialIcon name={copiedAccount ? "check" : "content_copy"} size={13} />
+              <span>{copiedAccount ? "Copied" : "Copy ID"}</span>
+            </button>
           </div>
 
-          <div className="space-y-4">
-            {feedEntries.map((item, idx) => (
-              <div key={idx} className="space-y-1.5 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-[#8C8B87] tabular-nums w-7">
-                    {item.time}
+          <div className="space-y-2 text-xs">
+            {/* Account ID / Number */}
+            <div className="p-3 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-[#CFE0EC] dark:bg-[#282D3A] text-[#1E1E1E] dark:text-slate-200 flex items-center justify-center shrink-0">
+                  <MaterialIcon name="badge" size={15} />
+                </span>
+                <div>
+                  <span className="text-[10px] text-[#8C8B87] uppercase font-semibold block">
+                    Account Number
                   </span>
-                  <span
-                    className={`w-6 h-6 rounded-full ${item.avatarBg} text-[#1E1E1E] flex items-center justify-center shrink-0`}
-                  >
-                    <MaterialIcon name={item.icon} size={14} />
-                  </span>
-                  <span className="font-semibold text-[#1E1E1E] dark:text-white">
-                    {item.actor}
+                  <span className="font-mono font-medium text-[11px] text-[#1E1E1E] dark:text-white">
+                    {accountNumber}
                   </span>
                 </div>
-                <p className="pl-9 text-[11px] text-[#7A7975] dark:text-slate-400 leading-relaxed">
-                  {item.text}
-                </p>
               </div>
-            ))}
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#D5EBD9] dark:bg-[#4EA871]/20 text-[#2D7347] dark:text-[#76CE93] font-semibold">
+                Active
+              </span>
+            </div>
+
+            {/* Email Verification & Security */}
+            <div className="p-3 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-[#D5EBD9] dark:bg-[#282D3A] text-[#2D7347] dark:text-[#76CE93] flex items-center justify-center shrink-0">
+                  <MaterialIcon name="verified_user" size={15} />
+                </span>
+                <div>
+                  <span className="text-[10px] text-[#8C8B87] uppercase font-semibold block">
+                    Email Security
+                  </span>
+                  <span className="text-[11px] font-medium text-[#1E1E1E] dark:text-white">
+                    {user?.emailVerified ? "Verified & Secured" : "Pending OTP"}
+                  </span>
+                </div>
+              </div>
+              <MaterialIcon
+                name={user?.emailVerified ? "check_circle" : "help_outline"}
+                size={16}
+                className={user?.emailVerified ? "text-[#4EA871]" : "text-[#E58A3C]"}
+              />
+            </div>
+
+            {/* Wallet Preloaded Funds */}
+            <div className="p-3 rounded-2xl bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-full bg-[#E6D8EA] dark:bg-[#282D3A] text-[#1E1E1E] dark:text-slate-200 flex items-center justify-center shrink-0">
+                  <MaterialIcon name="account_balance_wallet" size={15} />
+                </span>
+                <div>
+                  <span className="text-[10px] text-[#8C8B87] uppercase font-semibold block">
+                    Prepaid Balance
+                  </span>
+                  <span className="font-semibold text-xs tabular-nums text-[#1E1E1E] dark:text-white">
+                    {currencySymbol}
+                    {walletBalance.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDepositModalOpen(true)}
+                className="text-[11px] font-semibold text-[#4EA871] hover:underline cursor-pointer"
+              >
+                + Top Up
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom Section: "Call Recording" / Telemetry Waveform Widget */}
+      {/* Bottom Section: Real-time Telemetry & Infrastructure Pulse */}
       <div className="pt-5 mt-5 border-t border-[#E2DDD6] dark:border-[#282D3A] space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white">
-            Call Recording
-          </h3>
-          <button
-            type="button"
-            onClick={() => setPlayheadIndex((prev) => (prev + 4) % WAVEFORM_BARS.length)}
-            className="text-[11px] text-[#8C8B87] hover:text-[#1E1E1E] dark:hover:text-white transition-colors cursor-pointer"
-          >
-            Next
-          </button>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#4EA871] animate-pulse" />
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1E1E1E] dark:text-white">
+              Fleet Telemetry
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono font-medium text-[#7A7975] dark:text-slate-400">
+            {currencySymbol}{hourlyBurnRate}/hr
+          </span>
         </div>
 
         {/* Vertical Bar Waveform Visualization with Red Playhead */}
         <div className="relative pt-2 pb-4">
           <div className="h-12 flex items-center justify-between gap-[2px]">
-            {WAVEFORM_BARS.map((height, idx) => {
+            {TELEMETRY_BARS.map((height, idx) => {
               const isCurrent = idx === playheadIndex;
               const isPast = idx < playheadIndex;
               return (
@@ -265,12 +359,12 @@ export function RightInspectorPanel({
           </div>
         </div>
 
-        {/* Playback Controls Bar */}
+        {/* Telemetry Stream Controls Bar */}
         <div className="flex items-center justify-between pt-1 text-[#1E1E1E] dark:text-white">
           <button
             type="button"
             onClick={() => setSpeedMultiplier((s) => (s === "1x" ? "2x" : "1x"))}
-            className="text-xs font-medium text-[#5A5A58] dark:text-slate-400 hover:text-[#1E1E1E] cursor-pointer"
+            className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] text-[#5A5A58] dark:text-slate-300 hover:text-[#1E1E1E] cursor-pointer"
           >
             {speedMultiplier}
           </button>
@@ -280,10 +374,10 @@ export function RightInspectorPanel({
               type="button"
               onClick={() =>
                 setPlayheadIndex(
-                  (prev) => (prev - 5 + WAVEFORM_BARS.length) % WAVEFORM_BARS.length
+                  (prev) => (prev - 5 + TELEMETRY_BARS.length) % TELEMETRY_BARS.length
                 )
               }
-              aria-label="Rewind 10 seconds"
+              aria-label="Rewind stream 10s"
               className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-300 dark:hover:text-white cursor-pointer"
             >
               <MaterialIcon name="replay_10" size={18} />
@@ -292,7 +386,7 @@ export function RightInspectorPanel({
             <button
               type="button"
               onClick={() => setIsPlaying(!isPlaying)}
-              aria-label={isPlaying ? "Pause telemetry" : "Play telemetry"}
+              aria-label={isPlaying ? "Pause telemetry pulse" : "Resume telemetry pulse"}
               className="w-7 h-7 rounded-full bg-[#222222] dark:bg-white text-white dark:text-[#1E1E1E] flex items-center justify-center cursor-pointer shadow-2xs"
             >
               <MaterialIcon name={isPlaying ? "pause" : "play_arrow"} size={16} />
@@ -300,8 +394,10 @@ export function RightInspectorPanel({
 
             <button
               type="button"
-              onClick={() => setPlayheadIndex((prev) => (prev + 5) % WAVEFORM_BARS.length)}
-              aria-label="Forward 10 seconds"
+              onClick={() =>
+                setPlayheadIndex((prev) => (prev + 5) % TELEMETRY_BARS.length)
+              }
+              aria-label="Forward stream 10s"
               className="text-[#5A5A58] hover:text-[#1E1E1E] dark:text-slate-300 dark:hover:text-white cursor-pointer"
             >
               <MaterialIcon name="forward_10" size={18} />
@@ -313,10 +409,11 @@ export function RightInspectorPanel({
             onClick={() => {
               if (activeInstance) setTerminalInstance(activeInstance);
             }}
-            aria-label="Audio / Console output"
-            className="text-[#222222] dark:text-white hover:opacity-75 cursor-pointer"
+            title="Open Droplet Web Console"
+            aria-label="Web Terminal Console"
+            className="w-7 h-7 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF]/70 dark:border-[#282D3A] text-[#222222] dark:text-white flex items-center justify-center hover:opacity-75 cursor-pointer"
           >
-            <MaterialIcon name="volume_up" size={18} />
+            <MaterialIcon name="terminal" size={15} />
           </button>
         </div>
       </div>
