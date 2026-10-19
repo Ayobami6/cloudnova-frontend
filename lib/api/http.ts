@@ -35,11 +35,12 @@ async function refreshAccessToken(): Promise<string> {
     }
 
     const payload: RefreshTokenRequest = { refresh_token: refreshToken };
-    const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+    const response = await fetch(buildUrl("/auth/refresh-token"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
 
     if (!response.ok) {
       clearTokens();
@@ -77,14 +78,21 @@ async function toApiError(response: Response): Promise<ApiError> {
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
-  const url = new URL(`${API_BASE_URL}${path}`);
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const combined = `${API_BASE_URL}${normalizedPath}`;
+  const isAbsolute = combined.startsWith("http://") || combined.startsWith("https://");
+  const base = isAbsolute ? undefined : "https://dummy.internal";
+  const url = new URL(combined, base);
+
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined) url.searchParams.set(key, String(value));
     }
   }
-  return url.toString();
+
+  return isAbsolute ? url.toString() : `${url.pathname}${url.search}`;
 }
+
 
 /**
  * Core request function for every CloudNova API call.
@@ -138,4 +146,13 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   return (await response.json()) as T;
+}
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Validates if a string is a standard RFC 4122 UUID.
+ */
+export function isUUID(val: unknown): val is string {
+  return typeof val === "string" && UUID_REGEX.test(val);
 }

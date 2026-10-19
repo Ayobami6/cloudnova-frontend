@@ -15,8 +15,37 @@ import { useAuth } from "./auth-context";
 
 type ActionResult<T = undefined> = { success: boolean; error?: string; data?: T };
 
+export function getCurrencySymbol(currencyCode?: string): string {
+  switch ((currencyCode || "USD").toUpperCase()) {
+    case "NGN":
+      return "₦";
+    case "EUR":
+      return "€";
+    case "GBP":
+      return "£";
+    case "CAD":
+      return "CA$";
+    case "AUD":
+      return "A$";
+    case "JPY":
+    case "CNY":
+      return "¥";
+    case "INR":
+      return "₹";
+    case "ZAR":
+      return "R";
+    case "KES":
+      return "KSh";
+    case "GHS":
+      return "GH₵";
+    default:
+      return "$";
+  }
+}
+
 interface BillingContextType {
   isLoading: boolean;
+  isSwitchingCurrency: boolean;
   loadError: string | null;
 
   balance: BalanceResponse | null;
@@ -26,6 +55,17 @@ interface BillingContextType {
   virtualAccounts: VirtualAccountResponse[];
   marginConfig: MarginConfigResponse | null;
 
+  /** Active display currency (e.g. NGN or USD) */
+  currency: string;
+  /** Currency symbol (e.g. ₦, $, €, £) */
+  currencySymbol: string;
+  /** Detected currency based on user IP */
+  detectedCurrency: string;
+  /** Detected country code based on user IP */
+  detectedCountry: string;
+  /** Active USD/NGN exchange rate */
+  exchangeRate: number;
+
   /** Convenience numeric read of balance.balance, defaulting to 0 while loading. */
   walletBalance: number;
   /** Convenience numeric read of usage.hourly_burn_rate, defaulting to 0. */
@@ -34,6 +74,7 @@ interface BillingContextType {
   isDepositModalOpen: boolean;
   setIsDepositModalOpen: (open: boolean) => void;
 
+  formatMoney: (amountInUSD: number, decimals?: number) => string;
   refreshAll: () => Promise<void>;
   recordDeposit: (
     amount: number,
@@ -46,6 +87,7 @@ interface BillingContextType {
   switchCurrency: (currency: string) => Promise<ActionResult>;
   generateInvoice: (period: string) => Promise<ActionResult>;
 }
+
 
 const BillingContext = createContext<BillingContextType | undefined>(undefined);
 
@@ -61,6 +103,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSwitchingCurrency, setIsSwitchingCurrency] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
   const [usage, setUsage] = useState<UsageSummaryResponse | null>(null);
@@ -69,6 +112,28 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   const [virtualAccounts, setVirtualAccounts] = useState<VirtualAccountResponse[]>([]);
   const [marginConfig, setMarginConfig] = useState<MarginConfigResponse | null>(null);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
+  const [detectedCurrency, setDetectedCurrency] = useState<string>("NGN");
+  const [detectedCountry, setDetectedCountry] = useState<string>("NG");
+  const [exchangeRate, setExchangeRate] = useState<number>(1600);
+
+  useEffect(() => {
+    billingApi
+      .getCurrencyFromIP()
+      .then((res) => {
+        if (res.currency) setDetectedCurrency(res.currency);
+        if (res.country_code) setDetectedCountry(res.country_code);
+      })
+      .catch(() => {});
+
+    billingApi
+      .convertCurrency({ amount: "1.00", from_currency: "USD", to_currency: "NGN" })
+      .then((res) => {
+        if (res.rate && Number(res.rate) > 0) {
+          setExchangeRate(Number(res.rate));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const refreshAll = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -168,12 +233,15 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
 
   const switchCurrency = useCallback(
     async (currency: string): Promise<ActionResult> => {
+      setIsSwitchingCurrency(true);
       try {
         await billingApi.switchCurrency({ currency });
         await refreshAll();
         return { success: true };
       } catch (err) {
         return { success: false, error: errorMessage(err, "Failed to switch currency.") };
+      } finally {
+        setIsSwitchingCurrency(false);
       }
     },
     [refreshAll]
@@ -192,8 +260,29 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
     [refreshAll]
   );
 
+  const activeCurrency = balance?.currency || detectedCurrency || "USD";
+  const currencySymbol = getCurrencySymbol(activeCurrency);
+
+  const formatMoney = useCallback(
+    (amountInUSD: number, decimals: number = 2): string => {
+      if (activeCurrency === "NGN") {
+        const converted = amountInUSD * exchangeRate;
+        return `₦${converted.toLocaleString("en-US", {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals,
+        })}`;
+      }
+      return `${currencySymbol}${amountInUSD.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}`;
+    },
+    [activeCurrency, currencySymbol, exchangeRate]
+  );
+
   const value: BillingContextType = {
     isLoading,
+    isSwitchingCurrency,
     loadError,
     balance,
     usage,
@@ -201,10 +290,16 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
     invoices,
     virtualAccounts,
     marginConfig,
+    currency: activeCurrency,
+    currencySymbol,
+    detectedCurrency,
+    detectedCountry,
+    exchangeRate,
     walletBalance: balance ? Number(balance.balance) : 0,
     hourlyBurnRate: usage ? Number(usage.hourly_burn_rate) : 0,
     isDepositModalOpen,
     setIsDepositModalOpen,
+    formatMoney,
     refreshAll,
     recordDeposit,
     provisionPaystackVirtualAccount,
@@ -212,6 +307,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
     switchCurrency,
     generateInvoice,
   };
+
 
   return <BillingContext.Provider value={value}>{children}</BillingContext.Provider>;
 }

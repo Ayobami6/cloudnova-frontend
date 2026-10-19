@@ -1,8 +1,9 @@
 /**
  * Central configuration for the CloudNova API client.
  *
- * NEXT_PUBLIC_API_BASE_URL must include the `/api/v1` prefix (the Django
- * Ninja root router is mounted there - see cloudnova-api's config/urls.py).
+ * Defaults to `/api/v1` so client-side browser requests go through
+ * the Next.js / Vercel proxy, preventing Mixed Content and CORS issues.
  */
 export const API_BASE_URL: string =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") || "http://localhost:8000/api/v1";
+  process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") || "/api/v1";
+

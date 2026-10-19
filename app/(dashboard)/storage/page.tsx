@@ -18,6 +18,7 @@ import {
   Sliders,
 } from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
+import { useBilling } from "@/lib/store/billing-context";
 import { REGIONS } from "@/lib/mock-data/initial-state";
 import { Volume, S3Bucket } from "@/lib/types/cloud";
 
@@ -37,6 +38,7 @@ export default function StoragePage() {
     destroyBucket,
     selectedRegion,
   } = useCloud();
+  const { formatMoney } = useBilling();
 
   const [activeTab, setActiveTab] = useState<"volumes" | "s3">("volumes");
 
@@ -190,8 +192,21 @@ export default function StoragePage() {
                 return (
                   <tr key={vol.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02] transition-colors">
                     <td className="py-3 px-4">
-                      <span className="font-semibold text-slate-900 dark:text-slate-200 block">{vol.name}</span>
-                      <span className="text-[11px] font-mono text-slate-500 uppercase">{vol.region}</span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-2 h-2 rounded-full shrink-0 ${
+                            vol.status === "available" || vol.status === "in_use"
+                              ? "bg-emerald-500"
+                              : vol.status === "provisioning" || vol.status === "creating"
+                              ? "bg-amber-500 animate-pulse"
+                              : "bg-slate-500"
+                          }`}
+                        />
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-slate-200 block">{vol.name}</span>
+                          <span className="text-[11px] font-mono text-slate-500 uppercase">{vol.region}</span>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3 px-4 font-mono">
                       <span className="text-slate-900 dark:text-slate-200 font-medium block">{vol.sizeGb} GB</span>
@@ -229,9 +244,9 @@ export default function StoragePage() {
                     </td>
                     <td className="py-3 px-4 font-mono text-slate-600 dark:text-slate-400">{vol.filesystem}</td>
                     <td className="py-3 px-4 font-mono">
-                      <span className="text-slate-900 dark:text-slate-200 font-semibold block">${vol.retailMonthly}/mo</span>
+                      <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(vol.retailMonthly)}/mo</span>
                       <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                        +${(vol.retailMonthly - vol.wholesaleMonthly).toFixed(2)} profit
+                        +{formatMoney(vol.retailMonthly - vol.wholesaleMonthly)} profit
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">

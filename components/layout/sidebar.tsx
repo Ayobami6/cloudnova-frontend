@@ -113,23 +113,8 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Global Infrastructure Status Widget */}
-      <div className="p-3 border-t border-slate-200 dark:border-[#232736] space-y-2">
-        <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#161922] border border-slate-200 dark:border-[#232736]">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              SLA Health
-            </span>
-            <span className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
-              99.995%
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-500">
-            8 Global Anycast regions online
-          </p>
-        </div>
-
+      {/* Bottom Action */}
+      <div className="p-3 border-t border-slate-200 dark:border-[#232736]">
         <button
           onClick={() => setIsDepositModalOpen(true)}
           className="w-full h-8 px-3 rounded-md bg-slate-100 dark:bg-[#1E2230] hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-slate-200 dark:border-[#232736] text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-between transition-colors cursor-pointer"
