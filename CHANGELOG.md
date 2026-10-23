@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Security Groups & VPC Consolidation (`app/(dashboard)/network/page.tsx`)**:
+  - Streamlined the Network Dashboard to focus exclusively on **Security Groups** and **VPC Networks**.
+  - Added attached droplet management within Security Group inspector: list attached droplets with real-time status, detach droplets, and attach unattached compute instances.
+- **Inline VPC & Security Group Creation (`components/compute/deploy-droplet-modal.tsx`)**:
+  - Added inline `+ New VPC` creation dialog directly from the droplet deployment flow with auto-selection of the newly provisioned VPC.
+  - Added inline `+ New SG` creation dialog with Web/SSH port presets and auto-attachment to the droplet.
+- **SSH Key Authentication & Encrypted Key Registration (`components/compute/deploy-droplet-modal.tsx`, `lib/store/cloud-context.tsx`)**:
+  - Added SSH key authentication selector with key cards displaying names and SHA-256 fingerprints.
+  - Added `+ Add SSH Key` inline modal to register and encrypt OpenSSH public keys (`ssh-ed25519`, `ssh-rsa`, `ecdsa`).
+  - Added `listSSHKeys`, `createSSHKey`, and `deleteSSHKey` API actions in `lib/api/compute.ts` and `useCloud()`.
+  - Wired `sshKeyIds` to `createInstance` for multi-key binding upon droplet launch.
+
+
 ### Changed
 - Redesigned the entire `cloudnova-frontend` UI based on the Nixtio IVR & Communication Dashboard aesthetic (Dribbble #27709197): Plus Jakarta Sans + Inter + JetBrains Mono typography, Google Material Symbols Rounded icons, Light-First warm alabaster (`#F6F6F4`) & warm stone (`#EFECE8`) surfaces, slim matte-charcoal (`#222222`) navigation rail with circular white active indicator, pastel Lavender/Powder-Blue/Marigold KPI cards, Sankey ribbon + bubble matrix telemetry chart, floating white pill-row tables, and right-hand contextual inspector with live waveform telemetry.
 

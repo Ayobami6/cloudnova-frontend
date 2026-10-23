@@ -1,34 +1,29 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Database,
-  Plus,
-  Server,
-  Shield,
-  Layers,
-  Terminal,
-  Eye,
-  EyeOff,
-  Copy,
-  Check,
-  RotateCw,
-  Trash2,
-  Play,
-  CheckCircle2,
-} from "lucide-react";
 import { useCloud } from "@/lib/store/cloud-context";
 import { useBilling } from "@/lib/store/billing-context";
 import { DatabaseCluster } from "@/lib/types/cloud";
 import * as databasesApi from "@/lib/api/databases";
 import { mapDatabaseCluster } from "@/lib/api/mappers";
 import { isUUID } from "@/lib/api/http";
+import {
+  MaterialIcon,
+  PastelTypePill,
+  StatusIndicator,
+  PastelVariant,
+} from "@/components/ui/material-icon";
+import {
+  PastelKpiCard,
+  SegmentedPillTabs,
+} from "@/components/ui/bento-primitives";
 
 export default function DatabasesPage() {
   const { databases, toggleDatabaseHA, destroyDatabase, createDatabase } = useCloud();
   const { formatMoney } = useBilling();
 
   const [activeDbId, setActiveDbId] = useState<string>(databases[0]?.id || "");
+  const [engineFilter, setEngineFilter] = useState<string>("all");
   const [activeSubTab, setActiveSubTab] = useState<
     "connection" | "users" | "pools" | "backups" | "replicas" | "console" | "security"
   >("connection");
@@ -52,7 +47,7 @@ export default function DatabasesPage() {
   const [newEngine, setNewEngine] = useState<"postgresql" | "mysql" | "redis" | "mongodb">("postgresql");
 
   const baseDb = databases.find((d) => d.id === activeDbId) || databases[0];
-  const activeDb = (baseDb && fullDbDetails[baseDb.id]) ? { ...baseDb, ...fullDbDetails[baseDb.id] } : baseDb;
+  const activeDb = baseDb && fullDbDetails[baseDb.id] ? { ...baseDb, ...fullDbDetails[baseDb.id] } : baseDb;
 
   // Hydrate full cluster details including admin_password_reveal when cluster changes
   React.useEffect(() => {
@@ -130,140 +125,238 @@ export default function DatabasesPage() {
     setIsCreateModalOpen(false);
   };
 
+  const filteredDatabases = databases.filter(
+    (d) => engineFilter === "all" || d.engine.toLowerCase() === engineFilter
+  );
+
+  const onlineCount = databases.filter((d) => d.status === "online").length;
+  const totalDiskGb = databases.reduce((acc, d) => acc + (d.diskAllocatedGb || 0), 0);
+  const haCount = databases.filter((d) => d.haEnabled).length;
+
+  const getEnginePillVariant = (engine: string): PastelVariant => {
+    switch (engine.toLowerCase()) {
+      case "postgresql":
+        return "blue";
+      case "mysql":
+        return "sand";
+      case "redis":
+        return "lavender";
+      case "mongodb":
+        return "sage";
+      default:
+        return "stone";
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5">
+      {/* Top 3 Pastel KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <PastelKpiCard
+          label="Active Database Clusters"
+          value={`${onlineCount} / ${databases.length}`}
+          subtitle="Multi-AZ Aurora & RDS"
+          variant="lavender"
+          actionLabel="Provision"
+          onAction={() => setIsCreateModalOpen(true)}
+        />
+        <PastelKpiCard
+          label="Allocated NVMe Storage"
+          value={`${totalDiskGb} GB`}
+          subtitle="High-IOPS Provisioned SSD"
+          variant="blue"
+          actionLabel="Check"
+          onAction={() => setEngineFilter("all")}
+        />
+        <PastelKpiCard
+          label="High Availability Standbys"
+          value={`${haCount} Active`}
+          subtitle="Zero-Downtime Failover"
+          variant="yellow"
+          actionLabel="Check"
+          onAction={() => setEngineFilter("all")}
+        />
+      </div>
+
+      {/* Header & Filter Controls Card */}
+      <div className="nixtio-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
-            Managed Databases
-            <span className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-[#EFECE8] dark:bg-[#161920] px-2 py-0.5 rounded border border-[#E7E4DF] dark:border-[#282D3A]">
-              {databases.length} clusters
+          <h2 className="text-base font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
+            <span>Managed Databases</span>
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-[#5A5A58] dark:text-slate-300">
+              {filteredDatabases.length} clusters
             </span>
-          </h1>
-          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
+          </h2>
+          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
             Fully managed PostgreSQL, MySQL, Redis, and MongoDB clusters with automated failover and PITR.
           </p>
         </div>
 
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create Database Cluster</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <SegmentedPillTabs
+            value={engineFilter}
+            onChange={setEngineFilter}
+            options={[
+              { id: "all", label: "All", badge: databases.length },
+              { id: "postgresql", label: "PostgreSQL" },
+              { id: "mysql", label: "MySQL" },
+              { id: "redis", label: "Redis" },
+            ]}
+          />
+
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+          >
+            <MaterialIcon name="add" size={16} />
+            <span>Create Database Cluster</span>
+          </button>
+        </div>
       </div>
 
       {/* Cluster Cards Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {databases.map((db) => (
-          <button
-            key={db.id}
-            onClick={() => setActiveDbId(db.id)}
-            className={`p-4 rounded-lg text-left transition-colors border ${
-              activeDb?.id === db.id
-                ? "bg-white dark:bg-[#1C2029] border-blue-500 shadow-xs"
-                : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#161922] hover:border-slate-300 dark:hover:border-[#33394D]"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-xs text-slate-900 dark:text-slate-200 block truncate">{db.name}</span>
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  db.status === "online"
-                    ? "bg-emerald-500"
-                    : db.status === "provisioning" || db.status === "rebuilding"
-                    ? "bg-amber-500 animate-pulse"
-                    : "bg-blue-500"
-                }`}
-              />
-            </div>
-            <div className="mt-2 flex items-center justify-between text-[11px] text-[#8C8B87] dark:text-slate-400 font-mono">
-              <span className="capitalize">{db.engine} {db.version}</span>
-              <span>{db.region.toUpperCase()}</span>
-            </div>
-            <div className="mt-1 flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500">
-              <span>{db.haEnabled ? "HA Standby Active" : "Single Node"}</span>
-              <span className="font-mono text-[#4EA871] dark:text-[#56B87C] font-medium">+{formatMoney(db.retailMonthly - db.wholesaleMonthly, 0)}/mo</span>
-            </div>
-          </button>
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {filteredDatabases.map((db) => {
+          const isSelected = activeDb?.id === db.id;
+          const statusTone =
+            db.status === "online"
+              ? "completed"
+              : db.status === "provisioning" || db.status === "rebuilding"
+              ? "pending"
+              : "failed";
+
+          return (
+            <button
+              key={db.id}
+              onClick={() => setActiveDbId(db.id)}
+              className={`rounded-[22px] p-4.5 text-left transition-all border cursor-pointer ${
+                isSelected
+                  ? "bg-white dark:bg-[#1C2029] border-[#222222] dark:border-white ring-2 ring-[#222222]/10 dark:ring-white/20 shadow-xs"
+                  : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#1C2029] hover:border-[#D5D0C8] dark:hover:border-[#383F52]"
+              }`}
+            >
+              {/* Row 1: Cluster Name & Status */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-semibold text-xs text-[#1E1E1E] dark:text-white truncate block">
+                  {db.name}
+                </span>
+                <StatusIndicator status={statusTone} label={db.status} />
+              </div>
+
+              {/* Row 2: Engine & Region */}
+              <div className="mt-2.5 flex items-center justify-between gap-2">
+                <PastelTypePill
+                  icon="database"
+                  label={`${db.engine} ${db.version}`}
+                  variant={getEnginePillVariant(db.engine)}
+                  size="sm"
+                />
+                <span className="font-mono text-[11px] text-[#8C8B87] dark:text-slate-400 font-medium uppercase">
+                  {db.region}
+                </span>
+              </div>
+
+              {/* Row 3: HA Standby Pill & Price */}
+              <div className="mt-3 pt-2.5 border-t border-[#E7E4DF]/60 dark:border-[#282D3A] flex items-center justify-between gap-2">
+                {db.haEnabled ? (
+                  <PastelTypePill
+                    icon="verified_user"
+                    label="HA Standby"
+                    variant="sage"
+                    size="sm"
+                  />
+                ) : (
+                  <PastelTypePill
+                    icon="dns"
+                    label="Single Node"
+                    variant="stone"
+                    size="sm"
+                  />
+                )}
+                <span className="font-mono text-xs font-semibold text-[#1E1E1E] dark:text-white">
+                  {formatMoney(db.retailMonthly, 0)}/mo
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {activeDb && (
         <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
           {/* Active DB Banner */}
-          <div className="p-5 border-b border-[#E7E4DF] dark:border-[#282D3A] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#F6F6F4] dark:bg-[#161920]">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-600/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                <Database className="w-5 h-5" />
+          <div className="p-5 sm:p-6 border-b border-[#E7E4DF] dark:border-[#282D3A] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#F6F6F4] dark:bg-[#161920]">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-[#CFE0EC] dark:bg-[#CFE0EC]/18 text-[#1E1E1E] dark:text-[#E2EEF7] flex items-center justify-center shrink-0">
+                <MaterialIcon name="database" size={22} />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base font-semibold text-[#1E1E1E] dark:text-white">{activeDb.name}</h2>
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded uppercase border ${
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#1E1E1E] dark:text-white tracking-tight">
+                    {activeDb.name}
+                  </h2>
+                  <StatusIndicator
+                    status={
                       activeDb.status === "online"
-                        ? "bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] border-emerald-500/20"
+                        ? "completed"
                         : activeDb.status === "provisioning" || activeDb.status === "rebuilding"
-                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 animate-pulse"
-                        : "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20"
-                    }`}
-                  >
-                    {activeDb.status}
-                  </span>
+                        ? "pending"
+                        : "failed"
+                    }
+                    label={activeDb.status}
+                  />
                 </div>
-                <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
-                  Engine: <span className="capitalize text-slate-700 dark:text-slate-200 font-medium">{activeDb.engine} {activeDb.version}</span> • {activeDb.vcpu} vCPU, {activeDb.ramGb} GB RAM, {activeDb.diskAllocatedGb} GB NVMe ({activeDb.diskUsedGb} GB used)
+                <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
+                  Engine: <span className="capitalize text-slate-800 dark:text-slate-200 font-medium">{activeDb.engine} {activeDb.version}</span> • {activeDb.vcpu} vCPU, {activeDb.ramGb} GB RAM, {activeDb.diskAllocatedGb} GB NVMe ({activeDb.diskUsedGb} GB used)
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <button
+                type="button"
                 onClick={() => toggleDatabaseHA(activeDb.id)}
-                className={`h-8 px-3 rounded-md border text-xs font-medium transition-colors ${
+                className={`h-9 px-4 rounded-full border text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
                   activeDb.haEnabled
-                    ? "bg-emerald-500/10 border-emerald-500/20 text-[#4EA871] dark:text-[#56B87C]"
+                    ? "bg-[#D5EBD9] dark:bg-[#4EA871]/20 border-[#4EA871]/30 text-[#1E1E1E] dark:text-[#A3E4BC]"
                     : "bg-[#EFECE8] dark:bg-[#232834] border-[#E7E4DF] dark:border-[#282D3A] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                 }`}
               >
-                {activeDb.haEnabled ? "✓ High Availability Enabled" : "Enable HA Standby"}
+                <MaterialIcon
+                  name={activeDb.haEnabled ? "verified_user" : "add_moderator"}
+                  size={16}
+                  className={activeDb.haEnabled ? "text-[#4EA871] dark:text-[#56B87C]" : ""}
+                />
+                <span>{activeDb.haEnabled ? "High Availability Enabled" : "Enable HA Standby"}</span>
               </button>
+
               <button
+                type="button"
                 onClick={() => destroyDatabase(activeDb.id)}
-                className="h-8 w-8 rounded-md bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center transition-colors"
+                className="h-9 w-9 rounded-full bg-[#FCE8E8] dark:bg-[#D94E4E]/15 border border-[#D94E4E]/25 text-[#D94E4E] dark:text-[#EF6363] hover:bg-[#F8D7D7] dark:hover:bg-[#D94E4E]/25 flex items-center justify-center transition-colors cursor-pointer"
                 title="Destroy Cluster"
               >
-                <Trash2 className="w-4 h-4" />
+                <MaterialIcon name="delete" size={16} />
               </button>
             </div>
           </div>
 
-          {/* Sub-Tabs */}
-          <div className="flex items-center px-4 border-b border-[#E7E4DF] dark:border-[#282D3A] bg-[#F6F6F4] dark:bg-[#161920] overflow-x-auto gap-2 text-xs font-medium">
-            {[
-              { id: "connection", label: "Connection Details" },
-              { id: "users", label: "Users & DBs" },
-              { id: "pools", label: "Connection Pools (PgBouncer)" },
-              { id: "backups", label: "Backups & PITR" },
-              { id: "replicas", label: "Read Replicas" },
-              { id: "console", label: "Interactive SQL" },
-              { id: "security", label: "Trusted Sources" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSubTab(tab.id as typeof activeSubTab)}
-                className={`py-3 px-3 border-b-2 transition-colors whitespace-nowrap ${
-                  activeSubTab === tab.id
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400 font-semibold"
-                    : "border-transparent text-[#8C8B87] dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {/* Sub-Tabs using SegmentedPillTabs */}
+          <div className="px-5 sm:px-6 py-3.5 border-b border-[#E7E4DF] dark:border-[#282D3A] bg-[#F6F6F4] dark:bg-[#161920] overflow-x-auto">
+            <SegmentedPillTabs
+              value={activeSubTab}
+              onChange={setActiveSubTab}
+              options={[
+                { id: "connection", label: "Connection Details", icon: "link" },
+                { id: "users", label: "Users & DBs", icon: "group", badge: activeDb.users.length },
+                { id: "pools", label: "Connection Pools (PgBouncer)", icon: "alt_route", badge: activeDb.pools.length },
+                { id: "backups", label: "Backups & PITR", icon: "history", badge: activeDb.backups.length },
+                { id: "replicas", label: "Read Replicas", icon: "dns", badge: activeDb.replicas.length },
+                { id: "console", label: "Interactive SQL", icon: "terminal" },
+                { id: "security", label: "Trusted Sources", icon: "shield", badge: activeDb.trustedSources.length },
+              ]}
+            />
           </div>
 
           {/* Sub-Tab Contents */}
@@ -273,26 +366,28 @@ export default function DatabasesPage() {
               <div className="space-y-6 max-w-3xl">
                 {/* Connect Using Mode Selection */}
                 <div>
-                  <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-2">
+                  <label className="text-xs font-semibold text-[#1E1E1E] dark:text-white block mb-2.5">
                     Connect using
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <button
                       type="button"
                       onClick={() => setConnectTabMode("snippets")}
-                      className={`p-3 rounded-lg border text-left transition-all ${
+                      className={`p-4 rounded-[20px] border text-left transition-all cursor-pointer ${
                         connectTabMode === "snippets"
-                          ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 ring-1 ring-blue-500"
-                          : "border-[#E7E4DF] dark:border-[#282D3A] bg-slate-50/50 dark:bg-[#11131A] hover:border-slate-300 dark:hover:border-[#33394D]"
+                          ? "bg-white dark:bg-[#1C2029] border-[#222222] dark:border-white ring-2 ring-[#222222]/10 dark:ring-white/20 shadow-xs"
+                          : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#1C2029]"
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${connectTabMode === "snippets" ? "border-blue-600 bg-blue-600" : "border-slate-400"}`}>
-                          {connectTabMode === "snippets" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </div>
+                      <div className="flex items-center gap-2.5">
+                        <MaterialIcon
+                          name={connectTabMode === "snippets" ? "radio_button_checked" : "radio_button_unchecked"}
+                          size={18}
+                          className={connectTabMode === "snippets" ? "text-[#222222] dark:text-white" : "text-[#8C8B87]"}
+                        />
                         <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Code snippets & CLI</span>
                       </div>
-                      <p className="text-[11px] text-[#8C8B87] dark:text-slate-400 mt-1 pl-5.5">
+                      <p className="text-[11px] text-[#8C8B87] dark:text-slate-400 mt-1.5 pl-7">
                         Use when connecting through PSQL, Node.js, Python, or Go SDKs with AWS SSL certificate.
                       </p>
                     </button>
@@ -300,19 +395,21 @@ export default function DatabasesPage() {
                     <button
                       type="button"
                       onClick={() => setConnectTabMode("params")}
-                      className={`p-3 rounded-lg border text-left transition-all ${
+                      className={`p-4 rounded-[20px] border text-left transition-all cursor-pointer ${
                         connectTabMode === "params"
-                          ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 ring-1 ring-blue-500"
-                          : "border-[#E7E4DF] dark:border-[#282D3A] bg-slate-50/50 dark:bg-[#11131A] hover:border-slate-300 dark:hover:border-[#33394D]"
+                          ? "bg-white dark:bg-[#1C2029] border-[#222222] dark:border-white ring-2 ring-[#222222]/10 dark:ring-white/20 shadow-xs"
+                          : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#1C2029]"
                       }`}
                     >
-                      <div className="flex items-center gap-2">
-                        <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${connectTabMode === "params" ? "border-blue-600 bg-blue-600" : "border-slate-400"}`}>
-                          {connectTabMode === "params" && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-                        </div>
+                      <div className="flex items-center gap-2.5">
+                        <MaterialIcon
+                          name={connectTabMode === "params" ? "radio_button_checked" : "radio_button_unchecked"}
+                          size={18}
+                          className={connectTabMode === "params" ? "text-[#222222] dark:text-white" : "text-[#8C8B87]"}
+                        />
                         <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Endpoints & Credentials</span>
                       </div>
-                      <p className="text-[11px] text-[#8C8B87] dark:text-slate-400 mt-1 pl-5.5">
+                      <p className="text-[11px] text-[#8C8B87] dark:text-slate-400 mt-1.5 pl-7">
                         Raw hostname, port, database credentials, and full connection URI string.
                       </p>
                     </button>
@@ -320,22 +417,22 @@ export default function DatabasesPage() {
                 </div>
 
                 {/* Security badges */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-[20px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs">
                   <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">SSL Mode</span>
-                    <span className="font-mono text-[#4EA871] dark:text-[#56B87C] font-medium flex items-center gap-1 mt-0.5">
-                      <Shield className="w-3 h-3" /> verify-full (Enforced)
-                    </span>
+                    <span className="text-[10px] uppercase font-semibold text-[#8C8B87] dark:text-slate-400 block">SSL Mode</span>
+                    <div className="mt-1">
+                      <StatusIndicator status="completed" label="verify-full (Enforced)" />
+                    </div>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">Truststore CA</span>
-                    <span className="font-mono text-slate-700 dark:text-slate-300 font-medium block mt-0.5 truncate">
+                    <span className="text-[10px] uppercase font-semibold text-[#8C8B87] dark:text-slate-400 block">Truststore CA</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200 font-medium block mt-1 truncate">
                       AWS RDS Global Bundle
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">Region</span>
-                    <span className="font-mono text-slate-700 dark:text-slate-300 font-medium block mt-0.5 uppercase">
+                    <span className="text-[10px] uppercase font-semibold text-[#8C8B87] dark:text-slate-400 block">Region</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200 font-medium block mt-1 uppercase">
                       {activeDb.region}
                     </span>
                   </div>
@@ -344,54 +441,50 @@ export default function DatabasesPage() {
                 {/* Code Snippets Mode */}
                 {connectTabMode === "snippets" && (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-[#E7E4DF] dark:border-[#282D3A] pb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E4DF] dark:border-[#282D3A] pb-3">
                       <div className="flex items-center gap-2">
-                        <Terminal className="w-4 h-4 text-blue-500" />
-                        <span className="text-xs font-semibold text-slate-900 dark:text-slate-200">Programming Language & Tool</span>
+                        <MaterialIcon name="terminal" size={18} className="text-[#222222] dark:text-white" />
+                        <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Programming Language & Tool</span>
                       </div>
-                      <div className="flex items-center gap-1 bg-[#EFECE8] dark:bg-[#161920] p-0.5 rounded border border-[#E7E4DF] dark:border-[#282D3A]">
-                        {(["psql", "nodejs", "python", "go"] as const).map((lang) => (
-                          <button
-                            key={lang}
-                            type="button"
-                            onClick={() => setConnectSnippetLang(lang)}
-                            className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
-                              connectSnippetLang === lang
-                                ? "bg-white dark:bg-[#1E2230] text-blue-600 dark:text-blue-400 font-semibold shadow-xs"
-                                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
-                            }`}
-                          >
-                            {lang === "psql" ? "PSQL" : lang === "nodejs" ? "Node.js" : lang === "python" ? "Python" : "Go"}
-                          </button>
-                        ))}
-                      </div>
+                      <SegmentedPillTabs
+                        value={connectSnippetLang}
+                        onChange={setConnectSnippetLang}
+                        options={[
+                          { id: "psql", label: "PSQL" },
+                          { id: "nodejs", label: "Node.js" },
+                          { id: "python", label: "Python" },
+                          { id: "go", label: "Go" },
+                        ]}
+                      />
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="space-y-1.5">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                          <label className="text-xs font-medium text-[#5A5A58] dark:text-slate-300">
                             Step 1: Download the AWS RDS Global Certificate Bundle
                           </label>
                           <button
+                            type="button"
                             onClick={() => handleCopy("curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem", "step1")}
-                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 text-[11px]"
+                            className="px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-[#1E1E1E] dark:text-white hover:bg-slate-200 dark:hover:bg-[#282D3A] flex items-center gap-1.5 text-[11px] font-medium transition-colors cursor-pointer"
                           >
-                            {copiedText === "step1" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            <MaterialIcon name={copiedText === "step1" ? "check" : "content_copy"} size={14} />
                             <span>{copiedText === "step1" ? "Copied" : "Copy"}</span>
                           </button>
                         </div>
-                        <div className="p-3 rounded bg-slate-900 text-slate-200 font-mono text-xs overflow-x-auto border border-slate-800">
+                        <div className="p-3.5 rounded-2xl bg-[#14161B] text-slate-200 font-mono text-xs overflow-x-auto border border-[#282D3A]">
                           <code>curl -o global-bundle.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem</code>
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                          <label className="text-xs font-medium text-[#5A5A58] dark:text-slate-300">
                             Step 2: Connect to the instance endpoint
                           </label>
                           <button
+                            type="button"
                             onClick={() => {
                               const snippet =
                                 connectSnippetLang === "psql"
@@ -403,13 +496,13 @@ export default function DatabasesPage() {
                                   : `package main\n\nimport (\n\t"context"\n\t"os"\n\t"github.com/jackc/pgx/v5/pgxpool"\n)\n\nfunc main() {\n\tconnStr := "postgres://${activeDb.adminUser || "cloudnova_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"\n\tpool, err := pgxpool.New(context.Background(), connStr)\n\t_ = pool\n}`;
                               handleCopy(snippet, "step2");
                             }}
-                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 flex items-center gap-1 text-[11px]"
+                            className="px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-[#1E1E1E] dark:text-white hover:bg-slate-200 dark:hover:bg-[#282D3A] flex items-center gap-1.5 text-[11px] font-medium transition-colors cursor-pointer"
                           >
-                            {copiedText === "step2" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                            <MaterialIcon name={copiedText === "step2" ? "check" : "content_copy"} size={14} />
                             <span>{copiedText === "step2" ? "Copied" : "Copy"}</span>
                           </button>
                         </div>
-                        <div className="p-3.5 rounded bg-slate-900 text-slate-200 font-mono text-xs overflow-x-auto border border-slate-800 leading-relaxed">
+                        <div className="p-4 rounded-2xl bg-[#14161B] text-slate-200 font-mono text-xs overflow-x-auto border border-[#282D3A] leading-relaxed">
                           {connectSnippetLang === "psql" && (
                             <pre className="text-slate-200 whitespace-pre-wrap">
 {`export RDSHOST="${activeDb.host}"
@@ -475,76 +568,84 @@ func main() {
 
                 {/* Direct Parameters & Credentials */}
                 <div className="space-y-4 pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A]">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">
-                      Connection Parameters
-                    </h4>
-                  </div>
+                  <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">
+                    Connection Parameters
+                  </h4>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Endpoint / Host</label>
-                      <div className="flex items-center justify-between p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Endpoint / Host</label>
+                      <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
                         <span className="truncate mr-2">{activeDb.host}</span>
-                        <button onClick={() => handleCopy(activeDb.host, "host")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0">
-                          {copiedText === "host" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(activeDb.host, "host")}
+                          className="text-[#8C8B87] hover:text-[#1E1E1E] dark:hover:text-white shrink-0 cursor-pointer"
+                        >
+                          <MaterialIcon name={copiedText === "host" ? "check" : "content_copy"} size={16} />
                         </button>
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Port</label>
-                      <div className="p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Port</label>
+                      <div className="p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
                         {activeDb.port}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Default Database</label>
-                      <div className="p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Default Database</label>
+                      <div className="p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
                         {activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"}
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Admin User</label>
-                      <div className="p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Admin User</label>
+                      <div className="p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
                         {activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"}
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Admin Password</label>
-                    <div className="flex items-center justify-between p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Admin Password</label>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
                       <span>{showPassword ? effectivePassword : "••••••••••••••••••••"}</span>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5"
+                          className="text-[#8C8B87] hover:text-[#1E1E1E] dark:hover:text-white cursor-pointer"
                           title={showPassword ? "Hide password" : "Show password"}
                         >
-                          {showPassword ? <EyeOff className="w-4 h-4 text-blue-500" /> : <Eye className="w-4 h-4" />}
+                          <MaterialIcon name={showPassword ? "visibility_off" : "visibility"} size={16} />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleCopy(effectivePassword, "pwd")}
-                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5"
+                          className="text-[#8C8B87] hover:text-[#1E1E1E] dark:hover:text-white cursor-pointer"
                           title="Copy password"
                         >
-                          {copiedText === "pwd" ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                          <MaterialIcon name={copiedText === "pwd" ? "check" : "content_copy"} size={16} />
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-600 dark:text-slate-400 font-medium">Connection URI (Public / SSL Enforced)</label>
-                    <div className="flex items-center justify-between p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
-                      <span className="truncate mr-2 font-mono">{connectionUriDisplay}</span>
-                      <button onClick={() => handleCopy(connectionUriDisplay, "uri")} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 shrink-0">
-                        {copiedText === "uri" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Connection URI (Public / SSL Enforced)</label>
+                    <div className="flex items-center justify-between p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+                      <span className="truncate mr-2">{connectionUriDisplay}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopy(connectionUriDisplay, "uri")}
+                        className="text-[#8C8B87] hover:text-[#1E1E1E] dark:hover:text-white shrink-0 cursor-pointer"
+                      >
+                        <MaterialIcon name={copiedText === "uri" ? "check" : "content_copy"} size={16} />
                       </button>
                     </div>
                   </div>
@@ -556,46 +657,62 @@ func main() {
             {activeSubTab === "users" && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">Database Users</h4>
-                  <span className="text-[11px] text-slate-500">{activeDb.users.length} active users</span>
+                  <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Database Users</h4>
+                  <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">{activeDb.users.length} active users</span>
                 </div>
-                <table className="w-full text-left text-xs border border-[#E7E4DF] dark:border-[#282D3A] rounded-md overflow-hidden">
-                  <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase">
-                    <tr>
-                      <th className="py-2 px-3">Username</th>
-                      <th className="py-2 px-3">Role</th>
-                      <th className="py-2 px-3">Created</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
-                    {activeDb.users.map((u) => (
-                      <tr key={u.username} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
-                        <td className="py-2.5 px-3 font-mono font-medium text-[#1E1E1E] dark:text-slate-200">{u.username}</td>
-                        <td className="py-2.5 px-3 capitalize text-[#8C8B87] dark:text-slate-400">{u.role}</td>
-                        <td className="py-2.5 px-3 text-slate-500">{u.createdAt}</td>
+                <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-[22px] overflow-hidden">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase border-b border-[#E7E4DF] dark:border-[#282D3A]">
+                      <tr>
+                        <th className="py-3 px-4">Username</th>
+                        <th className="py-3 px-4">Role</th>
+                        <th className="py-3 px-4">Created</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] bg-white dark:bg-[#1C2029]">
+                      {activeDb.users.map((u) => (
+                        <tr key={u.username} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+                          <td className="py-3 px-4 font-mono font-medium text-[#1E1E1E] dark:text-slate-200">{u.username}</td>
+                          <td className="py-3 px-4">
+                            <PastelTypePill
+                              icon="badge"
+                              label={u.role}
+                              variant={u.role === "admin" ? "lavender" : "blue"}
+                              size="sm"
+                            />
+                          </td>
+                          <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400 font-mono text-[11px]">{u.createdAt}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
             {/* 3. Pools */}
             {activeSubTab === "pools" && (
-              <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">PgBouncer Connection Pools</h4>
+              <div className="space-y-3.5">
+                <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">PgBouncer Connection Pools</h4>
                 {activeDb.pools.length === 0 ? (
-                  <p className="text-xs text-slate-500 py-4">No connection pools configured for this database cluster.</p>
+                  <div className="p-8 text-center text-xs text-[#8C8B87] rounded-[22px] bg-[#F6F6F4] dark:bg-[#161920]">
+                    No connection pools configured for this database cluster.
+                  </div>
                 ) : (
                   activeDb.pools.map((p) => (
-                    <div key={p.id} className="p-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
-                      <div>
-                        <span className="text-xs font-mono font-semibold text-[#1E1E1E] dark:text-slate-200 block">{p.name}</span>
-                        <span className="text-[11px] text-slate-500">Mode: {p.mode} • Size: {p.size} connections • User: {p.user}</span>
+                    <div
+                      key={p.id}
+                      className="p-4 rounded-[20px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between gap-3"
+                    >
+                      <div className="space-y-1">
+                        <span className="text-xs font-mono font-semibold text-[#1E1E1E] dark:text-white block">
+                          {p.name}
+                        </span>
+                        <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">
+                          Mode: {p.mode} • Size: {p.size} connections • User: {p.user}
+                        </span>
                       </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] border border-emerald-500/20">
-                        ACTIVE
-                      </span>
+                      <StatusIndicator status="completed" label="ACTIVE" />
                     </div>
                   ))
                 )}
@@ -604,21 +721,27 @@ func main() {
 
             {/* 4. Backups */}
             {activeSubTab === "backups" && (
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">Point-in-Time Recovery Snapshots</h4>
+                  <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Point-in-Time Recovery Snapshots</h4>
                   <span className="text-[11px] text-[#4EA871] dark:text-[#56B87C] font-medium">PITR Retention: 7 Days</span>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {activeDb.backups.map((b) => (
-                    <div key={b.id} className="p-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
+                    <div
+                      key={b.id}
+                      className="p-4 rounded-[20px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between gap-3"
+                    >
                       <div>
-                        <span className="text-xs font-medium text-[#1E1E1E] dark:text-slate-200 block">{b.createdAt}</span>
-                        <span className="text-[11px] text-slate-500">{b.sizeMb} MB compressed NVMe snapshot</span>
+                        <span className="text-xs font-medium text-[#1E1E1E] dark:text-white block">{b.createdAt}</span>
+                        <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">{b.sizeMb} MB compressed NVMe snapshot</span>
                       </div>
-                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 cursor-pointer">
+                      <button
+                        type="button"
+                        className="h-8 px-3.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-xs font-medium text-[#1E1E1E] dark:text-white hover:bg-slate-200 dark:hover:bg-[#282D3A] transition-colors cursor-pointer"
+                      >
                         Restore to Point
-                      </span>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -627,18 +750,27 @@ func main() {
 
             {/* 5. Read Replicas */}
             {activeSubTab === "replicas" && (
-              <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">Geo-Distributed Read Replicas</h4>
+              <div className="space-y-3.5">
+                <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Geo-Distributed Read Replicas</h4>
                 {activeDb.replicas.length === 0 ? (
-                  <p className="text-xs text-slate-500 py-4">No read replicas configured. Deploy replicas to offload read traffic.</p>
+                  <div className="p-8 text-center text-xs text-[#8C8B87] rounded-[22px] bg-[#F6F6F4] dark:bg-[#161920]">
+                    No read replicas configured. Deploy replicas to offload read traffic.
+                  </div>
                 ) : (
                   activeDb.replicas.map((rep) => (
-                    <div key={rep.id} className="p-3 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between">
+                    <div
+                      key={rep.id}
+                      className="p-4 rounded-[20px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between gap-3"
+                    >
                       <div>
-                        <span className="text-xs font-mono font-semibold text-[#1E1E1E] dark:text-slate-200 block">{rep.name}</span>
-                        <span className="text-[11px] text-slate-500">Region: {rep.region.toUpperCase()} • Replication Lag: {rep.lagMs}ms</span>
+                        <span className="text-xs font-mono font-semibold text-[#1E1E1E] dark:text-white block">
+                          {rep.name}
+                        </span>
+                        <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">
+                          Region: {rep.region.toUpperCase()} • Replication Lag: {rep.lagMs}ms
+                        </span>
                       </div>
-                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <StatusIndicator status="completed" label="Synced" />
                     </div>
                   ))
                 )}
@@ -648,14 +780,14 @@ func main() {
             {/* 6. Interactive SQL Console */}
             {activeSubTab === "console" && (
               <div className="space-y-4">
-                <form onSubmit={handleRunQuery} className="space-y-2">
+                <form onSubmit={handleRunQuery} className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Run Query on {activeDb.defaultDb}</span>
+                    <span className="text-xs font-medium text-[#5A5A58] dark:text-slate-300">Run Query on {activeDb.defaultDb || "postgres"}</span>
                     <button
                       type="submit"
-                      className="h-8 px-3 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="h-8.5 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                     >
-                      <Play className="w-3 h-3 fill-white" />
+                      <MaterialIcon name="play_arrow" size={16} />
                       <span>Execute</span>
                     </button>
                   </div>
@@ -663,33 +795,33 @@ func main() {
                     value={sqlQuery}
                     onChange={(e) => setSqlQuery(e.target.value)}
                     rows={3}
-                    className="w-full p-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                    className="w-full p-4 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#222222]/10 dark:focus:ring-white/20 transition-all"
                   />
                 </form>
 
                 {queryResult && (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex items-center justify-between text-[11px] text-[#8C8B87] dark:text-slate-400">
                       <span>Query Results ({queryResult.length} rows)</span>
                       <span className="font-mono text-[#4EA871] dark:text-[#56B87C]">Executed in {queryExecutionTime}ms</span>
                     </div>
-                    <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-md">
+                    <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-[22px] overflow-hidden">
                       <table className="w-full text-left text-xs">
                         <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase border-b border-[#E7E4DF] dark:border-[#282D3A]">
                           <tr>
-                            <th className="py-2 px-3">id</th>
-                            <th className="py-2 px-3">name</th>
-                            <th className="py-2 px-3">status</th>
-                            <th className="py-2 px-3">created_at</th>
+                            <th className="py-2.5 px-3.5">id</th>
+                            <th className="py-2.5 px-3.5">name</th>
+                            <th className="py-2.5 px-3.5">status</th>
+                            <th className="py-2.5 px-3.5">created_at</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] font-mono text-[11px]">
+                        <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] font-mono text-[11px] bg-white dark:bg-[#1C2029]">
                           {queryResult.map((row) => (
                             <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
-                              <td className="py-2 px-3 text-[#8C8B87] dark:text-slate-400">{row.id}</td>
-                              <td className="py-2 px-3 text-[#1E1E1E] dark:text-slate-200 font-sans">{row.name}</td>
-                              <td className="py-2 px-3 text-[#4EA871] dark:text-[#56B87C]">{row.status}</td>
-                              <td className="py-2 px-3 text-slate-500">{row.created_at}</td>
+                              <td className="py-2.5 px-3.5 text-[#8C8B87] dark:text-slate-400">{row.id}</td>
+                              <td className="py-2.5 px-3.5 text-[#1E1E1E] dark:text-slate-200 font-sans">{row.name}</td>
+                              <td className="py-2.5 px-3.5 text-[#4EA871] dark:text-[#56B87C]">{row.status}</td>
+                              <td className="py-2.5 px-3.5 text-[#8C8B87] dark:text-slate-400">{row.created_at}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -702,14 +834,17 @@ func main() {
 
             {/* 7. Security & Trusted Sources */}
             {activeSubTab === "security" && (
-              <div className="space-y-3 max-w-xl">
-                <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-200">Inbound Network Whitelist (CIDRs)</h4>
+              <div className="space-y-3.5 max-w-xl">
+                <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Inbound Network Whitelist (CIDRs)</h4>
                 <p className="text-xs text-[#8C8B87] dark:text-slate-400">Connections from outside these ranges will be dropped by the cloud firewall.</p>
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {activeDb.trustedSources.map((src) => (
-                    <div key={src} className="flex items-center justify-between p-2.5 rounded bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
+                    <div
+                      key={src}
+                      className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200"
+                    >
                       <span>{src}</span>
-                      <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] font-sans font-medium">Whitelisted</span>
+                      <PastelTypePill icon="shield" label="Whitelisted" variant="sage" size="sm" />
                     </div>
                   ))}
                 </div>
@@ -721,26 +856,33 @@ func main() {
 
       {/* Create Database Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] rounded-lg shadow-2xl w-full max-w-md p-6 space-y-4">
-            <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white">Create Managed Database Cluster</h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] rounded-[28px] shadow-2xl w-full max-w-md p-6 space-y-5">
+            <div>
+              <h3 className="text-base font-semibold text-[#1E1E1E] dark:text-white">Create Database Cluster</h3>
+              <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-0.5">
+                Provision high-availability PostgreSQL, MySQL, Redis, or Mongo clusters.
+              </p>
+            </div>
+
             <form onSubmit={handleCreateCluster} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Cluster Name</label>
+                <label className="text-xs font-medium text-[#5A5A58] dark:text-slate-300">Cluster Name</label>
                 <input
                   type="text"
                   value={newClusterName}
                   onChange={(e) => setNewClusterName(e.target.value)}
-                  className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 font-mono focus:outline-none focus:border-blue-500"
+                  className="w-full h-10 px-4 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 font-mono focus:outline-none focus:ring-2 focus:ring-[#222222]/10 dark:focus:ring-white/20 transition-all"
                   required
                 />
               </div>
+
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Database Engine</label>
+                <label className="text-xs font-medium text-[#5A5A58] dark:text-slate-300">Database Engine</label>
                 <select
                   value={newEngine}
                   onChange={(e) => setNewEngine(e.target.value as typeof newEngine)}
-                  className="w-full h-9 px-3 rounded-md bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:border-blue-500"
+                  className="w-full h-10 px-4 rounded-full bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#222222]/10 dark:focus:ring-white/20 transition-all cursor-pointer"
                 >
                   <option value="postgresql">PostgreSQL 16.3 (Recommended)</option>
                   <option value="mysql">MySQL 8.4 LTS</option>
@@ -748,17 +890,18 @@ func main() {
                   <option value="mongodb">MongoDB 7.0</option>
                 </select>
               </div>
-              <div className="pt-2 flex items-center justify-end gap-2">
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="h-9 px-3.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] cursor-pointer"
+                  className="h-9 px-4 rounded-full bg-[#EFECE8] dark:bg-[#232834] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-[#5A5A58] dark:text-slate-300 hover:text-[#1E1E1E] dark:hover:text-white cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm"
+                  className="h-9 px-5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-xs transition-colors"
                 >
                   Provision Cluster
                 </button>

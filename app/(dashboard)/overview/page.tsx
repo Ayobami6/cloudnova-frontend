@@ -31,7 +31,6 @@ export default function OverviewPage() {
     instances,
     databases,
     volumes,
-    buckets,
     domains,
     setTerminalInstance,
     selectedRegion,
@@ -53,11 +52,14 @@ export default function OverviewPage() {
           activeInstances.reduce((acc, i) => acc + i.currentCpu, 0) /
             activeInstances.length
         )
-      : 24;
+      : 0;
 
-  const totalStorageGb =
-    volumes.reduce((acc, v) => acc + v.sizeGb, 0) +
-    Math.round(buckets.reduce((acc, b) => acc + b.totalSizeBytes / 1e9, 0));
+  const filteredDatabases = databases.filter(
+    (db) => selectedRegion === "all" || db.region === selectedRegion
+  );
+  const activeDatabases = filteredDatabases.filter((db) => db.status === "online");
+
+  const activeDomains = domains.filter((d) => d.status === "active");
 
   // Build unified resource rows matching the floating white rows in the Dribbble shot
   const allRows: UnifiedResourceRow[] = [
@@ -127,27 +129,24 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <PastelKpiCard
           label="Compute Droplets"
-          value={filteredInstances.length || 142}
-          subtitle={`${activeInstances.length} online • ${avgCpu}% CPU`}
+          value={activeInstances.length}
           variant="lavender"
           actionLabel="Check"
           href="/compute"
         />
         <PastelKpiCard
           label="Managed Databases"
-          value={databases.length || 324}
-          subtitle="HA & PITR Active"
+          value={activeDatabases.length}
           variant="blue"
           actionLabel="Check"
           href="/databases"
         />
         <PastelKpiCard
-          label="Storage & Anycast"
-          value={`${totalStorageGb || 786} GB`}
-          subtitle={`${domains.length} Anycast Domains`}
+          label="Active Domains"
+          value={activeDomains.length}
           variant="yellow"
           actionLabel="Check"
-          href="/storage"
+          href="/domains"
         />
       </div>
 

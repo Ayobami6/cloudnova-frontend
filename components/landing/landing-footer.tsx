@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Cloud, ShieldCheck } from "lucide-react";
+import { MaterialIcon } from "@/components/ui/material-icon";
 
 export function LandingFooter() {
   return (
@@ -12,19 +12,19 @@ export function LandingFooter() {
           {/* Col 1: Brand */}
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
-                <Cloud className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-full bg-[#CFE0EC] flex items-center justify-center text-[#222222] shadow-2xs">
+                <MaterialIcon name="cloud_done" size={18} />
               </div>
               <span className="font-semibold text-base tracking-tight text-[#1E1E1E] dark:text-white">
                 CloudNova
               </span>
             </Link>
             <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
-              Developer-first global cloud infrastructure platform providing high-performance KVM compute, managed multi-engine databases, and zero-egress NVMe & S3 storage across 8 planetary datacenter regions.
+              Developer-first cloud infrastructure for African tech teams. Spin up high-performance KVM compute, managed databases, and NVMe block storage with seamless Naira bank transfers and 0% foreign card fees.
             </p>
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] text-xs font-mono border border-emerald-500/20">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>All Systems Operational (99.995% SLA)</span>
+              <span>All Systems Operational (99.99% SLA)</span>
             </div>
           </div>
 
@@ -55,42 +55,42 @@ export function LandingFooter() {
                 </a>
               </li>
               <li>
-                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  Layer 4/7 Load Balancers
-                </span>
+                <a href="#pricing" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Naira Pricing Calculator
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Col 3: Developers */}
+          {/* Col 3: Payment Rails */}
           <div className="space-y-3 text-xs">
             <span className="font-semibold uppercase tracking-wider text-[#1E1E1E] dark:text-white font-mono text-[11px]">
-              Developers
+              Payment Rails
             </span>
             <ul className="space-y-2 text-[#8C8B87] dark:text-slate-400">
               <li>
-                <a href="#developers" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  CloudNova CLI
-                </a>
-              </li>
-              <li>
-                <a href="#developers" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Terraform Provider
-                </a>
-              </li>
-              <li>
-                <a href="#developers" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  REST API Documentation
-                </a>
-              </li>
-              <li>
-                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  Cloud-Init Recipes
+                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Dedicated NUBAN Accounts
                 </span>
               </li>
               <li>
-                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  GitHub Actions Runner
+                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Instant Bank Transfers
+                </span>
+              </li>
+              <li>
+                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Paystack & Monnify Checkout
+                </span>
+              </li>
+              <li>
+                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Verve & Nigerian Cards
+                </span>
+              </li>
+              <li>
+                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Zero FX Volatility Surcharge
                 </span>
               </li>
             </ul>
@@ -108,14 +108,9 @@ export function LandingFooter() {
                 </span>
               </li>
               <li>
-                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  Global Datacenters
-                </span>
-              </li>
-              <li>
-                <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  Security & SOC2
-                </span>
+                <a href="#faq" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Developer FAQ
+                </a>
               </li>
               <li>
                 <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
@@ -135,9 +130,9 @@ export function LandingFooter() {
         <div className="pt-8 border-t border-[#E7E4DF] dark:border-[#282D3A] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} CloudNova Inc. All rights reserved.</p>
           <div className="flex items-center gap-4 font-mono text-[11px]">
-            <span>TLS 1.3 Strict</span>
+            <span>Lagos & Global</span>
             <span>•</span>
-            <span>BGP Anycast Routing</span>
+            <span>Naira (NGN) Billing</span>
             <span>•</span>
             <span>Zero Egress Tax</span>
           </div>

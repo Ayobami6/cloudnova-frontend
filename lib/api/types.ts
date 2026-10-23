@@ -425,6 +425,9 @@ export interface CreateInstanceRequest {
   plan_id: string;
   tags?: string[];
   idempotency_key?: string | null;
+  vpc_id?: string | null;
+  security_group_ids?: string[];
+  ssh_key_ids?: string[];
 }
 
 export interface InstanceResponse {
@@ -442,6 +445,9 @@ export interface InstanceResponse {
   tags: string[];
   client_id: string | null;
   provider_instance_id: string;
+  vpc_id?: string | null;
+  security_group_ids?: string[];
+  ssh_key_ids?: string[];
   created_at: string;
   updated_at: string;
 }
@@ -457,7 +463,28 @@ export interface InstanceListItemResponse {
   ipv4: string;
   hourly_retail: string | number;
   currency: string;
+  vpc_id?: string | null;
+  security_group_ids?: string[];
+  ssh_key_ids?: string[];
   created_at: string;
+}
+
+export interface CreateSSHKeyRequest {
+  name: string;
+  public_key: string;
+}
+
+export interface SSHKeyResponse {
+  id: string;
+  name: string;
+  fingerprint: string;
+  public_key: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AttachInstanceRequest {
+  instanceId: string;
 }
 
 export interface PowerActionRequest {

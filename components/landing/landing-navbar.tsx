@@ -78,7 +78,7 @@ export function LandingNavbar() {
                 href="/register"
                 className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
               >
-                <span>Deploy with $200 Free</span>
+                <span>Deploy with ₦10,000 Free</span>
                 <MaterialIcon name="arrow_forward" size={15} />
               </Link>
             </div>
@@ -102,7 +102,7 @@ export function LandingNavbar() {
             <a href="#databases" onClick={() => setMobileMenuOpen(false)} className="py-1.5">Managed Databases</a>
             <a href="#storage" onClick={() => setMobileMenuOpen(false)} className="py-1.5">NVMe & S3 Storage</a>
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="py-1.5">Pricing</a>
-            <a href="#developers" onClick={() => setMobileMenuOpen(false)} className="py-1.5">API & CLI</a>
+            <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="py-1.5">FAQ</a>
           </nav>
           <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A] flex flex-col gap-2">
             <Link
@@ -115,7 +115,7 @@ export function LandingNavbar() {
               href="/register"
               className="w-full h-10 rounded-full bg-[#222222] text-white text-xs font-semibold flex items-center justify-center gap-1.5"
             >
-              <span>Create Account ($200 Credit)</span>
+              <span>Create Account (₦10,000 Credit)</span>
               <MaterialIcon name="arrow_forward" size={15} />
             </Link>
           </div>

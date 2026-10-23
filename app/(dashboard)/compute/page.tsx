@@ -47,34 +47,32 @@ export default function ComputePage() {
     return matchesRegion && matchesStatus && matchesSearch;
   });
 
-  const activeCount = filteredInstances.filter((i) => i.status === "active").length;
-  const totalVcpus = filteredInstances.reduce((acc, i) => acc + i.plan.vcpu, 0);
-  const totalRam = filteredInstances.reduce((acc, i) => acc + i.plan.ramGb, 0);
+  const totalActiveCores = filteredInstances
+    .filter((i) => i.status === "active")
+    .reduce((acc, i) => acc + (i.plan?.vcpu ?? 0), 0);
+  const totalRam = filteredInstances.reduce((acc, i) => acc + (i.plan?.ramGb ?? 0), 0);
 
   return (
     <div className="space-y-5">
       {/* Top 3 Pastel KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <PastelKpiCard
-          label="Active KVM Droplets"
-          value={`${activeCount} / ${filteredInstances.length}`}
-          subtitle="Sub-18s boot times"
+          label="Total Instances"
+          value={filteredInstances.length}
           variant="lavender"
           actionLabel="Deploy"
           onAction={() => setIsDeployOpen(true)}
         />
         <PastelKpiCard
-          label="Provisioned vCPUs"
-          value={`${totalVcpus} Cores`}
-          subtitle="AMD EPYC Genoa"
+          label="Total Active Cores"
+          value={`${totalActiveCores} Cores`}
           variant="blue"
           actionLabel="Check"
           onAction={() => setStatusFilter("active")}
         />
         <PastelKpiCard
-          label="Allocated ECC Memory"
+          label="Total Memory"
           value={`${totalRam} GB`}
-          subtitle="DDR5 NVMe Fabric"
           variant="yellow"
           actionLabel="Check"
           onAction={() => setStatusFilter("all")}
