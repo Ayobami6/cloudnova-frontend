@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **VPC Network Creation & Management (`app/(dashboard)/network/page.tsx`, `lib/store/cloud-context.tsx`)**:
+  - Added full **Create VPC Network** dialog with region selection (`REGIONS`), subnet CIDR range specification with quick presets (`10.0.0.0/16`, `10.10.0.0/16`, `172.16.0.0/16`, `192.168.1.0/24`), and default VPC configuration.
+  - Added `deleteVPC` action with confirmation modal and guardrails preventing accidental deletion of active default VPCs.
+  - Added copy CIDR block quick action with real-time feedback.
+  - Redesigned the Network dashboard to strictly adhere to the Nixtio design system: top pastel KPI cards (`Active VPC Networks`, `Perimeter Security Groups`, `Protected Droplet Nodes`), `SegmentedPillTabs`, floating pill-row table, `PastelTypePill`, `MaterialIcon` integration, and responsive modal dialogs.
 - **Security Groups & VPC Consolidation (`app/(dashboard)/network/page.tsx`)**:
   - Streamlined the Network Dashboard to focus exclusively on **Security Groups** and **VPC Networks**.
   - Added attached droplet management within Security Group inspector: list attached droplets with real-time status, detach droplets, and attach unattached compute instances.
