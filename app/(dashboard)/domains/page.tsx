@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Globe,
   Plus,
@@ -203,21 +203,43 @@ export default function DomainsPage() {
     [checkDomainAvailability, getDomainsToVerify]
   );
 
-  // Trigger verification whenever modal opens or input changes (debounced)
-  useEffect(() => {
-    if (!isRegisterOpen) return;
-    const clean = searchDomain.trim().toLowerCase().replace(/^\.+|\.+$/g, "");
-    if (!clean || clean.length < 2) {
-      setAvailabilityMap({});
-      return;
-    }
+  // Single candidate verification executor
+  const verifySingleDomain = useCallback(
+    async (domainName: string, defaultWholesale: number, defaultRetail: number) => {
+      setAvailabilityMap((prev) => ({
+        ...prev,
+        [domainName]: {
+          status: "checking",
+          wholesale: prev[domainName]?.wholesale ?? defaultWholesale,
+          retail: prev[domainName]?.retail ?? defaultRetail,
+        },
+      }));
+      setRegisterError(null);
 
-    const timer = setTimeout(() => {
-      verifyAvailability(clean);
-    }, 350);
-
-    return () => clearTimeout(timer);
-  }, [isRegisterOpen, searchDomain, verifyAvailability]);
+      try {
+        const res = await checkDomainAvailability(domainName);
+        setAvailabilityMap((prev) => ({
+          ...prev,
+          [domainName]: {
+            status: res.available ? "available" : "unavailable",
+            wholesale: res.wholesalePrice || defaultWholesale,
+            retail: res.retailPrice || defaultRetail,
+          },
+        }));
+      } catch {
+        setAvailabilityMap((prev) => ({
+          ...prev,
+          [domainName]: {
+            status: "error",
+            error: "Verification failed",
+            wholesale: defaultWholesale,
+            retail: defaultRetail,
+          },
+        }));
+      }
+    },
+    [checkDomainAvailability]
+  );
 
   // Registration submit handler
   const handleRegister = async (
@@ -527,6 +549,12 @@ export default function DomainsPage() {
                     type="text"
                     value={searchDomain}
                     onChange={(e) => setSearchDomain(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !isVerifyingAll && searchDomain.trim().length >= 2) {
+                        e.preventDefault();
+                        verifyAvailability(searchDomain);
+                      }
+                    }}
                     placeholder="e.g. yourstartup or yourstartup.com"
                     className="w-full h-10 pl-9 pr-8 rounded-lg bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-mono text-[#1E1E1E] dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30 transition-all"
                   />
@@ -688,7 +716,7 @@ export default function DomainsPage() {
                           ) : (
                             <button
                               type="button"
-                              onClick={() => verifyAvailability(domainKey)}
+                              onClick={() => verifySingleDomain(domainKey, item.wholesale, item.retail)}
                               className="h-8 px-3 rounded-full bg-[#EFECE8] dark:bg-[#232834] hover:bg-slate-200 dark:hover:bg-[#272D3F] text-slate-700 dark:text-slate-300 text-xs font-medium cursor-pointer"
                             >
                               Verify
