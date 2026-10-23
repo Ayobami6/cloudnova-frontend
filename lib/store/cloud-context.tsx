@@ -125,7 +125,14 @@ interface CloudContextType {
   detachFirewallInstance: (firewallId: string, instanceId: string) => Promise<void>;
 
   // VPC Actions
-  createVPC: (name: string, region: DatacenterRegion, cidr: string, description?: string) => Promise<VPC>;
+  createVPC: (
+    name: string,
+    region: DatacenterRegion,
+    cidr: string,
+    description?: string,
+    isDefault?: boolean
+  ) => Promise<VPC>;
+  deleteVPC: (id: string) => Promise<void>;
 
   // SSH Key Actions
   createSSHKey: (name: string, publicKey: string) => Promise<SSHKey>;
@@ -1087,7 +1094,8 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       name: string,
       region: DatacenterRegion,
       cidr: string,
-      description?: string
+      description?: string,
+      isDefault?: boolean
     ): Promise<VPC> => {
       showToast({
         type: "provisioning",
@@ -1101,6 +1109,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             name,
             region,
             cidr,
+            is_default: isDefault,
           });
           const newVpc = mapVPC(wire);
           setVpcs((prev) => [newVpc, ...prev]);
@@ -1125,13 +1134,53 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         region,
         cidr,
         connectedInstancesCount: 0,
-        isDefault: false,
+        isDefault: isDefault ?? false,
         createdAt: new Date().toISOString().split("T")[0],
       };
       setVpcs((prev) => [fallbackVpc, ...prev]);
       return fallbackVpc;
     },
     [isAuthenticated, showToast]
+  );
+
+  const deleteVPC = useCallback(
+    async (id: string): Promise<void> => {
+      const target = vpcs.find((v) => v.id === id);
+      const name = target ? target.name : id;
+      showToast({
+        type: "info",
+        title: "Deleting VPC",
+        message: `Removing Virtual Private Cloud "${name}"...`,
+      });
+
+      if (isAuthenticated) {
+        try {
+          await networkApi.destroyVPC(id);
+          setVpcs((prev) => prev.filter((v) => v.id !== id));
+          showToast({
+            type: "success",
+            title: "VPC Deleted",
+            message: `Virtual Private Cloud "${name}" has been removed.`,
+          });
+          return;
+        } catch (err: unknown) {
+          showToast({
+            type: "error",
+            title: "VPC Deletion Failed",
+            message: err instanceof Error ? err.message : "Failed to delete VPC.",
+          });
+          throw err;
+        }
+      }
+
+      setVpcs((prev) => prev.filter((v) => v.id !== id));
+      showToast({
+        type: "success",
+        title: "VPC Deleted",
+        message: `Virtual Private Cloud "${name}" removed.`,
+      });
+    },
+    [isAuthenticated, showToast, vpcs]
   );
 
   // SSH Key Actions
@@ -1433,6 +1482,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     attachFirewallInstance: attachSecurityGroupInstance,
     detachFirewallInstance: detachSecurityGroupInstance,
     createVPC,
+    deleteVPC,
     createSSHKey,
     deleteSSHKey,
     registerDomain,
