@@ -22,6 +22,9 @@ export const CreateDropletSchema = z.object({
   enableMonitoring: z.boolean().default(true),
   sshKeyName: z.string().default("id_ed25519_default"),
   clientId: z.string().optional(),
+  vpcId: z.string().optional(),
+  securityGroupIds: z.array(z.string()).default([]),
+  sshKeyIds: z.array(z.string()).default([]),
 });
 
 export type CreateDropletInput = z.infer<typeof CreateDropletSchema>;

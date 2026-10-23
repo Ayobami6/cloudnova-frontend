@@ -18,6 +18,7 @@ import {
   FirewallRule,
   S3Object,
   ComputePlan,
+  SSHKey,
 } from "../types/cloud";
 import {
   INITIAL_INSTANCES,
@@ -53,6 +54,7 @@ import {
   mapFloatingIP,
   mapInstance,
   mapLoadBalancer,
+  mapSSHKey,
   mapVPC,
   mapVolume,
 } from "../api/mappers";
@@ -72,6 +74,7 @@ interface CloudContextType {
   clients: ClientTenant[];
   alerts: OperationalAlert[];
   plans: ComputePlan[];
+  sshKeys: SSHKey[];
   isLoading: boolean;
   selectedRegion: DatacenterRegion | "all";
   searchQuery: string;
@@ -111,11 +114,22 @@ interface CloudContextType {
   deleteObject: (bucketId: string, key: string) => void;
   destroyBucket: (bucketId: string) => Promise<void>;
 
-  // Firewall Actions
-  createFirewall: (name: string, rules: FirewallRule[]) => Promise<void>;
+  // Firewall & Security Group Actions
+  createFirewall: (name: string, rules: FirewallRule[]) => Promise<Firewall>;
   deleteFirewall: (id: string) => Promise<void>;
   addFirewallRule: (firewallId: string, rule: FirewallRule) => Promise<void>;
   deleteFirewallRule: (firewallId: string, ruleId: string) => Promise<void>;
+  attachSecurityGroupInstance: (securityGroupId: string, instanceId: string) => Promise<void>;
+  detachSecurityGroupInstance: (securityGroupId: string, instanceId: string) => Promise<void>;
+  attachFirewallInstance: (firewallId: string, instanceId: string) => Promise<void>;
+  detachFirewallInstance: (firewallId: string, instanceId: string) => Promise<void>;
+
+  // VPC Actions
+  createVPC: (name: string, region: DatacenterRegion, cidr: string, description?: string) => Promise<VPC>;
+
+  // SSH Key Actions
+  createSSHKey: (name: string, publicKey: string) => Promise<SSHKey>;
+  deleteSSHKey: (id: string) => Promise<void>;
 
   // Domain Actions
   registerDomain: (
@@ -171,6 +185,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [clients, setClients] = useState<ClientTenant[]>(INITIAL_CLIENTS);
   const [alerts, setAlerts] = useState<OperationalAlert[]>(INITIAL_ALERTS);
   const [plans, setPlans] = useState<ComputePlan[]>(COMPUTE_PLANS);
+  const [sshKeys, setSSHKeys] = useState<SSHKey[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Filter & Navigation State
@@ -195,6 +210,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         fipRes,
         domRes,
         altRes,
+        sshRes,
       ] = await Promise.allSettled([
         computeApi.listComputePlans(),
         computeApi.listInstances(),
@@ -207,6 +223,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         networkApi.listFloatingIPs(),
         domainsApi.listDomains(),
         alertsApi.listAlerts(),
+        computeApi.listSSHKeys(),
       ]);
 
       let loadedPlans = COMPUTE_PLANS;
@@ -282,6 +299,10 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       if (altRes.status === "fulfilled" && Array.isArray(altRes.value)) {
         setAlerts(altRes.value.map(mapAlert));
+      }
+
+      if (sshRes.status === "fulfilled" && Array.isArray(sshRes.value)) {
+        setSSHKeys(sshRes.value.map(mapSSHKey));
       }
     } catch {
       // Fall back gracefully to existing mock/cached state
@@ -419,9 +440,37 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             image: input.image,
             plan_id: backendPlanId,
             tags: tagList,
+            vpc_id: input.vpcId || undefined,
+            security_group_ids:
+              input.securityGroupIds && input.securityGroupIds.length > 0
+                ? input.securityGroupIds
+                : undefined,
+            ssh_key_ids:
+              input.sshKeyIds && input.sshKeyIds.length > 0
+                ? input.sshKeyIds
+                : undefined,
           });
           const newInst = mapInstance(wire, plans);
           setInstances((prev) => [newInst, ...prev]);
+          if (input.vpcId) {
+            setVpcs((prev) =>
+              prev.map((v) =>
+                v.id === input.vpcId
+                  ? { ...v, connectedInstancesCount: v.connectedInstancesCount + 1 }
+                  : v
+              )
+            );
+          }
+          if (input.securityGroupIds && input.securityGroupIds.length > 0) {
+            setFirewalls((prev) =>
+              prev.map((fw) =>
+                input.securityGroupIds?.includes(fw.id) &&
+                !fw.attachedInstanceIds.includes(newInst.id)
+                  ? { ...fw, attachedInstanceIds: [...fw.attachedInstanceIds, newInst.id] }
+                  : fw
+              )
+            );
+          }
           return newInst;
         } catch (err: unknown) {
           showToast({
@@ -450,9 +499,30 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         uptimeSeconds: 60,
         tags: tagList,
         clientId: input.clientId,
+        vpcId: input.vpcId,
+        securityGroupIds: input.securityGroupIds || [],
         createdAt: new Date().toISOString().split("T")[0],
       };
       setInstances((prev) => [fallbackInst, ...prev]);
+      if (input.vpcId) {
+        setVpcs((prev) =>
+          prev.map((v) =>
+            v.id === input.vpcId
+              ? { ...v, connectedInstancesCount: v.connectedInstancesCount + 1 }
+              : v
+          )
+        );
+      }
+      if (input.securityGroupIds && input.securityGroupIds.length > 0) {
+        setFirewalls((prev) =>
+          prev.map((fw) =>
+            input.securityGroupIds?.includes(fw.id) &&
+            !fw.attachedInstanceIds.includes(fallbackInst.id)
+              ? { ...fw, attachedInstanceIds: [...fw.attachedInstanceIds, fallbackInst.id] }
+              : fw
+          )
+        );
+      }
       return fallbackInst;
     },
     [isAuthenticated, plans, showToast]
@@ -844,7 +914,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Firewall Actions
   const createFirewall = useCallback(
-    async (name: string, rules: FirewallRule[]) => {
+    async (name: string, rules: FirewallRule[]): Promise<Firewall> => {
       if (isAuthenticated) {
         try {
           const wire = await networkApi.createFirewall({
@@ -860,7 +930,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           });
           const newFw = mapFirewall(wire);
           setFirewalls((prev) => [newFw, ...prev]);
-          return;
+          return newFw;
         } catch {
           // fallback
         }
@@ -874,6 +944,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         createdAt: new Date().toISOString().split("T")[0],
       };
       setFirewalls((prev) => [fallbackFw, ...prev]);
+      return fallbackFw;
     },
     [isAuthenticated]
   );
@@ -931,6 +1002,199 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     },
     [isAuthenticated]
+  );
+
+  const attachSecurityGroupInstance = useCallback(
+    async (securityGroupId: string, instanceId: string) => {
+      setFirewalls((prev) =>
+        prev.map((fw) =>
+          fw.id === securityGroupId && !fw.attachedInstanceIds.includes(instanceId)
+            ? { ...fw, attachedInstanceIds: [...fw.attachedInstanceIds, instanceId] }
+            : fw
+        )
+      );
+      setInstances((prev) =>
+        prev.map((inst) =>
+          inst.id === instanceId
+            ? {
+                ...inst,
+                securityGroupIds: inst.securityGroupIds?.includes(securityGroupId)
+                  ? inst.securityGroupIds
+                  : [...(inst.securityGroupIds || []), securityGroupId],
+              }
+            : inst
+        )
+      );
+
+      if (isAuthenticated && isUUID(securityGroupId) && isUUID(instanceId)) {
+        try {
+          await networkApi.attachInstanceToFirewall(securityGroupId, instanceId);
+        } catch (err: unknown) {
+          showToast({
+            type: "error",
+            title: "Failed to Attach Droplet",
+            message: err instanceof Error ? err.message : "Unable to attach instance to security group.",
+          });
+        }
+      }
+    },
+    [isAuthenticated, showToast]
+  );
+
+  const detachSecurityGroupInstance = useCallback(
+    async (securityGroupId: string, instanceId: string) => {
+      setFirewalls((prev) =>
+        prev.map((fw) =>
+          fw.id === securityGroupId
+            ? {
+                ...fw,
+                attachedInstanceIds: fw.attachedInstanceIds.filter((id) => id !== instanceId),
+              }
+            : fw
+        )
+      );
+      setInstances((prev) =>
+        prev.map((inst) =>
+          inst.id === instanceId
+            ? {
+                ...inst,
+                securityGroupIds: (inst.securityGroupIds || []).filter(
+                  (sgId) => sgId !== securityGroupId
+                ),
+              }
+            : inst
+        )
+      );
+
+      if (isAuthenticated && isUUID(securityGroupId) && isUUID(instanceId)) {
+        try {
+          await networkApi.detachInstanceFromFirewall(securityGroupId, instanceId);
+        } catch (err: unknown) {
+          showToast({
+            type: "error",
+            title: "Failed to Detach Droplet",
+            message: err instanceof Error ? err.message : "Unable to detach instance from security group.",
+          });
+        }
+      }
+    },
+    [isAuthenticated, showToast]
+  );
+
+  // VPC Actions
+  const createVPC = useCallback(
+    async (
+      name: string,
+      region: DatacenterRegion,
+      cidr: string,
+      description?: string
+    ): Promise<VPC> => {
+      showToast({
+        type: "provisioning",
+        title: "Creating VPC",
+        message: `Provisioning isolated VPC "${name}" (${cidr}) in ${region.toUpperCase()}...`,
+      });
+
+      if (isAuthenticated) {
+        try {
+          const wire = await networkApi.createVPC({
+            name,
+            region,
+            cidr,
+          });
+          const newVpc = mapVPC(wire);
+          setVpcs((prev) => [newVpc, ...prev]);
+          showToast({
+            type: "success",
+            title: "VPC Ready",
+            message: `Virtual Private Cloud "${name}" is active.`,
+          });
+          return newVpc;
+        } catch (err: unknown) {
+          showToast({
+            type: "error",
+            title: "VPC Creation Failed",
+            message: err instanceof Error ? err.message : "Failed to create VPC.",
+          });
+        }
+      }
+
+      const fallbackVpc: VPC = {
+        id: `vpc-${Date.now().toString().slice(-6)}`,
+        name,
+        region,
+        cidr,
+        connectedInstancesCount: 0,
+        isDefault: false,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      setVpcs((prev) => [fallbackVpc, ...prev]);
+      return fallbackVpc;
+    },
+    [isAuthenticated, showToast]
+  );
+
+  // SSH Key Actions
+  const createSSHKey = useCallback(
+    async (name: string, publicKey: string): Promise<SSHKey> => {
+      if (isAuthenticated) {
+        try {
+          const wire = await computeApi.createSSHKey({
+            name,
+            public_key: publicKey,
+          });
+          const newKey = mapSSHKey(wire);
+          setSSHKeys((prev) => [newKey, ...prev.filter((k) => k.id !== newKey.id)]);
+          showToast({
+            type: "success",
+            title: "SSH Key Registered",
+            message: `Saved and encrypted key "${name}" (${newKey.fingerprint.slice(0, 16)}...).`,
+          });
+          return newKey;
+        } catch (err: unknown) {
+          showToast({
+            type: "error",
+            title: "SSH Key Registration Failed",
+            message: err instanceof Error ? err.message : "Failed to register SSH key.",
+          });
+          throw err;
+        }
+      }
+
+      const fallbackKey: SSHKey = {
+        id: `ssh-${Date.now().toString().slice(-6)}`,
+        name,
+        publicKey,
+        fingerprint: `SHA256:mock${Date.now().toString(36)}`,
+        createdAt: new Date().toISOString().split("T")[0],
+      };
+      setSSHKeys((prev) => [fallbackKey, ...prev]);
+      return fallbackKey;
+    },
+    [isAuthenticated, showToast]
+  );
+
+  const deleteSSHKey = useCallback(
+    async (id: string) => {
+      setSSHKeys((prev) => prev.filter((k) => k.id !== id));
+      if (isAuthenticated && isUUID(id)) {
+        try {
+          await computeApi.deleteSSHKey(id);
+          showToast({
+            type: "success",
+            title: "SSH Key Removed",
+            message: "SSH public key deleted successfully.",
+          });
+        } catch (err: unknown) {
+          showToast({
+            type: "error",
+            title: "Failed to Delete SSH Key",
+            message: err instanceof Error ? err.message : "Unable to delete SSH key.",
+          });
+        }
+      }
+    },
+    [isAuthenticated, showToast]
   );
 
   // Domain Actions
@@ -1133,6 +1397,7 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     clients,
     alerts,
     plans,
+    sshKeys,
     isLoading,
     selectedRegion,
     searchQuery,
@@ -1163,6 +1428,13 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     deleteFirewall,
     addFirewallRule,
     deleteFirewallRule,
+    attachSecurityGroupInstance,
+    detachSecurityGroupInstance,
+    attachFirewallInstance: attachSecurityGroupInstance,
+    detachFirewallInstance: detachSecurityGroupInstance,
+    createVPC,
+    createSSHKey,
+    deleteSSHKey,
     registerDomain,
     checkDomainAvailability,
     addDNSRecord,

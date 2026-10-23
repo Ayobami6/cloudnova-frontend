@@ -14,6 +14,7 @@ import type {
   InstanceResponse,
   LoadBalancerResponse,
   S3ObjectResponse,
+  SSHKeyResponse,
   VPCResponse,
   VolumeResponse,
 } from "./types";
@@ -38,6 +39,7 @@ import type {
   OSImageId,
   S3Bucket,
   S3Object,
+  SSHKey,
   VPC,
   Volume,
 } from "../types/cloud";
@@ -96,7 +98,21 @@ export function mapInstance(
     uptimeSeconds: "uptime_seconds" in wire ? wire.uptime_seconds : 86400,
     tags: "tags" in wire && Array.isArray(wire.tags) ? wire.tags : [],
     clientId: "client_id" in wire && wire.client_id ? wire.client_id : undefined,
+    vpcId: "vpc_id" in wire && wire.vpc_id ? wire.vpc_id : undefined,
+    securityGroupIds: "security_group_ids" in wire && Array.isArray(wire.security_group_ids) ? wire.security_group_ids : [],
+    sshKeyIds: "ssh_key_ids" in wire && Array.isArray(wire.ssh_key_ids) ? wire.ssh_key_ids : [],
     createdAt: wire.created_at,
+  };
+}
+
+export function mapSSHKey(wire: SSHKeyResponse): SSHKey {
+  return {
+    id: wire.id,
+    name: wire.name,
+    fingerprint: wire.fingerprint,
+    publicKey: wire.public_key,
+    createdAt: wire.created_at,
+    updatedAt: wire.updated_at,
   };
 }
 

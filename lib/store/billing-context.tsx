@@ -114,7 +114,7 @@ export function BillingProvider({ children }: { children: React.ReactNode }) {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
   const [detectedCurrency, setDetectedCurrency] = useState<string>("NGN");
   const [detectedCountry, setDetectedCountry] = useState<string>("NG");
-  const [exchangeRate, setExchangeRate] = useState<number>(1600);
+  const [exchangeRate, setExchangeRate] = useState<number>(1400);
 
   useEffect(() => {
     billingApi

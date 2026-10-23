@@ -62,6 +62,36 @@ export async function destroyFirewall(id: string): Promise<void> {
   });
 }
 
+export async function attachInstanceToFirewall(
+  firewallId: string,
+  instanceId: string
+): Promise<FirewallResponse> {
+  return apiRequest<FirewallResponse>(`/network/firewalls/${firewallId}/instances`, {
+    method: "POST",
+    body: { instanceId },
+  });
+}
+
+export async function detachInstanceFromFirewall(
+  firewallId: string,
+  instanceId: string
+): Promise<FirewallResponse> {
+  return apiRequest<FirewallResponse>(`/network/firewalls/${firewallId}/instances/${instanceId}`, {
+    method: "DELETE",
+  });
+}
+
+// Security Groups API aliases
+export const listSecurityGroups = listFirewalls;
+export const getSecurityGroup = getFirewall;
+export const createSecurityGroup = createFirewall;
+export const addSecurityGroupRule = addFirewallRule;
+export const deleteSecurityGroupRule = deleteFirewallRule;
+export const destroySecurityGroup = destroyFirewall;
+export const attachInstanceToSecurityGroup = attachInstanceToFirewall;
+export const detachInstanceFromSecurityGroup = detachInstanceFromFirewall;
+
+
 // --- VPCs ---
 
 export async function listVPCs(): Promise<VPCResponse[]> {

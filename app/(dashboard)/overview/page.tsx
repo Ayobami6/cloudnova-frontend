@@ -130,7 +130,6 @@ export default function OverviewPage() {
         <PastelKpiCard
           label="Compute Droplets"
           value={activeInstances.length}
-          subtitle={`${filteredInstances.length} total • ${avgCpu}% CPU`}
           variant="lavender"
           actionLabel="Check"
           href="/compute"
@@ -138,11 +137,6 @@ export default function OverviewPage() {
         <PastelKpiCard
           label="Managed Databases"
           value={activeDatabases.length}
-          subtitle={
-            filteredDatabases.length > 1
-              ? `${filteredDatabases.length} total • HA & PITR Active`
-              : "HA & PITR Active"
-          }
           variant="blue"
           actionLabel="Check"
           href="/databases"
@@ -150,11 +144,6 @@ export default function OverviewPage() {
         <PastelKpiCard
           label="Active Domains"
           value={activeDomains.length}
-          subtitle={
-            domains.length > 1
-              ? `${domains.length} total • Anycast DNS`
-              : "Anycast DNS Active"
-          }
           variant="yellow"
           actionLabel="Check"
           href="/domains"

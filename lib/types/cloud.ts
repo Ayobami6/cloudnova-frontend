@@ -76,7 +76,19 @@ export interface Instance {
   uptimeSeconds: number;
   tags: string[];
   clientId?: string;
+  vpcId?: string;
+  securityGroupIds?: string[];
+  sshKeyIds?: string[];
   createdAt: string;
+}
+
+export interface SSHKey {
+  id: string;
+  name: string;
+  fingerprint: string;
+  publicKey: string;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export type DatabaseEngine = "postgresql" | "mysql" | "redis" | "mongodb";
@@ -202,6 +214,9 @@ export interface Firewall {
   attachedInstanceIds: string[];
   createdAt: string;
 }
+
+export type SecurityGroup = Firewall;
+
 
 export interface VPC {
   id: string;

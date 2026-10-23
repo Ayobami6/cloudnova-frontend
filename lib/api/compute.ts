@@ -2,11 +2,13 @@ import { apiRequest } from "./http";
 import type {
   ComputePlanResponse,
   CreateInstanceRequest,
+  CreateSSHKeyRequest,
   DatacenterRegion,
   InstanceActionResponse,
   InstanceListItemResponse,
   InstanceResponse,
   PowerActionRequest,
+  SSHKeyResponse,
   TerminalSessionResponse,
 } from "./types";
 
@@ -50,5 +52,22 @@ export async function destroyInstance(id: string): Promise<void> {
 export async function createTerminalSession(id: string): Promise<TerminalSessionResponse> {
   return apiRequest<TerminalSessionResponse>(`/compute/instances/${id}/terminal`, {
     method: "POST",
+  });
+}
+
+export async function listSSHKeys(): Promise<SSHKeyResponse[]> {
+  return apiRequest<SSHKeyResponse[]>("/compute/ssh-keys");
+}
+
+export async function createSSHKey(payload: CreateSSHKeyRequest): Promise<SSHKeyResponse> {
+  return apiRequest<SSHKeyResponse>("/compute/ssh-keys", {
+    method: "POST",
+    body: payload,
+  });
+}
+
+export async function deleteSSHKey(id: string): Promise<void> {
+  return apiRequest<void>(`/compute/ssh-keys/${id}`, {
+    method: "DELETE",
   });
 }
