@@ -1,5 +1,5 @@
 /**
- * TypeScript mirrors of cloudnova-api's Pydantic v2 wire schemas across all 8 domains:
+ * TypeScript mirrors of tibicloud-api's Pydantic v2 wire schemas across all 8 domains:
  * 1. Authentication & Multi-Tenancy
  * 2. Double-Entry Billing & Ledger
  * 3. Compute (Instances & Plans)

@@ -77,9 +77,9 @@ export default function DatabasesPage() {
     if (activeDb.connectionUri && !activeDb.connectionUri.includes("@:") && !activeDb.connectionUri.includes("••••")) {
       return activeDb.connectionUri;
     }
-    const host = activeDb.host || `${activeDb.name}.internal.cloudnova.net`;
+    const host = activeDb.host || `${activeDb.name}.internal.tibicloud.net`;
     const port = activeDb.port || 5432;
-    const user = activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin";
+    const user = activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "tibicloud_admin";
     const db = activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres";
     const pwd = effectivePassword;
     const scheme =
@@ -131,7 +131,6 @@ export default function DatabasesPage() {
 
   const onlineCount = databases.filter((d) => d.status === "online").length;
   const totalDiskGb = databases.reduce((acc, d) => acc + (d.diskAllocatedGb || 0), 0);
-  const haCount = databases.filter((d) => d.haEnabled).length;
 
   const getEnginePillVariant = (engine: string): PastelVariant => {
     switch (engine.toLowerCase()) {
@@ -150,29 +149,19 @@ export default function DatabasesPage() {
 
   return (
     <div className="space-y-5">
-      {/* Top 3 Pastel KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Top Pastel KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <PastelKpiCard
           label="Active Database Clusters"
-          value={`${onlineCount} / ${databases.length}`}
-          subtitle="Multi-AZ Aurora & RDS"
+          value={onlineCount}
           variant="lavender"
           actionLabel="Provision"
           onAction={() => setIsCreateModalOpen(true)}
         />
         <PastelKpiCard
-          label="Allocated NVMe Storage"
+          label="NVMe Storage"
           value={`${totalDiskGb} GB`}
-          subtitle="High-IOPS Provisioned SSD"
           variant="blue"
-          actionLabel="Check"
-          onAction={() => setEngineFilter("all")}
-        />
-        <PastelKpiCard
-          label="High Availability Standbys"
-          value={`${haCount} Active`}
-          subtitle="Zero-Downtime Failover"
-          variant="yellow"
           actionLabel="Check"
           onAction={() => setEngineFilter("all")}
         />
@@ -488,12 +477,12 @@ export default function DatabasesPage() {
                             onClick={() => {
                               const snippet =
                                 connectSnippetLang === "psql"
-                                  ? `export RDSHOST="${activeDb.host}"\npsql "host=$RDSHOST port=${activeDb.port} dbname=${activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"} user=${activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"} sslmode=verify-full sslrootcert=./global-bundle.pem"`
+                                  ? `export RDSHOST="${activeDb.host}"\npsql "host=$RDSHOST port=${activeDb.port} dbname=${activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"} user=${activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "tibicloud_admin"} sslmode=verify-full sslrootcert=./global-bundle.pem"`
                                   : connectSnippetLang === "nodejs"
-                                  ? `import { Pool } from "pg";\nimport fs from "fs";\n\nconst pool = new Pool({\n  host: "${activeDb.host}",\n  port: ${activeDb.port},\n  database: "${activeDb.defaultDb || "postgres"}",\n  user: "${activeDb.adminUser || "cloudnova_admin"}",\n  password: process.env.DB_PASSWORD,\n  ssl: {\n    ca: fs.readFileSync("./global-bundle.pem").toString(),\n    rejectUnauthorized: true,\n  },\n});`
+                                  ? `import { Pool } from "pg";\nimport fs from "fs";\n\nconst pool = new Pool({\n  host: "${activeDb.host}",\n  port: ${activeDb.port},\n  database: "${activeDb.defaultDb || "postgres"}",\n  user: "${activeDb.adminUser || "tibicloud_admin"}",\n  password: process.env.DB_PASSWORD,\n  ssl: {\n    ca: fs.readFileSync("./global-bundle.pem").toString(),\n    rejectUnauthorized: true,\n  },\n});`
                                   : connectSnippetLang === "python"
-                                  ? `import psycopg2\nimport os\n\nconn = psycopg2.connect(\n    host="${activeDb.host}",\n    port=${activeDb.port},\n    dbname="${activeDb.defaultDb || "postgres"}",\n    user="${activeDb.adminUser || "cloudnova_admin"}",\n    password=os.environ["DB_PASSWORD"],\n    sslmode="verify-full",\n    sslrootcert="./global-bundle.pem",\n)`
-                                  : `package main\n\nimport (\n\t"context"\n\t"os"\n\t"github.com/jackc/pgx/v5/pgxpool"\n)\n\nfunc main() {\n\tconnStr := "postgres://${activeDb.adminUser || "cloudnova_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"\n\tpool, err := pgxpool.New(context.Background(), connStr)\n\t_ = pool\n}`;
+                                  ? `import psycopg2\nimport os\n\nconn = psycopg2.connect(\n    host="${activeDb.host}",\n    port=${activeDb.port},\n    dbname="${activeDb.defaultDb || "postgres"}",\n    user="${activeDb.adminUser || "tibicloud_admin"}",\n    password=os.environ["DB_PASSWORD"],\n    sslmode="verify-full",\n    sslrootcert="./global-bundle.pem",\n)`
+                                  : `package main\n\nimport (\n\t"context"\n\t"os"\n\t"github.com/jackc/pgx/v5/pgxpool"\n)\n\nfunc main() {\n\tconnStr := "postgres://${activeDb.adminUser || "tibicloud_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"\n\tpool, err := pgxpool.New(context.Background(), connStr)\n\t_ = pool\n}`;
                               handleCopy(snippet, "step2");
                             }}
                             className="px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-[#1E1E1E] dark:text-white hover:bg-slate-200 dark:hover:bg-[#282D3A] flex items-center gap-1.5 text-[11px] font-medium transition-colors cursor-pointer"
@@ -506,7 +495,7 @@ export default function DatabasesPage() {
                           {connectSnippetLang === "psql" && (
                             <pre className="text-slate-200 whitespace-pre-wrap">
 {`export RDSHOST="${activeDb.host}"
-psql "host=$RDSHOST port=${activeDb.port} dbname=${activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"} user=${activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"} sslmode=verify-full sslrootcert=./global-bundle.pem"`}
+psql "host=$RDSHOST port=${activeDb.port} dbname=${activeDb.defaultDb && activeDb.defaultDb !== "defaultdb" ? activeDb.defaultDb : "postgres"} user=${activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "tibicloud_admin"} sslmode=verify-full sslrootcert=./global-bundle.pem"`}
                             </pre>
                           )}
                           {connectSnippetLang === "nodejs" && (
@@ -518,7 +507,7 @@ const pool = new Pool({
   host: "${activeDb.host}",
   port: ${activeDb.port},
   database: "${activeDb.defaultDb || "postgres"}",
-  user: "${activeDb.adminUser || "cloudnova_admin"}",
+  user: "${activeDb.adminUser || "tibicloud_admin"}",
   password: process.env.DB_PASSWORD,
   ssl: {
     ca: fs.readFileSync("./global-bundle.pem").toString(),
@@ -536,7 +525,7 @@ conn = psycopg2.connect(
     host="${activeDb.host}",
     port=${activeDb.port},
     dbname="${activeDb.defaultDb || "postgres"}",
-    user="${activeDb.adminUser || "cloudnova_admin"}",
+    user="${activeDb.adminUser || "tibicloud_admin"}",
     password=os.environ["DB_PASSWORD"],
     sslmode="verify-full",
     sslrootcert="./global-bundle.pem",
@@ -554,7 +543,7 @@ import (
 )
 
 func main() {
-\tconnStr := "postgres://${activeDb.adminUser || "cloudnova_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"
+\tconnStr := "postgres://${activeDb.adminUser || "tibicloud_admin"}:" + os.Getenv("DB_PASSWORD") + "@${activeDb.host}:${activeDb.port}/${activeDb.defaultDb || "postgres"}?sslmode=verify-full&sslrootcert=./global-bundle.pem"
 \tpool, err := pgxpool.New(context.Background(), connStr)
 \t_ = pool
 }`}
@@ -606,7 +595,7 @@ func main() {
                     <div className="space-y-1.5">
                       <label className="text-xs text-[#5A5A58] dark:text-slate-300 font-medium">Admin User</label>
                       <div className="p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200">
-                        {activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "cloudnova_admin"}
+                        {activeDb.adminUser && activeDb.adminUser !== "doadmin" ? activeDb.adminUser : "tibicloud_admin"}
                       </div>
                     </div>
                   </div>

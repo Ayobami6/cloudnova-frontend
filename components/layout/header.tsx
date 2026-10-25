@@ -224,7 +224,7 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
                   {user?.name || "Alexandra Rose"}
                 </span>
                 <span className="text-[11px] text-[#8C8B87] block truncate">
-                  {user?.email || "alex.chen@cloudnova.io"}
+                  {user?.email || "alex.chen@tibicloud.io"}
                 </span>
               </div>
               <Link

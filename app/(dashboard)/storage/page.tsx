@@ -92,7 +92,7 @@ export default function StoragePage() {
       cdnActive: true,
       wholesaleMonthly: 5.0,
       retailMonthly: 8.0,
-      endpoint: `https://${bucketName}.s3.${bucketRegion}.cloudnova.io`,
+      endpoint: `https://${bucketName}.s3.${bucketRegion}.tibicloud.io`,
     });
     setIsCreateBucketOpen(false);
   };

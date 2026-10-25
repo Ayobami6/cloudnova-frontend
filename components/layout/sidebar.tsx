@@ -45,7 +45,7 @@ export function Sidebar() {
       <div className="flex flex-col items-center gap-7 w-full">
         <Link
           href="/"
-          title="CloudNova Console"
+          title="TibiCloud Console"
           className="w-11 h-11 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
         >
           <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

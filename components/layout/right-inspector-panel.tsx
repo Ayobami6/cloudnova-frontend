@@ -26,8 +26,8 @@ export function RightInspectorPanel({
   const [isSignoutConfirmOpen, setIsSignoutConfirmOpen] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState(false);
 
-  const displayName = user?.name || "CloudNova Operator";
-  const email = user?.email || "operator@cloudnova.io";
+  const displayName = user?.name || "TibiCloud Operator";
+  const email = user?.email || "operator@tibicloud.io";
   const organizationName = user?.company || "Primary Team";
   const roleName = user?.role || "OWNER";
   const accountNumber =

@@ -12,7 +12,7 @@ interface RequestOptions {
 }
 
 /** Dispatched on window when a refresh fails and the session is unrecoverable. */
-export const SESSION_EXPIRED_EVENT = "cloudnova:session-expired";
+export const SESSION_EXPIRED_EVENT = "tibicloud:session-expired";
 
 // A single in-flight refresh is shared by every concurrent 401 so a burst
 // of parallel requests doesn't each try to refresh (and invalidate) the
@@ -95,7 +95,7 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
 
 
 /**
- * Core request function for every CloudNova API call.
+ * Core request function for every TibiCloud API call.
  *
  * On a 401 from an authenticated request, attempts exactly one silent
  * token refresh and retries the original request once before giving up -

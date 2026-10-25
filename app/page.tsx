@@ -13,18 +13,18 @@ export default function LandingPage() {
   const faqs = [
     {
       q: "Can I pay using my regular Nigerian debit card or bank mobile app?",
-      a: "Yes! Every CloudNova account is instantly provisioned with a dedicated NUBAN virtual bank account (via Monnify & Paystack, powered by Wema, Providus, and Sterling Bank). You can transfer Naira directly from GTBank, Zenith, Kuda, Moniepoint, OPay, or pay with your standard Verve, Mastercard, or Visa naira card.",
+      a: "Yes! Every TibiCloud account is instantly provisioned with a dedicated NUBAN virtual bank account (via Monnify & Paystack, powered by Wema, Providus, and Sterling Bank). You can transfer Naira directly from GTBank, Zenith, Kuda, Moniepoint, OPay, or pay with your standard Verve, Mastercard, or Visa naira card.",
     },
     {
       q: "Do I ever need a domiciliary account or a virtual dollar card?",
-      a: "Never. CloudNova was engineered specifically to solve the frustration of dollar card spending limits, black market FX spreads, and bank card declines. You deposit and maintain your wallet in Naira (NGN), and we handle all backend infrastructure settlements.",
+      a: "Never. TibiCloud was engineered specifically to solve the frustration of dollar card spending limits, black market FX spreads, and bank card declines. You deposit and maintain your wallet in Naira (NGN), and we handle all backend infrastructure settlements.",
     },
     {
-      q: "How does CloudNova handle the USD to Naira exchange rate?",
+      q: "How does TibiCloud handle the USD to Naira exchange rate?",
       a: "Our upstream cloud compute and bare-metal server infrastructure is anchored in USD. We translate this automatically into transparent, predictable Naira rates with zero hidden markups. You always see the exact Naira hourly burn rate and monthly cap before provisioning any server.",
     },
     {
-      q: "Where are CloudNova servers and datacenter regions located?",
+      q: "Where are TibiCloud servers and datacenter regions located?",
       a: "We operate high-performance KVM microVMs with AMD EPYC processors and NVMe storage across 8 Tier-3/Tier-4 datacenter regions worldwide (including London, Frankfurt, New York, Singapore, and low-latency Anycast routing to West Africa). Your instances enjoy sub-20s boot times and 10Gbps interconnects.",
     },
     {
@@ -109,7 +109,7 @@ export default function LandingPage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
                 <span className="text-xs font-mono text-[#8C8B87] dark:text-slate-400 ml-2">
-                  console.cloudnova.io — Prepaid Naira Cloud Wallet
+                  console.tibicloud.io — Prepaid Naira Cloud Wallet
                 </span>
               </div>
               <div className="flex items-center gap-2 text-[11px] font-mono text-[#4EA871] dark:text-[#56B87C]">

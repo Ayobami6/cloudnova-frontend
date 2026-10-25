@@ -134,10 +134,10 @@ export function mapDatabaseCluster(
   const isFull = "admin_user" in wire;
   const fullWire = isFull ? (wire as DatabaseClusterResponse) : null;
 
-  const host = wire.host || `${wire.name}.internal.cloudnova.net`;
+  const host = wire.host || `${wire.name}.internal.tibicloud.net`;
   const port = wire.port || (wire.engine === "redis" ? 6379 : wire.engine === "mysql" ? 3306 : 5432);
   const defaultDb = fullWire?.default_db || (wire.engine === "postgresql" ? "postgres" : "main_db");
-  const adminUser = fullWire?.admin_user || (wire.engine === "redis" ? "default" : "cloudnova_admin");
+  const adminUser = fullWire?.admin_user || (wire.engine === "redis" ? "default" : "tibicloud_admin");
   const rawPwd = fullWire?.admin_password_reveal;
   const adminPassword =
     rawPwd && !/^[•*]+$/.test(rawPwd)
@@ -268,7 +268,7 @@ export function mapBucket(wire: BucketResponse): S3Bucket {
     objectCount: wire.object_count || 0,
     wholesaleMonthly: Number(wire.wholesale_monthly) || 5,
     retailMonthly: Number(wire.retail_monthly) || 5,
-    endpoint: wire.endpoint || `https://${wire.name}.${wire.region}.cloudnovaspaces.com`,
+    endpoint: wire.endpoint || `https://${wire.name}.${wire.region}.tibicloudspaces.com`,
     objects: Array.isArray(wire.objects) ? wire.objects.map(mapS3Object) : [],
     createdAt: wire.created_at,
   };

@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </div>
             <div>
               <span className="font-semibold text-lg tracking-tight text-white flex items-center gap-2">
-                CloudNova
+                TibiCloud
                 <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#F8D568] text-[#1E1E1E] font-semibold">
                   GLOBAL CLOUD
                 </span>
@@ -50,7 +50,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           <blockquote className="text-xl font-medium tracking-tight text-white/95 leading-relaxed">
-            &ldquo;CloudNova reduced our p99 database response times from 140ms to 18ms across 8 continents, while completely eliminating our monthly AWS egress tax.&rdquo;
+            &ldquo;TibiCloud reduced our p99 database response times from 140ms to 18ms across 8 continents, while completely eliminating our monthly AWS egress tax.&rdquo;
           </blockquote>
 
           <div className="flex items-center gap-3 pt-1">
@@ -88,7 +88,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <MaterialIcon name="cloud_done" size={18} />
             </div>
             <span className="font-semibold text-base text-[#1E1E1E] dark:text-white">
-              CloudNova
+              TibiCloud
             </span>
           </Link>
           <div className="ml-auto">

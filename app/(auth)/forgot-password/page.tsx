@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex.chen@cloudnova.io"
+                  placeholder="alex.chen@tibicloud.io"
                   required
                   className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                 />

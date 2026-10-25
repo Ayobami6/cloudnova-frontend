@@ -10,8 +10,10 @@
  * simplicity - an accepted tradeoff for this iteration.
  */
 
-const ACCESS_TOKEN_KEY = "cloudnova_access_token";
-const REFRESH_TOKEN_KEY = "cloudnova_refresh_token";
+const ACCESS_TOKEN_KEY = "tibicloud_access_token";
+const REFRESH_TOKEN_KEY = "tibicloud_refresh_token";
+const LEGACY_ACCESS_TOKEN_KEY = "cloudnova_access_token";
+const LEGACY_REFRESH_TOKEN_KEY = "cloudnova_refresh_token";
 
 interface TokenPair {
   accessToken: string;
@@ -26,8 +28,12 @@ function hydrate(): void {
   hydrated = true;
   if (typeof window === "undefined") return;
   try {
-    const accessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY);
-    const refreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
+    const accessToken =
+      window.localStorage.getItem(ACCESS_TOKEN_KEY) ||
+      window.localStorage.getItem(LEGACY_ACCESS_TOKEN_KEY);
+    const refreshToken =
+      window.localStorage.getItem(REFRESH_TOKEN_KEY) ||
+      window.localStorage.getItem(LEGACY_REFRESH_TOKEN_KEY);
     if (accessToken && refreshToken) {
       cache = { accessToken, refreshToken };
     }
@@ -68,6 +74,8 @@ export function clearTokens(): void {
   try {
     window.localStorage.removeItem(ACCESS_TOKEN_KEY);
     window.localStorage.removeItem(REFRESH_TOKEN_KEY);
+    window.localStorage.removeItem(LEGACY_ACCESS_TOKEN_KEY);
+    window.localStorage.removeItem(LEGACY_REFRESH_TOKEN_KEY);
   } catch {
     // ignore
   }

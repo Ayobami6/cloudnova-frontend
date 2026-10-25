@@ -20,7 +20,7 @@ export function LandingNavbar() {
             <MaterialIcon name="cloud_done" size={18} />
           </div>
           <span className="font-semibold text-base tracking-tight text-[#1E1E1E] dark:text-white flex items-center gap-2">
-            CloudNova
+            TibiCloud
             <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#E6D8EA] text-[#1E1E1E] font-medium">
               CLOUD
             </span>

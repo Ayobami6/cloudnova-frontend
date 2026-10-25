@@ -27,6 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### Changed
+- **Rebranded Product to TibiCloud**:
+  - Rebranded all user-facing product name occurrences across the frontend UI (Landing page, Navigation, Auth flows, Layout, Terminal modal, CLI preview, Dashboard pages, and inspector).
+  - Updated metadata, titles, storage keys (with backwards-compatible fallbacks), and API error references from CloudNova to TibiCloud.
 - Redesigned the entire `cloudnova-frontend` UI based on the Nixtio IVR & Communication Dashboard aesthetic (Dribbble #27709197): Plus Jakarta Sans + Inter + JetBrains Mono typography, Google Material Symbols Rounded icons, Light-First warm alabaster (`#F6F6F4`) & warm stone (`#EFECE8`) surfaces, slim matte-charcoal (`#222222`) navigation rail with circular white active indicator, pastel Lavender/Powder-Blue/Marigold KPI cards, Sankey ribbon + bubble matrix telemetry chart, floating white pill-row tables, and right-hand contextual inspector with live waveform telemetry.
 
 

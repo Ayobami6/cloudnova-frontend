@@ -16,7 +16,7 @@ export function LandingFooter() {
                 <MaterialIcon name="cloud_done" size={18} />
               </div>
               <span className="font-semibold text-base tracking-tight text-[#1E1E1E] dark:text-white">
-                CloudNova
+                TibiCloud
               </span>
             </Link>
             <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
@@ -104,7 +104,7 @@ export function LandingFooter() {
             <ul className="space-y-2 text-[#8C8B87] dark:text-slate-400">
               <li>
                 <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  About CloudNova
+                  About TibiCloud
                 </span>
               </li>
               <li>
@@ -128,7 +128,7 @@ export function LandingFooter() {
 
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-[#E7E4DF] dark:border-[#282D3A] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} CloudNova Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} TibiCloud Inc. All rights reserved.</p>
           <div className="flex items-center gap-4 font-mono text-[11px]">
             <span>Lagos & Global</span>
             <span>•</span>

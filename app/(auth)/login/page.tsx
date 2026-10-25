@@ -63,7 +63,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
-          Sign in to your CloudNova infrastructure console and telemetry dashboard.
+          Sign in to your TibiCloud infrastructure console and telemetry dashboard.
         </p>
       </div>
 

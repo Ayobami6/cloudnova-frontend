@@ -13,7 +13,7 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const { verifyEmailOtp, resendOtp, pendingVerificationEmail, isLoading } = useAuth();
 
-  const email = searchParams.get("email") || pendingVerificationEmail || "alex.chen@cloudnova.io";
+  const email = searchParams.get("email") || pendingVerificationEmail || "alex.chen@tibicloud.io";
 
   const [digits, setDigits] = useState<string[]>(["", "", "", "", "", ""]);
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +131,7 @@ function VerifyEmailContent() {
       {isSuccess && (
         <div className="p-3 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-[#4EA871] dark:text-[#56B87C] flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>Email verified! Redirecting to CloudNova console...</span>
+          <span>Email verified! Redirecting to TibiCloud console...</span>
         </div>
       )}
 

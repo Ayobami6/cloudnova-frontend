@@ -61,7 +61,7 @@ export default function DomainsPage() {
 
   const [selectedDomainId, setSelectedDomainId] = useState<string>(domains[0]?.id || "");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [searchDomain, setSearchDomain] = useState("cloudnova");
+  const [searchDomain, setSearchDomain] = useState("tibicloud");
   const [availabilityMap, setAvailabilityMap] = useState<Record<string, DomainVerificationState>>({});
   const [isVerifyingAll, setIsVerifyingAll] = useState(false);
   const [isRegistering, setIsRegistering] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function DomainsPage() {
       addDNSRecord(activeDomain.id, {
         type: "CNAME",
         name: "@",
-        value: `${b.name}.s3.${b.region}.cloudnova.io`,
+        value: `${b.name}.s3.${b.region}.tibicloud.io`,
         ttl: 300,
       });
       linkDomainToResource(activeDomain.id, b.id);
@@ -382,7 +382,7 @@ export default function DomainsPage() {
                 DNS Zone Editor: <span className="text-blue-600 dark:text-blue-400 font-mono">{activeDomain.name}</span>
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Anycast Nameservers: ns1.cloudnova-dns.net, ns2.cloudnova-dns.net
+                Anycast Nameservers: ns1.tibicloud-dns.net, ns2.tibicloud-dns.net
               </p>
             </div>
 
@@ -539,7 +539,7 @@ export default function DomainsPage() {
               <label className="text-xs text-slate-700 dark:text-slate-300 font-medium flex items-center justify-between">
                 <span>Domain Name Search</span>
                 <span className="text-[11px] text-slate-400 font-normal">
-                  Type base name or specific FQDN (e.g. cloudnova or startup.io)
+                  Type base name or specific FQDN (e.g. tibicloud or startup.io)
                 </span>
               </label>
               <div className="relative flex items-center gap-2">

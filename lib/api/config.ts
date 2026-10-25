@@ -1,5 +1,5 @@
 /**
- * Central configuration for the CloudNova API client.
+ * Central configuration for the TibiCloud API client.
  *
  * Defaults to `/api/v1` so client-side browser requests go through
  * the Next.js / Vercel proxy, preventing Mixed Content and CORS issues.
