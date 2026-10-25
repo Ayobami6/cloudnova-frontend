@@ -22,10 +22,6 @@ export function LandingFooter() {
             <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
               Developer-first cloud infrastructure for African tech teams. Spin up high-performance KVM compute, managed databases, and NVMe block storage with seamless Naira bank transfers and 0% foreign card fees.
             </p>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] text-xs font-mono border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>All Systems Operational (99.99% SLA)</span>
-            </div>
           </div>
 
           {/* Col 2: Products */}

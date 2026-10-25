@@ -294,7 +294,7 @@ export default function DomainsPage() {
             setIsRegisterOpen(true);
             setRegisterError(null);
           }}
-          className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+          className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Register Domain</span>
@@ -310,7 +310,7 @@ export default function DomainsPage() {
               <th className="py-2.5 px-4">Security & SSL</th>
               <th className="py-2.5 px-4">Auto-Renew & Expiry</th>
               <th className="py-2.5 px-4">Linked Cloud Resource</th>
-              <th className="py-2.5 px-4">Annual Retail (Profit)</th>
+              <th className="py-2.5 px-4">Annual Price</th>
               <th className="py-2.5 px-4 text-right">Action</th>
             </tr>
           </thead>
@@ -351,9 +351,6 @@ export default function DomainsPage() {
                 </td>
                 <td className="py-3 px-4 font-mono">
                   <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(dom.retailAnnual)}/yr</span>
-                  <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] font-medium">
-                    +{formatMoney(dom.retailAnnual - dom.wholesaleAnnual)} margin
-                  </span>
                 </td>
                 <td className="py-3 px-4 text-right">
                   <button
@@ -455,7 +452,7 @@ export default function DomainsPage() {
             <div>
               <button
                 type="submit"
-                className="w-full h-8 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+                className="w-full h-8 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
               >
                 Add Record
               </button>
@@ -659,19 +656,9 @@ export default function DomainsPage() {
                           </div>
 
                           <div className="text-[11px] text-[#8C8B87] dark:text-slate-400 flex items-center gap-2">
-                            <span>Wholesale: {formatMoney(currentWholesale)}/yr</span>
-                            <span>•</span>
-                            <span className="text-slate-700 dark:text-slate-300 font-medium">
-                              Retail: {formatMoney(currentRetail)}/yr
+                            <span className="text-slate-700 dark:text-slate-300 font-medium font-mono">
+                              {formatMoney(currentRetail)}/yr
                             </span>
-                            {isAvailable && (
-                              <>
-                                <span>•</span>
-                                <span className="text-[#4EA871] dark:text-[#56B87C]">
-                                  +{formatMoney(currentRetail - currentWholesale)} margin
-                                </span>
-                              </>
-                            )}
                           </div>
                         </div>
 
@@ -682,7 +669,7 @@ export default function DomainsPage() {
                               type="button"
                               onClick={() => handleRegister(domainKey, item.tld, currentWholesale, currentRetail)}
                               disabled={isCurrentlyRegistering || isRegistering !== null}
-                              className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {isCurrentlyRegistering ? (
                                 <>

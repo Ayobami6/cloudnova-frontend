@@ -641,7 +641,7 @@ export function DeployDropletModal({
               </button>
               <button
                 type="submit"
-                className="h-10 px-6 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+                className="h-10 px-6 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
               >
                 Deploy Droplet
               </button>

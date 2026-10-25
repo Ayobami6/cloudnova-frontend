@@ -155,7 +155,7 @@ export default function StoragePage() {
           {activeTab === "volumes" ? (
             <button
               onClick={() => setIsCreateVolumeOpen(true)}
-              className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+              className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Create NVMe Volume</span>
@@ -163,7 +163,7 @@ export default function StoragePage() {
           ) : (
             <button
               onClick={() => setIsCreateBucketOpen(true)}
-              className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+              className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Create S3 Bucket</span>
@@ -182,7 +182,7 @@ export default function StoragePage() {
                 <th className="py-2.5 px-4">Capacity & IOPS</th>
                 <th className="py-2.5 px-4">Attached Droplet</th>
                 <th className="py-2.5 px-4">Filesystem</th>
-                <th className="py-2.5 px-4">Retail Price (Margin)</th>
+                <th className="py-2.5 px-4">Price</th>
                 <th className="py-2.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -245,9 +245,6 @@ export default function StoragePage() {
                     <td className="py-3 px-4 font-mono text-slate-600 dark:text-slate-400">{vol.filesystem}</td>
                     <td className="py-3 px-4 font-mono">
                       <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(vol.retailMonthly)}/mo</span>
-                      <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] font-medium">
-                        +{formatMoney(vol.retailMonthly - vol.wholesaleMonthly)} profit
-                      </span>
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="inline-flex items-center gap-1.5">
@@ -319,7 +316,7 @@ export default function StoragePage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <label className="h-8 px-3 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm">
+                <label className="h-8 px-3 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm">
                   <FolderUp className="w-3.5 h-3.5" />
                   <span>Upload Files</span>
                   <input type="file" onChange={handleFileUpload} className="hidden" />
@@ -414,7 +411,7 @@ export default function StoragePage() {
             <div className="flex justify-end">
               <button
                 onClick={() => setSelectedVolForMount(null)}
-                className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer"
+                className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer"
               >
                 Done
               </button>
@@ -461,7 +458,7 @@ export default function StoragePage() {
                 </button>
                 <button
                   type="submit"
-                  className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm"
+                  className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm"
                 >
                   Provision Volume
                 </button>
@@ -508,7 +505,7 @@ export default function StoragePage() {
                 </button>
                 <button
                   type="submit"
-                  className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm"
+                  className="h-8 px-4 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm"
                 >
                   Create Bucket
                 </button>

@@ -61,7 +61,7 @@ export function LandingNavbar() {
           {isAuthenticated ? (
             <Link
               href="/overview"
-              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
+              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
             >
               <span>Go to Console</span>
               <MaterialIcon name="arrow_forward" size={15} />
@@ -70,13 +70,13 @@ export function LandingNavbar() {
             <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/login"
-                className="h-9 px-4 rounded-full bg-white dark:bg-[#1C2029] text-xs font-medium text-[#1E1E1E] dark:text-slate-200 inline-flex items-center justify-center shadow-2xs hover:bg-[#EFECE8] transition-colors"
+                className="h-9 px-4 rounded-full bg-white dark:bg-[#1C2029] text-xs font-medium text-[#1E1E1E] dark:text-slate-200 inline-flex items-center justify-center shadow-2xs hover:bg-[#EFECE8] dark:hover:bg-[#232834] transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
+                className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
               >
                 <span>Deploy with ₦10,000 Free</span>
                 <MaterialIcon name="arrow_forward" size={15} />

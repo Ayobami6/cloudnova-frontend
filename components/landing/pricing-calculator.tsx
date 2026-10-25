@@ -263,7 +263,7 @@ export function PricingCalculator() {
             <div className="pt-6 mt-6 border-t border-[#E7E4DF] dark:border-[#282D3A]">
               <Link
                 href="/register"
-                className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+                className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
               >
                 <span>Deploy with ₦10,000 Free Credit</span>
                 <MaterialIcon name="arrow_forward" size={16} />

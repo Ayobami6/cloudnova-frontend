@@ -26,7 +26,6 @@ export default function BillingPage() {
     transactions,
     invoices,
     virtualAccounts,
-    marginConfig,
     walletBalance,
     setIsDepositModalOpen,
     switchCurrency,
@@ -174,7 +173,7 @@ export default function BillingPage() {
           <button
             type="button"
             onClick={() => setIsDepositModalOpen(true)}
-            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <MaterialIcon name="add" size={16} />
             <span>Deposit Funds</span>
@@ -312,46 +311,6 @@ export default function BillingPage() {
               </div>
             </div>
           ))}
-
-          {marginConfig && (
-            <div className="nixtio-card p-5 mt-4">
-              <span className="text-xs font-semibold text-[#1E1E1E] dark:text-white">
-                Platform Reseller Margins
-              </span>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-3 text-xs">
-                <div className="p-3 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920]">
-                  <span className="text-[#8C8B87] block">Global</span>
-                  <span className="font-mono font-semibold">
-                    {marginConfig.global_markup_percent}%
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#E6D8EA]/40">
-                  <span className="text-[#8C8B87] block">Compute</span>
-                  <span className="font-mono font-semibold">
-                    {marginConfig.compute_markup_percent}%
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#CFE0EC]/40">
-                  <span className="text-[#8C8B87] block">Database</span>
-                  <span className="font-mono font-semibold">
-                    {marginConfig.database_markup_percent}%
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#F8D568]/40">
-                  <span className="text-[#8C8B87] block">Storage</span>
-                  <span className="font-mono font-semibold">
-                    {marginConfig.storage_markup_percent}%
-                  </span>
-                </div>
-                <div className="p-3 rounded-2xl bg-[#E5B899]/40">
-                  <span className="text-[#8C8B87] block">Domains</span>
-                  <span className="font-mono font-semibold">
-                    {marginConfig.domains_markup_percent}%
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
 

@@ -207,7 +207,7 @@ export default function DatabasesPage() {
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
           >
             <MaterialIcon name="add" size={16} />
             <span>Create Database Cluster</span>
@@ -785,7 +785,7 @@ func main() {
                     <span className="text-xs font-medium text-[#5A5A58] dark:text-slate-300">Run Query on {activeDb.defaultDb || "postgres"}</span>
                     <button
                       type="submit"
-                      className="h-8.5 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+                      className="h-8.5 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                     >
                       <MaterialIcon name="play_arrow" size={16} />
                       <span>Execute</span>
@@ -901,7 +901,7 @@ func main() {
                 </button>
                 <button
                   type="submit"
-                  className="h-9 px-5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-xs transition-colors"
+                  className="h-9 px-5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-xs transition-colors"
                 >
                   Provision Cluster
                 </button>
