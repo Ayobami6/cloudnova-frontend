@@ -131,6 +131,7 @@ export default function DatabasesPage() {
 
   const onlineCount = databases.filter((d) => d.status === "online").length;
   const totalDiskGb = databases.reduce((acc, d) => acc + (d.diskAllocatedGb || 0), 0);
+  const haCount = databases.filter((d) => d.haEnabled).length;
 
   const getEnginePillVariant = (engine: string): PastelVariant => {
     switch (engine.toLowerCase()) {
@@ -149,19 +150,29 @@ export default function DatabasesPage() {
 
   return (
     <div className="space-y-5">
-      {/* Top Pastel KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Top 3 Pastel KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <PastelKpiCard
           label="Active Database Clusters"
-          value={onlineCount}
+          value={`${onlineCount} / ${databases.length}`}
+          subtitle="Multi-AZ Aurora & RDS"
           variant="lavender"
           actionLabel="Provision"
           onAction={() => setIsCreateModalOpen(true)}
         />
         <PastelKpiCard
-          label="NVMe Storage"
+          label="Allocated NVMe Storage"
           value={`${totalDiskGb} GB`}
+          subtitle="High-IOPS Provisioned SSD"
           variant="blue"
+          actionLabel="Check"
+          onAction={() => setEngineFilter("all")}
+        />
+        <PastelKpiCard
+          label="High Availability Standbys"
+          value={`${haCount} Active`}
+          subtitle="Zero-Downtime Failover"
+          variant="yellow"
           actionLabel="Check"
           onAction={() => setEngineFilter("all")}
         />
