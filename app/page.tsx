@@ -208,34 +208,34 @@ export default function LandingPage() {
       </section>
 
       {/* 3. Core Offerings & Naira Pricing Cards */}
-      <section id="compute" className="py-24 bg-[#08090D] border-y border-[#1D2536] relative overflow-hidden">
+      <section id="compute" className="py-24 border-b border-[#E7E4DF] dark:border-[#282D3A] bg-[#F6F6F4] dark:bg-[#0F1115] relative overflow-hidden">
         {/* Subtle background glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(#1E69FF_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.03] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.03] dark:opacity-[0.06] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#181D2A] text-slate-300 text-xs font-mono border border-[#232B3D]">
-              <MaterialIcon name="dns" size={16} className="text-[#38BDF8]" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#CFE0EC] dark:bg-[#CFE0EC]/20 text-[#1E1E1E] dark:text-[#CFE0EC] text-xs font-mono border border-[#CFE0EC]/80 dark:border-[#CFE0EC]/30 shadow-2xs">
+              <MaterialIcon name="dns" size={16} className="text-[#2563eb] dark:text-[#38BDF8]" />
               <span>High-Velocity Infrastructure</span>
             </div>
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white sm:text-4xl">
               Clean Infrastructure, Transparent Naira Rates
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-[#8C8B87] dark:text-slate-400">
               Every plan includes dedicated CPU, NVMe SSD, private VPC, and unmetered internal traffic.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
             {/* Card 1: Developer Starter */}
-            <div className="p-7 sm:p-8 rounded-[22px] bg-[#10141D] border border-[#1E2538] flex flex-col justify-between shadow-xl transition-all duration-200 hover:border-slate-700">
+            <div className="nixtio-card p-7 sm:p-8 border border-[#E7E4DF]/70 dark:border-[#282D3A] flex flex-col justify-between transition-all duration-200 hover:border-[#D5D0C8] dark:hover:border-[#383F52] hover:shadow-md">
               <div>
                 {/* Header row */}
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-mono font-medium tracking-wider text-slate-400 uppercase">
+                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#8C8B87] dark:text-slate-400 uppercase">
                     DEVELOPER STARTER
                   </span>
-                  <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-[#181D2A] border border-[#232B3D] text-slate-300">
+                  <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-[#1E1E1E] dark:text-slate-300">
                     Ubuntu • Debian
                   </span>
                 </div>
@@ -243,33 +243,33 @@ export default function LandingPage() {
                 {/* Price */}
                 <div className="mt-6">
                   <div className="flex items-baseline">
-                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-white tracking-tight">₦8,000</span>
-                    <span className="text-xs sm:text-sm font-mono text-slate-400 font-normal ml-1.5">/month</span>
+                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-[#1E1E1E] dark:text-white tracking-tight">₦8,000</span>
+                    <span className="text-xs sm:text-sm font-mono text-[#8C8B87] dark:text-slate-400 font-normal ml-1.5">/month</span>
                   </div>
-                  <p className="text-xs font-mono text-slate-500 mt-2 tracking-tight">
+                  <p className="text-xs font-mono text-[#8C8B87] dark:text-slate-500 mt-2 tracking-tight">
                     ~₦11.11 / hr ($5.00 USD base)
                   </p>
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-[#1D2434] my-6" />
+                <div className="h-px bg-[#E7E4DF]/70 dark:bg-[#282D3A] my-6" />
 
                 {/* Features */}
-                <div className="space-y-3.5 text-[13px] text-slate-300 font-normal">
+                <div className="space-y-3.5 text-[13px] text-[#5A5A58] dark:text-slate-300 font-normal">
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>1 Dedicated AMD vCPU</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>1 GB High-Speed DDR5 RAM</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>25 GB Gen4 NVMe Storage</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>1 TB Free Outbound Bandwidth</span>
                   </div>
                 </div>
@@ -279,7 +279,7 @@ export default function LandingPage() {
               <div className="mt-8 pt-2">
                 <Link
                   href="/register"
-                  className="w-full h-12 rounded-2xl bg-[#161B26] hover:bg-[#1E2536] text-slate-300 hover:text-white border border-[#232B3D] text-sm font-medium flex items-center justify-center transition-all cursor-pointer"
+                  className="w-full h-11 rounded-full bg-[#EFECE8] hover:bg-[#E5E0D8] dark:bg-[#232834] dark:hover:bg-[#2C3342] text-[#1E1E1E] dark:text-white border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-semibold flex items-center justify-center transition-colors cursor-pointer"
                 >
                   Deploy Starter
                 </Link>
@@ -287,54 +287,52 @@ export default function LandingPage() {
             </div>
 
             {/* Card 2: General Production (Featured) */}
-            <div className="p-7 sm:p-8 rounded-[22px] bg-[#10141D] border-2 border-[#1E69FF] flex flex-col justify-between relative overflow-hidden shadow-2xl shadow-blue-500/10 transition-all duration-200">
-              {/* Pinned Most Popular Badge */}
-              <div className="absolute top-0 right-0 bg-[#1E69FF] text-white text-[10px] font-mono font-bold tracking-wider uppercase px-4 py-1.5 rounded-bl-xl rounded-tr-[20px] shadow-sm">
-                MOST POPULAR
-              </div>
-
+            <div className="nixtio-card p-7 sm:p-8 border-2 border-[#222222] dark:border-blue-500 relative flex flex-col justify-between shadow-lg shadow-black/5 dark:shadow-blue-500/10 transition-all duration-200">
               <div>
                 {/* Header row */}
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#38BDF8] uppercase">
+                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#2563eb] dark:text-[#38BDF8] uppercase">
                     GENERAL PRODUCTION
+                  </span>
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-[#222222] text-white dark:bg-blue-500 dark:text-white shadow-2xs">
+                    MOST POPULAR
                   </span>
                 </div>
 
                 {/* Price */}
                 <div className="mt-6">
                   <div className="flex items-baseline">
-                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-white tracking-tight">₦32,000</span>
-                    <span className="text-xs sm:text-sm font-mono text-slate-400 font-normal ml-1.5">/month</span>
+                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-[#1E1E1E] dark:text-white tracking-tight">₦32,000</span>
+                    <span className="text-xs sm:text-sm font-mono text-[#8C8B87] dark:text-slate-400 font-normal ml-1.5">/month</span>
                   </div>
-                  <p className="text-xs font-mono text-slate-500 mt-2 tracking-tight">
+                  <p className="text-xs font-mono text-[#8C8B87] dark:text-slate-500 mt-2 tracking-tight">
                     ~₦44.44 / hr ($20.00 USD base)
                   </p>
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-[#1D2434] my-6" />
+                <div className="h-px bg-[#E7E4DF]/70 dark:bg-[#282D3A] my-6" />
 
                 {/* Features */}
-                <div className="space-y-3.5 text-[13px] text-slate-300 font-normal">
+                <div className="space-y-3.5 text-[13px] text-[#5A5A58] dark:text-slate-300 font-normal">
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>2 Dedicated AMD Genoa vCPUs</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>4 GB High-Speed DDR5 RAM</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>50 GB Gen4 NVMe Storage</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>3 TB Free Outbound Bandwidth</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>10Gbps Private VPC Interconnect</span>
                   </div>
                 </div>
@@ -344,22 +342,23 @@ export default function LandingPage() {
               <div className="mt-8 pt-2">
                 <Link
                   href="/register"
-                  className="w-full h-12 rounded-2xl bg-[#1E69FF] hover:bg-[#1A5CD6] text-white text-sm font-medium flex items-center justify-center transition-all cursor-pointer shadow-lg shadow-blue-500/25"
+                  className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 text-white dark:text-[#1E1E1E] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
                 >
-                  Deploy Production
+                  <span>Deploy Production</span>
+                  <MaterialIcon name="arrow_forward" size={15} />
                 </Link>
               </div>
             </div>
 
             {/* Card 3: High-Performance Pro */}
-            <div className="p-7 sm:p-8 rounded-[22px] bg-[#10141D] border border-[#1E2538] flex flex-col justify-between shadow-xl transition-all duration-200 hover:border-slate-700">
+            <div className="nixtio-card p-7 sm:p-8 border border-[#E7E4DF]/70 dark:border-[#282D3A] flex flex-col justify-between transition-all duration-200 hover:border-[#D5D0C8] dark:hover:border-[#383F52] hover:shadow-md">
               <div>
                 {/* Header row */}
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-mono font-medium tracking-wider text-slate-400 uppercase">
+                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#8C8B87] dark:text-slate-400 uppercase">
                     HIGH-PERFORMANCE PRO
                   </span>
-                  <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-[#181D2A] border border-[#232B3D] text-slate-300">
+                  <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-[#1E1E1E] dark:text-slate-300">
                     APIs • Databases
                   </span>
                 </div>
@@ -367,33 +366,33 @@ export default function LandingPage() {
                 {/* Price */}
                 <div className="mt-6">
                   <div className="flex items-baseline">
-                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-white tracking-tight">₦64,000</span>
-                    <span className="text-xs sm:text-sm font-mono text-slate-400 font-normal ml-1.5">/month</span>
+                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-[#1E1E1E] dark:text-white tracking-tight">₦64,000</span>
+                    <span className="text-xs sm:text-sm font-mono text-[#8C8B87] dark:text-slate-400 font-normal ml-1.5">/month</span>
                   </div>
-                  <p className="text-xs font-mono text-slate-500 mt-2 tracking-tight">
+                  <p className="text-xs font-mono text-[#8C8B87] dark:text-slate-500 mt-2 tracking-tight">
                     ~₦88.88 / hr ($40.00 USD base)
                   </p>
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-[#1D2434] my-6" />
+                <div className="h-px bg-[#E7E4DF]/70 dark:bg-[#282D3A] my-6" />
 
                 {/* Features */}
-                <div className="space-y-3.5 text-[13px] text-slate-300 font-normal">
+                <div className="space-y-3.5 text-[13px] text-[#5A5A58] dark:text-slate-300 font-normal">
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>4 Dedicated AMD Genoa vCPUs</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>8 GB High-Speed DDR5 RAM</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>100 GB Gen4 NVMe Storage</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MaterialIcon name="check" size={16} className="text-[#10B981] shrink-0 font-bold" />
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
                     <span>5 TB Free Outbound Bandwidth</span>
                   </div>
                 </div>
@@ -403,7 +402,7 @@ export default function LandingPage() {
               <div className="mt-8 pt-2">
                 <Link
                   href="/register"
-                  className="w-full h-12 rounded-2xl bg-[#161B26] hover:bg-[#1E2536] text-slate-300 hover:text-white border border-[#232B3D] text-sm font-medium flex items-center justify-center transition-all cursor-pointer"
+                  className="w-full h-11 rounded-full bg-[#EFECE8] hover:bg-[#E5E0D8] dark:bg-[#232834] dark:hover:bg-[#2C3342] text-[#1E1E1E] dark:text-white border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-semibold flex items-center justify-center transition-colors cursor-pointer"
                 >
                   Deploy Pro
                 </Link>
