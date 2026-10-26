@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MaterialIcon } from "@/components/ui/material-icon";
+import { TibiCloudMark } from "@/components/ui/brand-logo";
 
 export function LandingFooter() {
   return (
@@ -12,9 +12,7 @@ export function LandingFooter() {
           {/* Col 1: Brand */}
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#CFE0EC] flex items-center justify-center text-[#222222] shadow-2xs">
-                <MaterialIcon name="cloud_done" size={18} />
-              </div>
+              <TibiCloudMark size={32} withBackground={true} className="shadow-2xs" />
               <span className="font-semibold text-base tracking-tight text-[#1E1E1E] dark:text-white">
                 TibiCloud
               </span>

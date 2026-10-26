@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { TibiCloudMark } from "@/components/ui/brand-logo";
 import { useCloud } from "@/lib/store/cloud-context";
 import { useBilling } from "@/lib/store/billing-context";
 import { useAuth } from "@/lib/store/auth-context";
@@ -41,17 +42,14 @@ export function Sidebar() {
 
   return (
     <aside className="w-[76px] bg-[#222222] dark:bg-[#14161B] text-white flex flex-col items-center justify-between py-6 shrink-0 h-full select-none z-30">
-      {/* Top: Circular Powder-Blue Brand Badge */}
+      {/* Top: Official TibiCloud Brand Mark */}
       <div className="flex flex-col items-center gap-7 w-full">
         <Link
           href="/"
           title="TibiCloud Console"
-          className="w-11 h-11 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
+          className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm hover:scale-105 transition-transform"
         >
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 13c2.5-5 6.5-5 9 0s6.5 5 9 0" strokeLinecap="round" />
-            <circle cx="6.5" cy="9" r="1.2" fill="currentColor" stroke="none" />
-          </svg>
+          <TibiCloudMark size={44} withBackground={true} />
         </Link>
 
         {/* Center Icon Stack */}

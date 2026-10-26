@@ -41,7 +41,7 @@ export function RightInspectorPanel({
       .map((n) => n[0])
       .join("")
       .toUpperCase()
-      .slice(0, 2) || "CN";
+      .slice(0, 2) || "TC";
 
   const activeInstancesCount = instances.filter(
     (i) => i.status === "active"

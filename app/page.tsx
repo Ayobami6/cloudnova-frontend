@@ -72,13 +72,6 @@ export default function LandingPage() {
                 <span>Deploy with ₦10,000 Free Credit</span>
                 <MaterialIcon name="arrow_forward" size={16} />
               </Link>
-              <Link
-                href="/overview"
-                className="w-full sm:w-auto h-11 px-5 rounded-full bg-white dark:bg-[#1C2029] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <MaterialIcon name="terminal" size={16} className="text-slate-400" />
-                <span>Explore Live Console Demo</span>
-              </Link>
             </div>
           </div>
 
@@ -512,12 +505,6 @@ export default function LandingPage() {
             >
               <span>Create Account (₦10,000 Credit)</span>
               <MaterialIcon name="arrow_forward" size={16} />
-            </Link>
-            <Link
-              href="/overview"
-              className="w-full sm:w-auto h-11 px-6 rounded-full bg-white dark:bg-[#1C2029] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <span>Explore Live Console Demo</span>
             </Link>
           </div>
         </div>

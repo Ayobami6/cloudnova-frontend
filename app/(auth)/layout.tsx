@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useTheme } from "@/lib/store/theme-context";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { TibiCloudMark } from "@/components/ui/brand-logo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const { theme, toggleTheme } = useTheme();
@@ -15,9 +16,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* Top: Brand */}
         <div className="relative z-10 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center shadow-sm">
-              <MaterialIcon name="cloud_done" size={22} />
-            </div>
+            <TibiCloudMark size={44} withBackground={true} className="shadow-sm hover:scale-105 transition-transform" />
             <div>
               <span className="font-semibold text-lg tracking-tight text-white flex items-center gap-2">
                 TibiCloud
@@ -83,10 +82,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Right side: Auth Form Container */}
       <div className="w-full lg:w-1/2 flex flex-col justify-between p-6 sm:p-10 nixtio-stone-panel">
         <div className="flex items-center justify-between w-full max-w-md mx-auto">
-          <Link href="/" className="lg:hidden inline-flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center">
-              <MaterialIcon name="cloud_done" size={18} />
-            </div>
+          <Link href="/" className="lg:hidden inline-flex items-center gap-2.5">
+            <TibiCloudMark size={36} withBackground={true} />
             <span className="font-semibold text-base text-[#1E1E1E] dark:text-white">
               TibiCloud
             </span>
