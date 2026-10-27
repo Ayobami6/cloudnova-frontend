@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="c2Bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080C15" />
+      <stop offset="50%" stop-color="#0F172A" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+
+    <!-- Wing 1: Cyber Cyan -->
+    <linearGradient id="c2GradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <!-- Wing 2: Electric Violet / Indigo -->
+    <linearGradient id="c2GradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#4338CA" />
+    </linearGradient>
+
+    <!-- Center Spine: Luminous Gradient -->
+    <linearGradient id="c2GradSpine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E0F2FE" />
+      <stop offset="30%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="24" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Container -->
+  <rect width="512" height="512" rx="120" fill="url(#c2Bg)" />
+
+  <!-- Ambient Light Reflection -->
+  <circle cx="256" cy="220" r="160" fill="#0284C7" opacity="0.12" filter="url(#softGlow)" />
+
+  <!-- Symmetrical Aerodynamic T-Cloud Mark -->
+  <g transform="translate(0, 10)">
+    <!-- Cloud Canopy Arc (Left lobe) -->
+    <path d="M 120 220 C 120 180, 150 148, 190 148 C 205 148, 218 152, 230 160 C 240 135, 270 115, 305 115 C 348 115, 382 144, 388 185 C 418 190, 440 215, 440 248 C 440 285, 410 315, 372 315 L 320 315"
+          fill="none"
+          stroke="url(#c2GradRight)"
+          stroke-width="18"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.35" />
+
+    <!-- Sleek Precision "T" & Cloud Hybrid Body -->
+    <!-- Left Wing of T -->
+    <path d="M 140 200 L 244 200 C 252 200, 256 205, 256 214 L 256 376 C 256 390, 244 402, 230 402 C 216 402, 204 390, 204 376 L 204 252 L 140 252 C 126 252, 114 240, 114 226 C 114 212, 126 200, 140 200 Z"
+          fill="url(#c2GradLeft)" />
+
+    <!-- Right Wing of T with Overlap -->
+    <path d="M 372 200 L 268 200 C 260 200, 256 205, 256 214 L 256 376 C 256 390, 268 402, 282 402 C 296 402, 308 390, 308 376 L 308 252 L 372 252 C 386 252, 398 240, 398 226 C 398 212, 386 200, 372 200 Z"
+          fill="url(#c2GradRight)" />
+
+    <!-- Cloud Crown Bridge forming upper T dome -->
+    <path d="M 180 180 C 190 140, 224 112, 256 112 C 288 112, 322 140, 332 180 Z"
+          fill="url(#c2GradSpine)"
+          opacity="0.9" />
+
+    <!-- Central Glowing Data Conduit / Droplet Core -->
+    <circle cx="256" cy="226" r="14" fill="#FFFFFF" filter="url(#softGlow)" />
+  </g>
+</svg>
+

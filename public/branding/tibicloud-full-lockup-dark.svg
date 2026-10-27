@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="fullBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080D1A" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+
+    <!-- Logo Mark Gradient -->
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE" />
+      <stop offset="50%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#6366F1" />
+    </linearGradient>
+
+    <!-- Cloud Text Gradient -->
+    <linearGradient id="textCloudGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#818CF8" />
+    </linearGradient>
+
+    <filter id="markShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#0284C7" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Container -->
+  <rect width="1200" height="360" rx="36" fill="url(#fullBg)" />
+
+  <!-- LOGO ICON (Left) -->
+  <g transform="translate(100, 60)" filter="url(#markShadow)">
+    <!-- Hex / Node Backdrop -->
+    <rect width="240" height="240" rx="60" fill="#111C33" stroke="#1E293B" stroke-width="2" />
+
+    <!-- Ambient Glow -->
+    <circle cx="120" cy="120" r="70" fill="#0284C7" opacity="0.25" />
+
+    <!-- Connected Cloud Node Outline -->
+    <path d="M 64 150 C 50 150 40 138 40 124 C 40 110 50 100 64 100 C 66 80 84 64 106 64 C 122 64 136 74 142 88 C 148 84 156 82 164 82 C 182 82 196 96 196 114 C 204 120 210 130 210 140 C 210 156 196 168 180 168 L 64 168"
+          fill="none"
+          stroke="#38BDF8"
+          stroke-width="6"
+          stroke-linecap="round"
+          opacity="0.3" />
+
+    <!-- Stylized Modern "T" with Cloud Shoulders -->
+    <path d="M 64 106 C 64 96 72 88 82 88 L 158 88 C 168 88 176 96 176 106 C 176 116 168 124 158 124 L 132 124 L 132 186 C 132 196 124 204 114 204 C 104 204 96 196 96 186 L 96 124 L 82 124 C 72 124 64 116 64 106 Z"
+          fill="url(#markGrad)" />
+
+    <!-- Central Micro-Droplet Core -->
+    <circle cx="114" cy="106" r="6" fill="#FFFFFF" />
+
+    <!-- Floating Nova Spark -->
+    <circle cx="178" cy="74" r="5" fill="#00F2FE" />
+  </g>
+
+  <!-- TYPOGRAPHY LOCKUP (Right) -->
+  <g transform="translate(390, 195)">
+    <!-- Brand Wordmark -->
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+          font-weight="800"
+          font-size="104"
+          letter-spacing="-2px">
+      <!-- "Tibi" in Crisp White -->
+      <tspan fill="#F8FAFC">Tibi</tspan>
+      <!-- "Cloud" in Cyan-Indigo Gradient -->
+      <tspan fill="url(#textCloudGrad)" font-weight="700">Cloud</tspan>
+    </text>
+
+    <!-- Subtitle / Tagline -->
+    <text y="58"
+          x="6"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+          font-weight="600"
+          font-size="22"
+          letter-spacing="9px"
+          fill="#94A3B8">
+      CLOUD INFRASTRUCTURE PLATFORM
+    </text>
+
+    <!-- Feature Pill / Version Tag -->
+    <g transform="translate(560, -82)">
+      <rect width="112" height="34" rx="17" fill="#0369A1" opacity="0.3" />
+      <rect width="112" height="34" rx="17" fill="none" stroke="#38BDF8" stroke-width="1.5" opacity="0.7" />
+      <text x="56" y="22"
+            font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+            font-size="13"
+            font-weight="700"
+            fill="#38BDF8"
+            letter-spacing="2px"
+            text-anchor="middle">v2.0 PRO</text>
+    </g>
+  </g>
+</svg>
+

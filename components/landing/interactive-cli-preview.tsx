@@ -8,14 +8,14 @@ export function InteractiveCliPreview() {
   const [copied, setCopied] = useState(false);
 
   const snippets = {
-    cli: `# 1. Install CloudNova CLI via Homebrew or curl
-curl -fsSL https://get.cloudnova.io | sh
+    cli: `# 1. Install TibiCloud CLI via Homebrew or curl
+curl -fsSL https://get.tibicloud.io | sh
 
 # 2. Authenticate CLI session
-cloudnova auth login
+tibicloud auth login
 
 # 3. Provision 8-core KVM compute node with NVMe in NYC
-cloudnova droplet create \\
+tibicloud droplet create \\
   --name api-gateway-01 \\
   --region nyc1 \\
   --image ubuntu-24-04 \\
@@ -28,32 +28,32 @@ cloudnova droplet create \\
 
     terraform: `terraform {
   required_providers {
-    cloudnova = {
-      source  = "cloudnova/cloudnova"
+    tibicloud = {
+      source  = "tibicloud/tibicloud"
       version = "~> 2.4.0"
     }
   }
 }
 
-provider "cloudnova" {
-  api_token = var.cloudnova_token
+provider "tibicloud" {
+  api_token = var.tibicloud_token
 }
 
-resource "cloudnova_droplet" "api_cluster" {
+resource "tibicloud_droplet" "api_cluster" {
   count     = 3
   name      = "api-worker-\${count.index}"
   region    = "nyc1"
   image     = "ubuntu-24-04"
   plan      = "g4.4core-16g"
-  vpc_id    = cloudnova_vpc.main.id
+  vpc_id    = tibicloud_vpc.main.id
   tags      = ["production", "kubernetes"]
 
   monitoring = true
 }`,
 
     curl: `# Instant droplet provisioning via REST API (TLS 1.3)
-curl -X POST https://api.cloudnova.io/v2/droplets \\
-  -H "Authorization: Bearer \${NOVA_API_TOKEN}" \\
+curl -X POST https://api.tibicloud.io/v2/droplets \\
+  -H "Authorization: Bearer \${TIBI_API_TOKEN}" \\
   -H "Content-Type: application/json" \\
   -d '{
     "name": "prod-cache-01",
@@ -88,7 +88,7 @@ curl -X POST https://api.cloudnova.io/v2/droplets \\
             </h2>
 
             <p className="text-sm text-[#8C8B87] dark:text-slate-400 leading-relaxed">
-              Every feature visible in the CloudNova console is 100% exposed via open REST APIs, official Terraform / OpenTofu providers, and a lightning-fast Rust CLI. Automate cluster provisioning, Anycast DNS zone propagation, and volume attachments into your GitHub Actions CI/CD workflows.
+              Every feature visible in the TibiCloud console is 100% exposed via open REST APIs, official Terraform / OpenTofu providers, and a lightning-fast Rust CLI. Automate cluster provisioning, Anycast DNS zone propagation, and volume attachments into your GitHub Actions CI/CD workflows.
             </p>
 
             <div className="grid grid-cols-2 gap-4 pt-2 text-xs">
@@ -112,7 +112,7 @@ curl -X POST https://api.cloudnova.io/v2/droplets \\
                   <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
                   <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
                   <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-                  <span className="text-xs font-mono text-slate-400 ml-2">cloudnova-dx</span>
+                  <span className="text-xs font-mono text-slate-400 ml-2">tibicloud-dx</span>
                 </div>
 
                 {/* Tabs */}

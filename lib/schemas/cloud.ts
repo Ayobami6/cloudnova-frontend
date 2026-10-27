@@ -129,9 +129,9 @@ export const AssignFloatingIPSchema = z.object({
 export type AssignFloatingIPInput = z.infer<typeof AssignFloatingIPSchema>;
 
 export const RegistrantContactSchema = z.object({
-  firstName: z.string().min(1).default("CloudNova"),
+  firstName: z.string().min(1).default("TibiCloud"),
   lastName: z.string().min(1).default("Customer"),
-  email: z.string().email().default("admin@cloudnova.io"),
+  email: z.string().email().default("admin@tibicloud.io"),
   phone: z.string().min(1).default("+1.5555555555"),
   addressLine1: z.string().min(1).default("123 Cloud Way"),
   city: z.string().min(1).default("San Francisco"),

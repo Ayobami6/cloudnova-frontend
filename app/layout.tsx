@@ -3,9 +3,16 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "CloudNova — Developer-First Cloud Infrastructure & Global Compute Platform",
+  title: "TibiCloud — Developer-First Cloud Infrastructure & Global Compute Platform",
   description:
     "Next-generation developer cloud: high-performance KVM droplets, managed databases, zero-egress NVMe & S3 storage, and global Anycast network.",
+  icons: {
+    icon: [
+      { url: "/branding/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/branding/tibicloud-mark.svg",
+  },
 };
 
 export default function RootLayout({

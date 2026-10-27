@@ -63,7 +63,7 @@ export default function LoginPage() {
           Welcome back
         </h1>
         <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
-          Sign in to your CloudNova infrastructure console and telemetry dashboard.
+          Sign in to your TibiCloud infrastructure console and telemetry dashboard.
         </p>
       </div>
 
@@ -178,7 +178,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+          className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
         >
           {isLoading ? (
             <span>Authenticating...</span>

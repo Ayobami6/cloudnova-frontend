@@ -16,7 +16,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>("light");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("cloudnova-theme") as ThemeMode | null;
+    const savedTheme = (localStorage.getItem("tibicloud-theme") || localStorage.getItem("cloudnova-theme")) as ThemeMode | null;
     if (savedTheme === "light" || savedTheme === "dark") {
       setThemeState(savedTheme);
       applyTheme(savedTheme);
@@ -33,7 +33,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = (newTheme: ThemeMode) => {
     setThemeState(newTheme);
-    localStorage.setItem("cloudnova-theme", newTheme);
+    localStorage.setItem("tibicloud-theme", newTheme);
     applyTheme(newTheme);
   };
 

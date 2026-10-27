@@ -1,5 +1,5 @@
 /**
- * Core Domain Types for CloudNova Cloud Platform
+ * Core Domain Types for TibiCloud Cloud Platform
  * Enforces strict typings across Compute, Storage, Databases, Network, Domains, and Billing.
  */
 

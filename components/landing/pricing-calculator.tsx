@@ -14,7 +14,7 @@ export function PricingCalculator() {
   // Fixed transparent exchange rate translation: 1 USD = ₦1,600
   const FX_RATE = 1600;
 
-  // Upstream CloudNova calculation in USD:
+  // Upstream TibiCloud calculation in USD:
   // vCPU: $4/mo, RAM: $2.5/GB/mo, NVMe: $0.08/GB/mo, S3: $0.015/GB/mo
   const novaMonthlyUSD = vcpu * 4 + ramGb * 2.5 + nvmeGb * 0.08 + s3Gb * 0.015;
   const novaMonthlyNGN = Math.round(novaMonthlyUSD * FX_RATE);
@@ -239,7 +239,7 @@ export function PricingCalculator() {
                   <span className="font-mono text-rose-500">+$0.09 / GB (Billed in USD)</span>
                 </div>
                 <div className="flex justify-between items-center text-[#4EA871] dark:text-[#56B87C] font-semibold pt-1 border-t border-[#E7E4DF] dark:border-[#282D3A]">
-                  <span>CloudNova Outbound Egress:</span>
+                  <span>TibiCloud Outbound Egress:</span>
                   <span className="font-mono">₦0.00 (Unlimited Free)</span>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export function PricingCalculator() {
             <div className="pt-6 mt-6 border-t border-[#E7E4DF] dark:border-[#282D3A]">
               <Link
                 href="/register"
-                className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+                className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
               >
                 <span>Deploy with ₦10,000 Free Credit</span>
                 <MaterialIcon name="arrow_forward" size={16} />

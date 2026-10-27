@@ -61,7 +61,7 @@ export default function DomainsPage() {
 
   const [selectedDomainId, setSelectedDomainId] = useState<string>(domains[0]?.id || "");
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [searchDomain, setSearchDomain] = useState("cloudnova");
+  const [searchDomain, setSearchDomain] = useState("tibicloud");
   const [availabilityMap, setAvailabilityMap] = useState<Record<string, DomainVerificationState>>({});
   const [isVerifyingAll, setIsVerifyingAll] = useState(false);
   const [isRegistering, setIsRegistering] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function DomainsPage() {
       addDNSRecord(activeDomain.id, {
         type: "CNAME",
         name: "@",
-        value: `${b.name}.s3.${b.region}.cloudnova.io`,
+        value: `${b.name}.s3.${b.region}.tibicloud.io`,
         ttl: 300,
       });
       linkDomainToResource(activeDomain.id, b.id);
@@ -279,14 +279,14 @@ export default function DomainsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
-            Domains & Anycast DNS
+            Domains
             <span className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-[#EFECE8] dark:bg-[#161920] px-2 py-0.5 rounded border border-[#E7E4DF] dark:border-[#282D3A]">
               {domains.length} zones
             </span>
           </h1>
-          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
+          {/* <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
             Global Anycast DNS routing, automated DNSSEC, free Let&apos;s Encrypt SSL, and 1-click cloud resource binding.
-          </p>
+          </p> */}
         </div>
 
         <button
@@ -294,7 +294,7 @@ export default function DomainsPage() {
             setIsRegisterOpen(true);
             setRegisterError(null);
           }}
-          className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+          className="h-9 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Register Domain</span>
@@ -310,7 +310,7 @@ export default function DomainsPage() {
               <th className="py-2.5 px-4">Security & SSL</th>
               <th className="py-2.5 px-4">Auto-Renew & Expiry</th>
               <th className="py-2.5 px-4">Linked Cloud Resource</th>
-              <th className="py-2.5 px-4">Annual Retail (Profit)</th>
+              <th className="py-2.5 px-4">Annual Price</th>
               <th className="py-2.5 px-4 text-right">Action</th>
             </tr>
           </thead>
@@ -351,18 +351,14 @@ export default function DomainsPage() {
                 </td>
                 <td className="py-3 px-4 font-mono">
                   <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(dom.retailAnnual)}/yr</span>
-                  <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] font-medium">
-                    +{formatMoney(dom.retailAnnual - dom.wholesaleAnnual)} margin
-                  </span>
                 </td>
                 <td className="py-3 px-4 text-right">
                   <button
                     onClick={() => setSelectedDomainId(dom.id)}
-                    className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                      activeDomain?.id === dom.id
+                    className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${activeDomain?.id === dom.id
                         ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
                         : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
-                    }`}
+                      }`}
                   >
                     Manage DNS
                   </button>
@@ -382,7 +378,7 @@ export default function DomainsPage() {
                 DNS Zone Editor: <span className="text-blue-600 dark:text-blue-400 font-mono">{activeDomain.name}</span>
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Anycast Nameservers: ns1.cloudnova-dns.net, ns2.cloudnova-dns.net
+                Anycast Nameservers: ns1.tibicloud-dns.net, ns2.tibicloud-dns.net
               </p>
             </div>
 
@@ -455,7 +451,7 @@ export default function DomainsPage() {
             <div>
               <button
                 type="submit"
-                className="w-full h-8 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
+                className="w-full h-8 rounded bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-colors cursor-pointer"
               >
                 Add Record
               </button>
@@ -539,7 +535,7 @@ export default function DomainsPage() {
               <label className="text-xs text-slate-700 dark:text-slate-300 font-medium flex items-center justify-between">
                 <span>Domain Name Search</span>
                 <span className="text-[11px] text-slate-400 font-normal">
-                  Type base name or specific FQDN (e.g. cloudnova or startup.io)
+                  Type base name or specific FQDN (e.g. tibicloud or startup.io)
                 </span>
               </label>
               <div className="relative flex items-center gap-2">
@@ -615,15 +611,14 @@ export default function DomainsPage() {
                     return (
                       <div
                         key={domainKey}
-                        className={`p-3.5 rounded-lg border transition-all flex items-center justify-between gap-4 ${
-                          isAvailable
+                        className={`p-3.5 rounded-lg border transition-all flex items-center justify-between gap-4 ${isAvailable
                             ? "bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-300 dark:border-emerald-500/30"
                             : isUnavailable
-                            ? "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] opacity-75"
-                            : isChecking
-                            ? "bg-blue-50/30 dark:bg-blue-950/10 border-blue-200 dark:border-blue-500/20"
-                            : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A]"
-                        }`}
+                              ? "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] opacity-75"
+                              : isChecking
+                                ? "bg-blue-50/30 dark:bg-blue-950/10 border-blue-200 dark:border-blue-500/20"
+                                : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A]"
+                          }`}
                       >
                         <div className="space-y-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
@@ -659,19 +654,9 @@ export default function DomainsPage() {
                           </div>
 
                           <div className="text-[11px] text-[#8C8B87] dark:text-slate-400 flex items-center gap-2">
-                            <span>Wholesale: {formatMoney(currentWholesale)}/yr</span>
-                            <span>•</span>
-                            <span className="text-slate-700 dark:text-slate-300 font-medium">
-                              Retail: {formatMoney(currentRetail)}/yr
+                            <span className="text-slate-700 dark:text-slate-300 font-medium font-mono">
+                              {formatMoney(currentRetail)}/yr
                             </span>
-                            {isAvailable && (
-                              <>
-                                <span>•</span>
-                                <span className="text-[#4EA871] dark:text-[#56B87C]">
-                                  +{formatMoney(currentRetail - currentWholesale)} margin
-                                </span>
-                              </>
-                            )}
                           </div>
                         </div>
 
@@ -682,7 +667,7 @@ export default function DomainsPage() {
                               type="button"
                               onClick={() => handleRegister(domainKey, item.tld, currentWholesale, currentRetail)}
                               disabled={isCurrentlyRegistering || isRegistering !== null}
-                              className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {isCurrentlyRegistering ? (
                                 <>

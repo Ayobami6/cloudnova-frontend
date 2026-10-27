@@ -13,18 +13,18 @@ export default function LandingPage() {
   const faqs = [
     {
       q: "Can I pay using my regular Nigerian debit card or bank mobile app?",
-      a: "Yes! Every CloudNova account is instantly provisioned with a dedicated NUBAN virtual bank account (via Monnify & Paystack, powered by Wema, Providus, and Sterling Bank). You can transfer Naira directly from GTBank, Zenith, Kuda, Moniepoint, OPay, or pay with your standard Verve, Mastercard, or Visa naira card.",
+      a: "Yes! Every TibiCloud account is instantly provisioned with a dedicated NUBAN virtual bank account (via Monnify & Paystack, powered by Wema, Providus, and Sterling Bank). You can transfer Naira directly from GTBank, Zenith, Kuda, Moniepoint, OPay, or pay with your standard Verve, Mastercard, or Visa naira card.",
     },
     {
       q: "Do I ever need a domiciliary account or a virtual dollar card?",
-      a: "Never. CloudNova was engineered specifically to solve the frustration of dollar card spending limits, black market FX spreads, and bank card declines. You deposit and maintain your wallet in Naira (NGN), and we handle all backend infrastructure settlements.",
+      a: "Never. TibiCloud was engineered specifically to solve the frustration of dollar card spending limits, black market FX spreads, and bank card declines. You deposit and maintain your wallet in Naira (NGN), and we handle all backend infrastructure settlements.",
     },
     {
-      q: "How does CloudNova handle the USD to Naira exchange rate?",
+      q: "How does TibiCloud handle the USD to Naira exchange rate?",
       a: "Our upstream cloud compute and bare-metal server infrastructure is anchored in USD. We translate this automatically into transparent, predictable Naira rates with zero hidden markups. You always see the exact Naira hourly burn rate and monthly cap before provisioning any server.",
     },
     {
-      q: "Where are CloudNova servers and datacenter regions located?",
+      q: "Where are TibiCloud servers and datacenter regions located?",
       a: "We operate high-performance KVM microVMs with AMD EPYC processors and NVMe storage across 8 Tier-3/Tier-4 datacenter regions worldwide (including London, Frankfurt, New York, Singapore, and low-latency Anycast routing to West Africa). Your instances enjoy sub-20s boot times and 10Gbps interconnects.",
     },
     {
@@ -67,36 +67,11 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
                 href="/register"
-                className="w-full sm:w-auto h-11 px-7 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+                className="w-full sm:w-auto h-11 px-7 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
               >
                 <span>Deploy with ₦10,000 Free Credit</span>
                 <MaterialIcon name="arrow_forward" size={16} />
               </Link>
-              <Link
-                href="/overview"
-                className="w-full sm:w-auto h-11 px-5 rounded-full bg-white dark:bg-[#1C2029] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-              >
-                <MaterialIcon name="terminal" size={16} className="text-slate-400" />
-                <span>Explore Live Console Demo</span>
-              </Link>
-            </div>
-
-            {/* Trust Signals */}
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-3 text-xs text-slate-500">
-              <span className="flex items-center gap-1.5">
-                <MaterialIcon name="check_circle" size={15} className="text-emerald-500" />
-                Dedicated NUBAN bank transfer
-              </span>
-              <span className="hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5">
-                <MaterialIcon name="check_circle" size={15} className="text-emerald-500" />
-                Sub-20s KVM boot times
-              </span>
-              <span className="hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5">
-                <MaterialIcon name="check_circle" size={15} className="text-emerald-500" />
-                Zero egress bandwidth tax
-              </span>
             </div>
           </div>
 
@@ -109,7 +84,7 @@ export default function LandingPage() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
                 <span className="text-xs font-mono text-[#8C8B87] dark:text-slate-400 ml-2">
-                  console.cloudnova.io — Prepaid Naira Cloud Wallet
+                  console.tibicloud.io — Prepaid Naira Cloud Wallet
                 </span>
               </div>
               <div className="flex items-center gap-2 text-[11px] font-mono text-[#4EA871] dark:text-[#56B87C]">
@@ -226,148 +201,206 @@ export default function LandingPage() {
       </section>
 
       {/* 3. Core Offerings & Naira Pricing Cards */}
-      <section id="compute" className="py-24 max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto space-y-3 mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E5B899]/30 text-[#1E1E1E] dark:text-[#E5B899] text-xs font-mono border border-[#E5B899]/50">
-            <MaterialIcon name="dns" size={16} />
-            <span>High-Velocity Infrastructure</span>
-          </div>
-          <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white sm:text-4xl">
-            Clean Infrastructure, Transparent Naira Rates
-          </h2>
-          <p className="text-sm text-[#8C8B87] dark:text-slate-400">
-            Every plan includes dedicated CPU, NVMe SSD, private VPC, and unmetered internal traffic.
-          </p>
-        </div>
+      <section id="compute" className="py-24 border-b border-[#E7E4DF] dark:border-[#282D3A] bg-[#F6F6F4] dark:bg-[#0F1115] relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.03] dark:opacity-[0.06] pointer-events-none" />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-          {/* Card 1: Starter */}
-          <div className="p-6 rounded-[26px] bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] shadow-xs flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-mono uppercase font-semibold text-slate-500">Developer Starter</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  Ubuntu • Debian
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold font-mono text-[#1E1E1E] dark:text-white">₦8,000</span>
-                <span className="text-xs text-slate-500">/ month</span>
-              </div>
-              <p className="text-xs text-slate-500 font-mono">~₦11.11 / hr ($5.00 USD base)</p>
-              <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A] space-y-2 text-xs text-slate-600 dark:text-slate-300">
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>1 Dedicated AMD vCPU</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>1 GB High-Speed DDR5 RAM</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>25 GB Gen4 NVMe Storage</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>1 TB Free Outbound Bandwidth</span>
-                </div>
-              </div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-16">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#CFE0EC] dark:bg-[#CFE0EC]/20 text-[#1E1E1E] dark:text-[#CFE0EC] text-xs font-mono border border-[#CFE0EC]/80 dark:border-[#CFE0EC]/30 shadow-2xs">
+              <MaterialIcon name="dns" size={16} className="text-[#2563eb] dark:text-[#38BDF8]" />
+              <span>High-Velocity Infrastructure</span>
             </div>
-            <Link
-              href="/register"
-              className="w-full h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#232834] dark:hover:bg-[#2a3040] text-xs font-semibold text-[#1E1E1E] dark:text-white flex items-center justify-center transition-colors cursor-pointer"
-            >
-              Deploy Starter
-            </Link>
+            <h2 className="text-3xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white sm:text-4xl">
+              Clean Infrastructure, Transparent Naira Rates
+            </h2>
+            <p className="text-sm text-[#8C8B87] dark:text-slate-400">
+              Every plan includes dedicated CPU, NVMe SSD, private VPC, and unmetered internal traffic.
+            </p>
           </div>
 
-          {/* Card 2: General Purpose (Featured) */}
-          <div className="p-6 rounded-[26px] bg-white dark:bg-[#1C2029] border-2 border-blue-600/80 dark:border-blue-500 shadow-md flex flex-col justify-between space-y-6 relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl font-mono uppercase">
-              Most Popular
-            </div>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-mono uppercase font-semibold text-blue-600 dark:text-blue-400">
-                  General Production
-                </span>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold font-mono text-[#1E1E1E] dark:text-white">₦32,000</span>
-                <span className="text-xs text-slate-500">/ month</span>
-              </div>
-              <p className="text-xs text-slate-500 font-mono">~₦44.44 / hr ($20.00 USD base)</p>
-              <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A] space-y-2 text-xs text-slate-600 dark:text-slate-300">
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>2 Dedicated AMD Genoa vCPUs</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+            {/* Card 1: Developer Starter */}
+            <div className="nixtio-card p-7 sm:p-8 border border-[#E7E4DF]/70 dark:border-[#282D3A] flex flex-col justify-between transition-all duration-200 hover:border-[#D5D0C8] dark:hover:border-[#383F52] hover:shadow-md">
+              <div>
+                {/* Header row */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#8C8B87] dark:text-slate-400 uppercase">
+                    DEVELOPER STARTER
+                  </span>
+                  <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-[#1E1E1E] dark:text-slate-300">
+                    Ubuntu • Debian
+                  </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>4 GB High-Speed DDR5 RAM</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>50 GB Gen4 NVMe Storage</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>3 TB Free Outbound Bandwidth</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>10Gbps Private VPC Interconnect</span>
-                </div>
-              </div>
-            </div>
-            <Link
-              href="/register"
-              className="w-full h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs"
-            >
-              Deploy Production
-            </Link>
-          </div>
 
-          {/* Card 3: Pro Scaler */}
-          <div className="p-6 rounded-[26px] bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] shadow-xs flex flex-col justify-between space-y-6">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-mono uppercase font-semibold text-slate-500">High-Performance Pro</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  APIs • Databases
-                </span>
+                {/* Price */}
+                <div className="mt-6">
+                  <div className="flex items-baseline">
+                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-[#1E1E1E] dark:text-white tracking-tight">₦8,000</span>
+                    <span className="text-xs sm:text-sm font-mono text-[#8C8B87] dark:text-slate-400 font-normal ml-1.5">/month</span>
+                  </div>
+                  <p className="text-xs font-mono text-[#8C8B87] dark:text-slate-500 mt-2 tracking-tight">
+                    ~₦11.11 / hr ($5.00 USD base)
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-[#E7E4DF]/70 dark:bg-[#282D3A] my-6" />
+
+                {/* Features */}
+                <div className="space-y-3.5 text-[13px] text-[#5A5A58] dark:text-slate-300 font-normal">
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>1 Dedicated AMD vCPU</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>1 GB High-Speed DDR5 RAM</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>25 GB Gen4 NVMe Storage</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>1 TB Free Outbound Bandwidth</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold font-mono text-[#1E1E1E] dark:text-white">₦64,000</span>
-                <span className="text-xs text-slate-500">/ month</span>
-              </div>
-              <p className="text-xs text-slate-500 font-mono">~₦88.88 / hr ($40.00 USD base)</p>
-              <div className="pt-2 border-t border-[#E7E4DF] dark:border-[#282D3A] space-y-2 text-xs text-slate-600 dark:text-slate-300">
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>4 Dedicated AMD Genoa vCPUs</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>8 GB High-Speed DDR5 RAM</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>100 GB Gen4 NVMe Storage</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MaterialIcon name="check" size={16} className="text-emerald-500" />
-                  <span>5 TB Free Outbound Bandwidth</span>
-                </div>
+
+              {/* Button */}
+              <div className="mt-8 pt-2">
+                <Link
+                  href="/register"
+                  className="w-full h-11 rounded-full bg-[#EFECE8] hover:bg-[#E5E0D8] dark:bg-[#232834] dark:hover:bg-[#2C3342] text-[#1E1E1E] dark:text-white border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-semibold flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  Deploy Starter
+                </Link>
               </div>
             </div>
-            <Link
-              href="/register"
-              className="w-full h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-[#232834] dark:hover:bg-[#2a3040] text-xs font-semibold text-[#1E1E1E] dark:text-white flex items-center justify-center transition-colors cursor-pointer"
-            >
-              Deploy Pro
-            </Link>
+
+            {/* Card 2: General Production (Featured) */}
+            <div className="nixtio-card p-7 sm:p-8 border-2 border-[#222222] dark:border-blue-500 relative flex flex-col justify-between shadow-lg shadow-black/5 dark:shadow-blue-500/10 transition-all duration-200">
+              <div>
+                {/* Header row */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#2563eb] dark:text-[#38BDF8] uppercase">
+                    GENERAL PRODUCTION
+                  </span>
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-[#222222] text-white dark:bg-blue-500 dark:text-white shadow-2xs">
+                    MOST POPULAR
+                  </span>
+                </div>
+
+                {/* Price */}
+                <div className="mt-6">
+                  <div className="flex items-baseline">
+                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-[#1E1E1E] dark:text-white tracking-tight">₦32,000</span>
+                    <span className="text-xs sm:text-sm font-mono text-[#8C8B87] dark:text-slate-400 font-normal ml-1.5">/month</span>
+                  </div>
+                  <p className="text-xs font-mono text-[#8C8B87] dark:text-slate-500 mt-2 tracking-tight">
+                    ~₦44.44 / hr ($20.00 USD base)
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-[#E7E4DF]/70 dark:bg-[#282D3A] my-6" />
+
+                {/* Features */}
+                <div className="space-y-3.5 text-[13px] text-[#5A5A58] dark:text-slate-300 font-normal">
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>2 Dedicated AMD Genoa vCPUs</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>4 GB High-Speed DDR5 RAM</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>50 GB Gen4 NVMe Storage</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>3 TB Free Outbound Bandwidth</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>10Gbps Private VPC Interconnect</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Button */}
+              <div className="mt-8 pt-2">
+                <Link
+                  href="/register"
+                  className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 text-white dark:text-[#1E1E1E] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                >
+                  <span>Deploy Production</span>
+                  <MaterialIcon name="arrow_forward" size={15} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Card 3: High-Performance Pro */}
+            <div className="nixtio-card p-7 sm:p-8 border border-[#E7E4DF]/70 dark:border-[#282D3A] flex flex-col justify-between transition-all duration-200 hover:border-[#D5D0C8] dark:hover:border-[#383F52] hover:shadow-md">
+              <div>
+                {/* Header row */}
+                <div className="flex justify-between items-center">
+                  <span className="text-[11px] font-mono font-semibold tracking-wider text-[#8C8B87] dark:text-slate-400 uppercase">
+                    HIGH-PERFORMANCE PRO
+                  </span>
+                  <span className="text-[11px] font-mono px-3 py-1 rounded-full bg-[#EFECE8] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] text-[#1E1E1E] dark:text-slate-300">
+                    APIs • Databases
+                  </span>
+                </div>
+
+                {/* Price */}
+                <div className="mt-6">
+                  <div className="flex items-baseline">
+                    <span className="text-4xl sm:text-[42px] font-bold font-mono text-[#1E1E1E] dark:text-white tracking-tight">₦64,000</span>
+                    <span className="text-xs sm:text-sm font-mono text-[#8C8B87] dark:text-slate-400 font-normal ml-1.5">/month</span>
+                  </div>
+                  <p className="text-xs font-mono text-[#8C8B87] dark:text-slate-500 mt-2 tracking-tight">
+                    ~₦88.88 / hr ($40.00 USD base)
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-[#E7E4DF]/70 dark:bg-[#282D3A] my-6" />
+
+                {/* Features */}
+                <div className="space-y-3.5 text-[13px] text-[#5A5A58] dark:text-slate-300 font-normal">
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>4 Dedicated AMD Genoa vCPUs</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>8 GB High-Speed DDR5 RAM</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>100 GB Gen4 NVMe Storage</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon name="check" size={16} className="text-[#4EA871] dark:text-[#56B87C] shrink-0 font-bold" />
+                    <span>5 TB Free Outbound Bandwidth</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Button */}
+              <div className="mt-8 pt-2">
+                <Link
+                  href="/register"
+                  className="w-full h-11 rounded-full bg-[#EFECE8] hover:bg-[#E5E0D8] dark:bg-[#232834] dark:hover:bg-[#2C3342] text-[#1E1E1E] dark:text-white border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-semibold flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  Deploy Pro
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -468,16 +501,10 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
             <Link
               href="/register"
-              className="w-full sm:w-auto h-11 px-8 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
+              className="w-full sm:w-auto h-11 px-8 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transition-all cursor-pointer"
             >
               <span>Create Account (₦10,000 Credit)</span>
               <MaterialIcon name="arrow_forward" size={16} />
-            </Link>
-            <Link
-              href="/overview"
-              className="w-full sm:w-auto h-11 px-6 rounded-full bg-white dark:bg-[#1C2029] hover:bg-slate-100 dark:hover:bg-[#1E2230] border border-[#E7E4DF] dark:border-[#282D3A] text-xs font-medium text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <span>Explore Live Console Demo</span>
             </Link>
           </div>
         </div>

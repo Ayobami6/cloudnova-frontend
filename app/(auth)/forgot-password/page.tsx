@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex.chen@cloudnova.io"
+                  placeholder="alex.chen@tibicloud.io"
                   required
                   className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
                 />
@@ -155,7 +155,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span>Sending Code...</span>
@@ -266,7 +266,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isLoading || isSuccess}
-              className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+              className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span>Updating Password...</span>

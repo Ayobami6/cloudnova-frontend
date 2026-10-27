@@ -95,15 +95,12 @@ export default function NetworkPage() {
       : [];
   }, [activeFirewall, instances]);
 
-  // Total protected nodes count (either in a security group or inside a VPC)
-  const totalProtectedCount = useMemo(() => {
-    const protectedIds = new Set<string>();
-    firewalls.forEach((fw) => fw.attachedInstanceIds.forEach((id) => protectedIds.add(id)));
-    instances.forEach((inst) => {
-      if (inst.vpcId) protectedIds.add(inst.id);
-    });
-    return protectedIds.size;
-  }, [firewalls, instances]);
+  // Droplets connected to a VPC Network
+  const dropletsWithVpcCount = useMemo(() => {
+    const directCount = instances.filter((inst) => Boolean(inst.vpcId)).length;
+    if (directCount > 0) return directCount;
+    return vpcs.reduce((sum, vpc) => sum + (vpc.connectedInstancesCount || 0), 0);
+  }, [instances, vpcs]);
 
   // Filtered VPCs based on global search or region
   const filteredVpcs = useMemo(() => {
@@ -248,27 +245,24 @@ export default function NetworkPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <PastelKpiCard
           label="Active VPC Networks"
-          value={`${vpcs.length} Subnets`}
-          subtitle="Software-Defined Private Networks"
+          value={vpcs.length}
           variant="lavender"
           actionLabel="Create VPC"
           onAction={() => setIsCreateVpcOpen(true)}
         />
         <PastelKpiCard
-          label="Perimeter Security Groups"
-          value={`${firewalls.length} Groups`}
-          subtitle="Stateful L4 Packet Inspection"
+          label="Security Groups"
+          value={firewalls.length}
           variant="blue"
           actionLabel="New Group"
           onAction={() => setIsCreateFirewallOpen(true)}
         />
         <PastelKpiCard
-          label="Protected Droplet Nodes"
-          value={`${totalProtectedCount} Nodes`}
-          subtitle="Zero-Trust Encrypted Fabric"
+          label="Droplets with VPC Network"
+          value={dropletsWithVpcCount}
           variant="yellow"
           actionLabel="Inspect"
-          onAction={() => setActiveTab("securitygroups")}
+          onAction={() => setActiveTab("vpcs")}
         />
       </div>
 
@@ -300,7 +294,7 @@ export default function NetworkPage() {
             <button
               type="button"
               onClick={() => setIsCreateVpcOpen(true)}
-              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <MaterialIcon name="add" size={16} />
               <span>Create VPC Network</span>
@@ -309,7 +303,7 @@ export default function NetworkPage() {
             <button
               type="button"
               onClick={() => setIsCreateFirewallOpen(true)}
-              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
             >
               <MaterialIcon name="add" size={16} />
               <span>New Security Group</span>
@@ -371,7 +365,7 @@ export default function NetworkPage() {
               <button
                 type="button"
                 onClick={() => setIsCreateVpcOpen(true)}
-                className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
+                className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
               >
                 <MaterialIcon name="add" size={16} />
                 <span>Create VPC Network</span>
@@ -526,7 +520,7 @@ export default function NetworkPage() {
             <button
               type="button"
               onClick={() => setIsCreateFirewallOpen(true)}
-              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
+              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm transition-colors"
             >
               <MaterialIcon name="add" size={16} />
               <span>Create Security Group</span>
@@ -542,7 +536,7 @@ export default function NetworkPage() {
               <button
                 type="button"
                 onClick={() => setIsCreateFirewallOpen(true)}
-                className="h-7 px-3 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-[11px] font-medium flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
+                className="h-7 px-3 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-[11px] font-medium flex items-center gap-1 cursor-pointer shadow-xs transition-colors"
               >
                 <MaterialIcon name="add" size={14} />
                 <span>New Security Group</span>
@@ -604,7 +598,7 @@ export default function NetworkPage() {
                   <button
                     type="button"
                     onClick={() => setIsAddRuleOpen(true)}
-                    className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+                    className="h-8 px-3.5 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                   >
                     <MaterialIcon name="add" size={15} />
                     <span>Add Rule</span>
@@ -884,7 +878,7 @@ export default function NetworkPage() {
                 <button
                   type="submit"
                   disabled={isSubmittingVpc}
-                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
+                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors disabled:opacity-50 inline-flex items-center gap-1.5"
                 >
                   <MaterialIcon name="lan" size={14} />
                   <span>{isSubmittingVpc ? "Provisioning..." : "Create VPC Network"}</span>
@@ -1005,7 +999,7 @@ export default function NetworkPage() {
                 <button
                   type="submit"
                   disabled={isSubmittingFirewall}
-                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors disabled:opacity-50"
+                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors disabled:opacity-50"
                 >
                   {isSubmittingFirewall ? "Creating..." : "Create Security Group"}
                 </button>
@@ -1120,7 +1114,7 @@ export default function NetworkPage() {
                 </button>
                 <button
                   type="submit"
-                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors"
+                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors"
                 >
                   Add Rule
                 </button>
@@ -1188,7 +1182,7 @@ export default function NetworkPage() {
                 <button
                   type="submit"
                   disabled={unattachedInstances.length === 0}
-                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors disabled:opacity-50"
+                  className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold cursor-pointer shadow-sm transition-colors disabled:opacity-50"
                 >
                   Attach Droplet
                 </button>

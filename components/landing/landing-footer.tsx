@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { MaterialIcon } from "@/components/ui/material-icon";
+import { TibiCloudMark } from "@/components/ui/brand-logo";
 
 export function LandingFooter() {
   return (
@@ -12,20 +12,14 @@ export function LandingFooter() {
           {/* Col 1: Brand */}
           <div className="col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#CFE0EC] flex items-center justify-center text-[#222222] shadow-2xs">
-                <MaterialIcon name="cloud_done" size={18} />
-              </div>
+              <TibiCloudMark size={32} withBackground={true} className="shadow-2xs" />
               <span className="font-semibold text-base tracking-tight text-[#1E1E1E] dark:text-white">
-                CloudNova
+                TibiCloud
               </span>
             </Link>
             <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
               Developer-first cloud infrastructure for African tech teams. Spin up high-performance KVM compute, managed databases, and NVMe block storage with seamless Naira bank transfers and 0% foreign card fees.
             </p>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-[#4EA871] dark:text-[#56B87C] text-xs font-mono border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>All Systems Operational (99.99% SLA)</span>
-            </div>
           </div>
 
           {/* Col 2: Products */}
@@ -104,7 +98,7 @@ export function LandingFooter() {
             <ul className="space-y-2 text-[#8C8B87] dark:text-slate-400">
               <li>
                 <span className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                  About CloudNova
+                  About TibiCloud
                 </span>
               </li>
               <li>
@@ -128,7 +122,7 @@ export function LandingFooter() {
 
         {/* Bottom copyright */}
         <div className="pt-8 border-t border-[#E7E4DF] dark:border-[#282D3A] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} CloudNova Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} TibiCloud Inc. All rights reserved.</p>
           <div className="flex items-center gap-4 font-mono text-[11px]">
             <span>Lagos & Global</span>
             <span>•</span>

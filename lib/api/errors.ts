@@ -1,5 +1,5 @@
 /**
- * RFC 7807 Problem Details envelope, as returned by cloudnova-api's
+ * RFC 7807 Problem Details envelope, as returned by tibicloud-api's
  * config/api.py exception handlers.
  */
 export interface ProblemDetails {
@@ -15,7 +15,7 @@ export interface ProblemDetails {
 /**
  * Thrown by the API client for any non-2xx response. Carries the parsed
  * RFC 7807 body when the server returned one (every error response from
- * cloudnova-api does), falling back to a generic envelope for network
+ * tibicloud-api does), falling back to a generic envelope for network
  * failures or non-JSON responses (e.g. a proxy timeout page).
  */
 export class ApiError extends Error {
@@ -51,8 +51,8 @@ export function networkError(cause: unknown): ApiError {
     status: 0,
     detail:
       cause instanceof Error
-        ? `Could not reach the CloudNova API: ${cause.message}`
-        : "Could not reach the CloudNova API.",
+        ? `Could not reach the TibiCloud API: ${cause.message}`
+        : "Could not reach the TibiCloud API.",
     code: "NETWORK_ERROR",
   });
 }

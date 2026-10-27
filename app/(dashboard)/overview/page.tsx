@@ -93,7 +93,7 @@ export default function OverviewPage() {
       pillLabel: db.engine.toUpperCase(),
       pillVariant: "yellow" as PastelVariant,
       callerId: db.name,
-      destination: `${db.host || "db.internal.cloudnova.net"}:${db.port}`,
+      destination: `${db.host || "db.internal.tibicloud.net"}:${db.port}`,
       statusTone: (
         db.status === "online" ? "completed" : "pending"
       ) as NixtioStatusTone,

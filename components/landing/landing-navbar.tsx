@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTheme } from "@/lib/store/theme-context";
 import { useAuth } from "@/lib/store/auth-context";
 import { MaterialIcon } from "@/components/ui/material-icon";
+import { TibiCloudMark } from "@/components/ui/brand-logo";
 
 export function LandingNavbar() {
   const { theme, toggleTheme } = useTheme();
@@ -16,12 +17,10 @@ export function LandingNavbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-[#CFE0EC] text-[#222222] flex items-center justify-center shadow-2xs">
-            <MaterialIcon name="cloud_done" size={18} />
-          </div>
+          <TibiCloudMark size={36} withBackground={true} className="shadow-2xs hover:scale-105 transition-transform" />
           <span className="font-semibold text-base tracking-tight text-[#1E1E1E] dark:text-white flex items-center gap-2">
-            CloudNova
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#E6D8EA] text-[#1E1E1E] font-medium">
+            TibiCloud
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#E6D8EA] dark:bg-[#2A2E3D] text-[#1E1E1E] dark:text-[#E2E8F0] font-medium">
               CLOUD
             </span>
           </span>
@@ -61,7 +60,7 @@ export function LandingNavbar() {
           {isAuthenticated ? (
             <Link
               href="/overview"
-              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
+              className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
             >
               <span>Go to Console</span>
               <MaterialIcon name="arrow_forward" size={15} />
@@ -70,13 +69,13 @@ export function LandingNavbar() {
             <div className="hidden sm:flex items-center gap-2">
               <Link
                 href="/login"
-                className="h-9 px-4 rounded-full bg-white dark:bg-[#1C2029] text-xs font-medium text-[#1E1E1E] dark:text-slate-200 inline-flex items-center justify-center shadow-2xs hover:bg-[#EFECE8] transition-colors"
+                className="h-9 px-4 rounded-full bg-white dark:bg-[#1C2029] text-xs font-medium text-[#1E1E1E] dark:text-slate-200 inline-flex items-center justify-center shadow-2xs hover:bg-[#EFECE8] dark:hover:bg-[#232834] transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
-                className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
+                className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
               >
                 <span>Deploy with ₦10,000 Free</span>
                 <MaterialIcon name="arrow_forward" size={15} />

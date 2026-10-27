@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Official TibiCloud Vector Brand Mark Integration (`components/ui/brand-logo.tsx`, `public/branding/`)**:
+  - Implemented reusable `TibiCloudMark` and `BrandLogo` components based on the selected Concept 2 ("Pulse T / Aerodynamic Speed Cloud") brand mark featuring dual cyan/azure/indigo aerodynamic wings, luminous crown bridge, data heartbeat core, and outer speed canopy trace.
+  - Exported production vector assets to `public/branding/` (`tibicloud-mark.svg`, `tibicloud-logo-dark.svg`, `tibicloud-logo-light.svg`, `favicon.svg`, `concept-2-pulse-t.svg`).
+  - Updated Next.js application icon `app/icon.svg` with the optimized Concept 2 Pulse T vector glyph and registered responsive SVG favicons and Apple touch icons in `app/layout.tsx` metadata.
+  - Replaced generic placeholder icons (`cloud_done`, wave path SVG) across the entire application:
+    - Left navigation rail brand button (`components/layout/sidebar.tsx`).
+    - Landing page navigation header (`components/landing/landing-navbar.tsx`).
+    - Landing page footer brand lockup (`components/landing/landing-footer.tsx`).
+    - Authentication layout showcase header & mobile top bar (`app/(auth)/layout.tsx`).
+    - Updated fallback operator initials from `CN` to `TC` (`components/layout/right-inspector-panel.tsx`).
 - **VPC Network Creation & Management (`app/(dashboard)/network/page.tsx`, `lib/store/cloud-context.tsx`)**:
   - Added full **Create VPC Network** dialog with region selection (`REGIONS`), subnet CIDR range specification with quick presets (`10.0.0.0/16`, `10.10.0.0/16`, `172.16.0.0/16`, `192.168.1.0/24`), and default VPC configuration.
   - Added `deleteVPC` action with confirmation modal and guardrails preventing accidental deletion of active default VPCs.
@@ -27,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### Changed
+- **Rebranded Product to TibiCloud**:
+  - Rebranded all user-facing product name occurrences across the frontend UI (Landing page, Navigation, Auth flows, Layout, Terminal modal, CLI preview, Dashboard pages, and inspector).
+  - Updated metadata, titles, storage keys (with backwards-compatible fallbacks), and API error references from CloudNova to TibiCloud.
 - Redesigned the entire `cloudnova-frontend` UI based on the Nixtio IVR & Communication Dashboard aesthetic (Dribbble #27709197): Plus Jakarta Sans + Inter + JetBrains Mono typography, Google Material Symbols Rounded icons, Light-First warm alabaster (`#F6F6F4`) & warm stone (`#EFECE8`) surfaces, slim matte-charcoal (`#222222`) navigation rail with circular white active indicator, pastel Lavender/Powder-Blue/Marigold KPI cards, Sankey ribbon + bubble matrix telemetry chart, floating white pill-row tables, and right-hand contextual inspector with live waveform telemetry.
 
 

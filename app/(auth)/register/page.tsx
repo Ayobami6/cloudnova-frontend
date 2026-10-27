@@ -87,7 +87,7 @@ export default function RegisterPage() {
           <span>$200 Free Cloud Credit Included</span>
         </div>
         <h1 className="text-2xl font-semibold tracking-tight text-[#1E1E1E] dark:text-white">
-          Create CloudNova Account
+          Create TibiCloud Account
         </h1>
         <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
           Deploy high-performance KVM droplets and managed databases in seconds.
@@ -260,7 +260,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+          className="w-full h-9 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer disabled:opacity-50"
         >
           {isLoading ? (
             <span>Creating account & sending OTP...</span>
@@ -275,7 +275,7 @@ export default function RegisterPage() {
 
       {/* Switch to Login */}
       <p className="text-center text-xs text-[#8C8B87] dark:text-slate-400">
-        Already have a CloudNova account?{" "}
+        Already have a TibiCloud account?{" "}
         <Link href="/login" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
           Sign In
         </Link>

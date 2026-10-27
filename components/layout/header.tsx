@@ -104,7 +104,7 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
             type="button"
             onClick={() => switchCurrency(currency === "USD" ? "NGN" : "USD")}
             disabled={isSwitchingCurrency}
-            className="hidden md:inline-flex items-center gap-1.5 h-10 px-3.5 rounded-full bg-white dark:bg-[#1C2029] text-xs font-medium text-[#5A5A58] dark:text-slate-200 hover:text-[#1E1E1E] shadow-[0_1px_4px_rgba(0,0,0,0.03)] transition-colors cursor-pointer disabled:opacity-50"
+            className="hidden md:inline-flex items-center gap-1.5 h-10 px-3.5 rounded-full bg-white dark:bg-[#1C2029] hover:bg-slate-50 dark:hover:bg-[#232834] text-xs font-medium text-[#5A5A58] dark:text-slate-200 hover:text-[#1E1E1E] dark:hover:text-white shadow-[0_1px_4px_rgba(0,0,0,0.03)] transition-colors cursor-pointer disabled:opacity-50"
             title={`Active currency: ${currency}. Click to switch.`}
           >
             <span>{currency === "NGN" ? "🇳🇬 NGN" : "🇺🇸 USD"}</span>
@@ -224,7 +224,7 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
                   {user?.name || "Alexandra Rose"}
                 </span>
                 <span className="text-[11px] text-[#8C8B87] block truncate">
-                  {user?.email || "alex.chen@cloudnova.io"}
+                  {user?.email || "alex.chen@tibicloud.io"}
                 </span>
               </div>
               <Link

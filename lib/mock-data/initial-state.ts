@@ -84,6 +84,7 @@ export const INITIAL_INSTANCES: Instance[] = [
     uptimeSeconds: 1428500,
     tags: ["production", "api", "k8s-worker"],
     clientId: "client-1",
+    vpcId: "vpc-us-east",
     createdAt: "2026-06-12",
   },
   {
@@ -101,6 +102,7 @@ export const INITIAL_INSTANCES: Instance[] = [
     uptimeSeconds: 2894100,
     tags: ["database", "primary", "nvme"],
     clientId: "client-2",
+    vpcId: "vpc-us-west",
     createdAt: "2026-05-18",
   },
   {
@@ -118,6 +120,7 @@ export const INITIAL_INSTANCES: Instance[] = [
     uptimeSeconds: 981200,
     tags: ["gateway", "edge", "ssl"],
     clientId: "client-1",
+    vpcId: "vpc-eu-central",
     createdAt: "2026-07-01",
   },
   {
@@ -173,26 +176,26 @@ export const INITIAL_DATABASES: DatabaseCluster[] = [
     port: 5432,
     host: "app-db-cluster.c2lsqcq8shgj.us-east-1.rds.amazonaws.com",
     defaultDb: "postgres",
-    adminUser: "cloudnova_admin",
+    adminUser: "tibicloud_admin",
     adminPasswordReveal: "nV9#mK8$zQ2!vL90xR",
-    connectionUri: "postgresql://cloudnova_admin:nV9#mK8$zQ2!vL90xR@app-db-cluster.c2lsqcq8shgj.us-east-1.rds.amazonaws.com:5432/postgres?sslmode=verify-full",
+    connectionUri: "postgresql://tibicloud_admin:nV9#mK8$zQ2!vL90xR@app-db-cluster.c2lsqcq8shgj.us-east-1.rds.amazonaws.com:5432/postgres?sslmode=verify-full",
     wholesaleMonthly: 90.0,
     retailMonthly: 135.0,
     users: [
-      { username: "cloudnova_admin", role: "admin", createdAt: "2026-05-10" },
+      { username: "tibicloud_admin", role: "admin", createdAt: "2026-05-10" },
       { username: "app_worker", role: "read_write", createdAt: "2026-05-12" },
       { username: "bi_analytics", role: "read_only", createdAt: "2026-06-01" },
     ],
-    schemas: ["cloudnova_prod", "analytics", "auditing"],
+    schemas: ["tibicloud_prod", "analytics", "auditing"],
     pools: [
       {
         id: "pool-1",
         name: "api-trans-pool",
-        database: "cloudnova_prod",
+        database: "tibicloud_prod",
         user: "app_worker",
         mode: "transaction",
         size: 50,
-        connectionUri: "postgresql://app_worker:***@pg-aurora.internal.cloudnova.net:6432/cloudnova_prod",
+        connectionUri: "postgresql://app_worker:***@pg-aurora.internal.tibicloud.net:6432/tibicloud_prod",
       },
     ],
     backups: [
@@ -219,11 +222,11 @@ export const INITIAL_DATABASES: DatabaseCluster[] = [
     ramGb: 8,
     vcpu: 2,
     port: 6379,
-    host: "redis.internal.cloudnova.net",
+    host: "redis.internal.tibicloud.net",
     defaultDb: "0",
     adminUser: "default",
     adminPasswordReveal: "rD9!kP3#wQ7xZ",
-    connectionUri: "rediss://default:rD9!kP3#wQ7xZ@redis.internal.cloudnova.net:6379",
+    connectionUri: "rediss://default:rD9!kP3#wQ7xZ@redis.internal.tibicloud.net:6379",
     wholesaleMonthly: 35.0,
     retailMonthly: 52.0,
     users: [{ username: "default", role: "admin", createdAt: "2026-06-04" }],
@@ -281,7 +284,7 @@ export const INITIAL_VOLUMES: Volume[] = [
 export const INITIAL_BUCKETS: S3Bucket[] = [
   {
     id: "bucket-static-assets",
-    name: "cloudnova-static-cdn",
+    name: "tibicloud-static-cdn",
     region: "nyc1",
     acl: "public-read",
     storageClass: "STANDARD",
@@ -290,7 +293,7 @@ export const INITIAL_BUCKETS: S3Bucket[] = [
     objectCount: 1420,
     wholesaleMonthly: 4.5,
     retailMonthly: 7.2,
-    endpoint: "https://cloudnova-static-cdn.s3.nyc1.cloudnova.io",
+    endpoint: "https://tibicloud-static-cdn.s3.nyc1.tibicloud.io",
     objects: [
       { key: "app/bundles/v2.4.1.tar.gz", sizeBytes: 42100000, lastModified: "2026-09-02", contentType: "application/gzip" },
       { key: "assets/logo-vector.svg", sizeBytes: 18400, lastModified: "2026-08-10", contentType: "image/svg+xml" },
@@ -310,7 +313,7 @@ export const INITIAL_BUCKETS: S3Bucket[] = [
     objectCount: 38,
     wholesaleMonthly: 18.0,
     retailMonthly: 28.8,
-    endpoint: "https://secure-db-backups-vault.s3.fra1.cloudnova.io",
+    endpoint: "https://secure-db-backups-vault.s3.fra1.tibicloud.io",
     objects: [
       { key: "postgres/daily-2026-09-05.sql.zst", sizeBytes: 2480000000, lastModified: "2026-09-05", contentType: "application/zstd" },
       { key: "postgres/daily-2026-09-04.sql.zst", sizeBytes: 2420000000, lastModified: "2026-09-04", contentType: "application/zstd" },
@@ -374,7 +377,7 @@ export const INITIAL_FLOATING_IPS: FloatingIP[] = [
 export const INITIAL_DOMAINS: Domain[] = [
   {
     id: "dom-1",
-    name: "cloudnova.io",
+    name: "tibicloud.io",
     tld: ".io",
     status: "active",
     whoisPrivacy: true,
@@ -387,8 +390,8 @@ export const INITIAL_DOMAINS: Domain[] = [
     linkedResourceId: "inst-prod-api-01",
     records: [
       { id: "rec-1", type: "A", name: "@", value: "142.93.18.102", ttl: 300 },
-      { id: "rec-2", type: "CNAME", name: "api", value: "cloudnova.io", ttl: 300 },
-      { id: "rec-3", type: "CNAME", name: "static", value: "cloudnova-static-cdn.s3.nyc1.cloudnova.io", ttl: 300 },
+      { id: "rec-2", type: "CNAME", name: "api", value: "tibicloud.io", ttl: 300 },
+      { id: "rec-3", type: "CNAME", name: "static", value: "tibicloud-static-cdn.s3.nyc1.tibicloud.io", ttl: 300 },
       { id: "rec-4", type: "TXT", name: "@", value: "v=spf1 include:_spf.google.com ~all", ttl: 3600 },
     ],
   },
@@ -406,7 +409,7 @@ export const INITIAL_DOMAINS: Domain[] = [
     retailAnnual: 22.0,
     linkedResourceId: "bucket-static-assets",
     records: [
-      { id: "rec-5", type: "CNAME", name: "@", value: "cloudnova-static-cdn.s3.nyc1.cloudnova.io", ttl: 300 },
+      { id: "rec-5", type: "CNAME", name: "@", value: "tibicloud-static-cdn.s3.nyc1.tibicloud.io", ttl: 300 },
     ],
   },
 ];

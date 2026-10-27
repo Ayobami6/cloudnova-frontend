@@ -91,18 +91,18 @@ function createInitialVFS(instance: Instance): Record<string, VNode> {
               group: "root",
               size: 574,
               mtime: "Sep 14 09:40",
-              content: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGV0Z9K1+cloudnova-init@production (CloudNova Managed Key)`,
+              content: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGV0Z9K1+tibicloud-init@production (TibiCloud Managed Key)`,
             },
           },
         },
-        "cloudnova-bootstrap.log": {
+        "tibicloud-bootstrap.log": {
           type: "file",
           permissions: "-rw-r--r--",
           owner: "root",
           group: "root",
           size: 890,
           mtime: "Sep 14 09:40",
-          content: `[2026-09-14 09:40:12 UTC] CloudNova Hypervisor Provisioner: Instance '${instance.name}' booted.\n[2026-09-14 09:40:14 UTC] Region: ${instance.region.toUpperCase()} | Tier: ${instance.plan?.tier || "general"}\n[2026-09-14 09:40:15 UTC] Public IPv4: ${instance.ipv4 || "None"} | Private IPv4: ${instance.privateIpv4 || "10.0.1.45"}\n[2026-09-14 09:40:18 UTC] AWS SSM agent daemon v3.3.421.0 active (TargetConnected).\n[2026-09-14 09:40:20 UTC] Cloud-init completed successfully in 8.42s.`,
+          content: `[2026-09-14 09:40:12 UTC] TibiCloud Hypervisor Provisioner: Instance '${instance.name}' booted.\n[2026-09-14 09:40:14 UTC] Region: ${instance.region.toUpperCase()} | Tier: ${instance.plan?.tier || "general"}\n[2026-09-14 09:40:15 UTC] Public IPv4: ${instance.ipv4 || "None"} | Private IPv4: ${instance.privateIpv4 || "10.0.1.45"}\n[2026-09-14 09:40:18 UTC] AWS SSM agent daemon v3.3.421.0 active (TargetConnected).\n[2026-09-14 09:40:20 UTC] Cloud-init completed successfully in 8.42s.`,
         },
       },
     },
@@ -177,7 +177,7 @@ function createInitialVFS(instance: Instance): Record<string, VNode> {
           group: "root",
           size: 245,
           mtime: "Sep 14 09:40",
-          content: `127.0.0.1 localhost\n127.0.1.1 ${instance.name}\n${instance.ipv4 || "10.0.1.45"} ${instance.name}.cloudnova.internal\n::1 localhost ip6-localhost ip6-loopback`,
+          content: `127.0.0.1 localhost\n127.0.1.1 ${instance.name}\n${instance.ipv4 || "10.0.1.45"} ${instance.name}.tibicloud.internal\n::1 localhost ip6-localhost ip6-loopback`,
         },
         "resolv.conf": {
           type: "file",
@@ -186,7 +186,7 @@ function createInitialVFS(instance: Instance): Record<string, VNode> {
           group: "root",
           size: 78,
           mtime: "Sep 14 09:40",
-          content: `nameserver 1.1.1.1\nnameserver 8.8.8.8\nsearch cloudnova.internal\n`,
+          content: `nameserver 1.1.1.1\nnameserver 8.8.8.8\nsearch tibicloud.internal\n`,
         },
         nginx: {
           type: "dir",
@@ -262,7 +262,7 @@ function createInitialVFS(instance: Instance): Record<string, VNode> {
               mtime: "Sep 14 09:45",
               content: `sshd[412]: Server listening on 0.0.0.0 port 22.\nsshd[412]: Server listening on :: port 22.\namazon-ssm-agent[618]: Authenticated in-browser terminal session via TLS 1.3.`,
             },
-            "cloudnova.log": {
+            "tibicloud.log": {
               type: "file",
               permissions: "-rw-r--r--",
               owner: "root",
@@ -296,7 +296,7 @@ function createInitialVFS(instance: Instance): Record<string, VNode> {
                   group: "www-data",
                   size: 345,
                   mtime: "Sep 14 09:40",
-                  content: `<!DOCTYPE html>\n<html>\n<head><title>Welcome to ${instance.name}</title></head>\n<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">\n  <h1>Welcome to ${instance.name}!</h1>\n  <p>Your CloudNova compute instance is running on Ubuntu 24.04 LTS.</p>\n</body>\n</html>`,
+                  content: `<!DOCTYPE html>\n<html>\n<head><title>Welcome to ${instance.name}</title></head>\n<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">\n  <h1>Welcome to ${instance.name}!</h1>\n  <p>Your TibiCloud compute instance is running on Ubuntu 24.04 LTS.</p>\n</body>\n</html>`,
                 },
               },
             },
@@ -574,7 +574,7 @@ export function TerminalModal({
             setConnectionStatus("connected");
             appendLine("[SSM-TUNNEL] WebSocket tunnel open. TLS 1.3 end-to-end encrypted.", "success");
             appendLine(`Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.8.0-38-generic x86_64)`, "output");
-            appendLine(` * Documentation:  https://docs.cloudnova.io`, "output");
+            appendLine(` * Documentation:  https://docs.tibicloud.io`, "output");
             appendLine(
               ` * System load:    0.28, 0.19, 0.12    Uptime: ${Math.floor((instance.uptimeSeconds || 3600) / 3600)} hours`,
               "output"
@@ -594,7 +594,7 @@ export function TerminalModal({
               "success"
             );
             appendLine(`Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.8.0-38-generic x86_64)`, "output");
-            appendLine(` * Documentation:  https://docs.cloudnova.io`, "output");
+            appendLine(` * Documentation:  https://docs.tibicloud.io`, "output");
             appendLine(
               ` * System load:    0.28, 0.19, 0.12    Uptime: ${Math.floor((instance.uptimeSeconds || 3600) / 3600)} hours`,
               "output"
@@ -1122,7 +1122,7 @@ export function TerminalModal({
         { text: `CPU(s):                  ${instance.plan?.vcpu || 1}`, type: "output" },
         { text: "Model name:              AMD EPYC 7763 64-Core Processor", type: "output" },
         { text: "Thread(s) per core:      1", type: "output" },
-        { text: "Hypervisor vendor:       KVM (CloudNova Hypervisor)", type: "output" }
+        { text: "Hypervisor vendor:       KVM (TibiCloud Hypervisor)", type: "output" }
       );
     }
 
@@ -1193,7 +1193,7 @@ export function TerminalModal({
       } else if (url.includes("ifconfig") || url.includes("icanhazip")) {
         lines.push({ text: instance.ipv4 || "10.0.1.45", type: "output" });
       } else {
-        lines.push({ text: `HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status": "healthy", "region": "${instance.region}", "datacenter": "cloudnova"}`, type: "output" });
+        lines.push({ text: `HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"status": "healthy", "region": "${instance.region}", "datacenter": "tibicloud"}`, type: "output" });
       }
     }
 
@@ -1261,7 +1261,7 @@ export function TerminalModal({
     // 12. Help Menu
     else if (command === "help") {
       lines.push(
-        { text: "=== CloudNova In-Browser Terminal (Ubuntu 24.04 LTS) ===", type: "info" },
+        { text: "=== TibiCloud In-Browser Terminal (Ubuntu 24.04 LTS) ===", type: "info" },
         { text: "File Navigation : cd [dir], pwd, ls [-la], cat [file], head, tail, grep", type: "output" },
         { text: "File Operations : touch [file], mkdir [-p], rm [-rf], echo \"text\" > [file]", type: "output" },
         { text: "System Info     : whoami, id, hostname, uname -a, date, uptime, env", type: "output" },

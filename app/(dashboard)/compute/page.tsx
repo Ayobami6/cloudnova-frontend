@@ -107,7 +107,7 @@ export default function ComputePage() {
           <button
             type="button"
             onClick={() => setIsDeployOpen(true)}
-            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 transition-colors cursor-pointer"
           >
             <MaterialIcon name="add" size={16} />
             <span>Deploy Droplet</span>
