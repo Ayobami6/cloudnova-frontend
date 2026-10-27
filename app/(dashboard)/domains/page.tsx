@@ -279,14 +279,14 @@ export default function DomainsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold text-[#1E1E1E] dark:text-white flex items-center gap-2">
-            Domains & Anycast DNS
+            Domains
             <span className="text-xs font-mono text-slate-600 dark:text-slate-400 bg-[#EFECE8] dark:bg-[#161920] px-2 py-0.5 rounded border border-[#E7E4DF] dark:border-[#282D3A]">
               {domains.length} zones
             </span>
           </h1>
-          <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
+          {/* <p className="text-xs text-[#8C8B87] dark:text-slate-400 mt-1">
             Global Anycast DNS routing, automated DNSSEC, free Let&apos;s Encrypt SSL, and 1-click cloud resource binding.
-          </p>
+          </p> */}
         </div>
 
         <button
@@ -355,11 +355,10 @@ export default function DomainsPage() {
                 <td className="py-3 px-4 text-right">
                   <button
                     onClick={() => setSelectedDomainId(dom.id)}
-                    className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${
-                      activeDomain?.id === dom.id
+                    className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${activeDomain?.id === dom.id
                         ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
                         : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
-                    }`}
+                      }`}
                   >
                     Manage DNS
                   </button>
@@ -612,15 +611,14 @@ export default function DomainsPage() {
                     return (
                       <div
                         key={domainKey}
-                        className={`p-3.5 rounded-lg border transition-all flex items-center justify-between gap-4 ${
-                          isAvailable
+                        className={`p-3.5 rounded-lg border transition-all flex items-center justify-between gap-4 ${isAvailable
                             ? "bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-300 dark:border-emerald-500/30"
                             : isUnavailable
-                            ? "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] opacity-75"
-                            : isChecking
-                            ? "bg-blue-50/30 dark:bg-blue-950/10 border-blue-200 dark:border-blue-500/20"
-                            : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A]"
-                        }`}
+                              ? "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] opacity-75"
+                              : isChecking
+                                ? "bg-blue-50/30 dark:bg-blue-950/10 border-blue-200 dark:border-blue-500/20"
+                                : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A]"
+                          }`}
                       >
                         <div className="space-y-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
