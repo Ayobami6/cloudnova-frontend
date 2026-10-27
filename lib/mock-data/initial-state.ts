@@ -84,6 +84,7 @@ export const INITIAL_INSTANCES: Instance[] = [
     uptimeSeconds: 1428500,
     tags: ["production", "api", "k8s-worker"],
     clientId: "client-1",
+    vpcId: "vpc-us-east",
     createdAt: "2026-06-12",
   },
   {
@@ -101,6 +102,7 @@ export const INITIAL_INSTANCES: Instance[] = [
     uptimeSeconds: 2894100,
     tags: ["database", "primary", "nvme"],
     clientId: "client-2",
+    vpcId: "vpc-us-west",
     createdAt: "2026-05-18",
   },
   {
@@ -118,6 +120,7 @@ export const INITIAL_INSTANCES: Instance[] = [
     uptimeSeconds: 981200,
     tags: ["gateway", "edge", "ssl"],
     clientId: "client-1",
+    vpcId: "vpc-eu-central",
     createdAt: "2026-07-01",
   },
   {

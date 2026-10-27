@@ -95,15 +95,12 @@ export default function NetworkPage() {
       : [];
   }, [activeFirewall, instances]);
 
-  // Total protected nodes count (either in a security group or inside a VPC)
-  const totalProtectedCount = useMemo(() => {
-    const protectedIds = new Set<string>();
-    firewalls.forEach((fw) => fw.attachedInstanceIds.forEach((id) => protectedIds.add(id)));
-    instances.forEach((inst) => {
-      if (inst.vpcId) protectedIds.add(inst.id);
-    });
-    return protectedIds.size;
-  }, [firewalls, instances]);
+  // Droplets connected to a VPC Network
+  const dropletsWithVpcCount = useMemo(() => {
+    const directCount = instances.filter((inst) => Boolean(inst.vpcId)).length;
+    if (directCount > 0) return directCount;
+    return vpcs.reduce((sum, vpc) => sum + (vpc.connectedInstancesCount || 0), 0);
+  }, [instances, vpcs]);
 
   // Filtered VPCs based on global search or region
   const filteredVpcs = useMemo(() => {
@@ -248,27 +245,24 @@ export default function NetworkPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <PastelKpiCard
           label="Active VPC Networks"
-          value={`${vpcs.length} Subnets`}
-          subtitle="Software-Defined Private Networks"
+          value={vpcs.length}
           variant="lavender"
           actionLabel="Create VPC"
           onAction={() => setIsCreateVpcOpen(true)}
         />
         <PastelKpiCard
-          label="Perimeter Security Groups"
-          value={`${firewalls.length} Groups`}
-          subtitle="Stateful L4 Packet Inspection"
+          label="Security Groups"
+          value={firewalls.length}
           variant="blue"
           actionLabel="New Group"
           onAction={() => setIsCreateFirewallOpen(true)}
         />
         <PastelKpiCard
-          label="Protected Droplet Nodes"
-          value={`${totalProtectedCount} Nodes`}
-          subtitle="Zero-Trust Encrypted Fabric"
+          label="Droplets with VPC Network"
+          value={dropletsWithVpcCount}
           variant="yellow"
           actionLabel="Inspect"
-          onAction={() => setActiveTab("securitygroups")}
+          onAction={() => setActiveTab("vpcs")}
         />
       </div>
 
