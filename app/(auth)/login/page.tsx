@@ -195,7 +195,7 @@ export default function LoginPage() {
       <p className="text-center text-xs text-[#8C8B87] dark:text-slate-400">
         Don&apos;t have an account yet?{" "}
         <Link href="/register" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
-          Create account & get $200 credit
+          Create account
         </Link>
       </p>
     </div>

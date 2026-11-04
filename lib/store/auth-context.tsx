@@ -42,7 +42,12 @@ interface AuthContextType {
   login: (email: string, password: string, rememberMe?: boolean) => Promise<ActionResult>;
   loginWithGoogle: () => Promise<ActionResult>;
   loginWithGithub: () => Promise<ActionResult>;
-  register: (name: string, email: string, password: string) => Promise<ActionResult>;
+  register: (
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string
+  ) => Promise<ActionResult>;
   verifyEmailOtp: (email: string, otp: string) => Promise<ActionResult>;
   requestPasswordReset: (email: string) => Promise<ActionResult>;
   resetPasswordWithOtp: (email: string, otp: string, newPassword: string) => Promise<ActionResult>;
@@ -184,7 +189,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refreshSession]);
 
   const register = useCallback(
-    async (name: string, email: string, password: string): Promise<ActionResult> => {
+    async (
+      firstNameOrFullName: string,
+      lastNameOrEmail: string,
+      emailOrPassword?: string,
+      maybePassword?: string
+    ): Promise<ActionResult> => {
       // Note: the backend has no "create account with this name at signup"
       // step - verify-email-otp below auto-creates a default Account named
       // "<first name>'s Team" for a brand-new user (see
@@ -193,9 +203,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // form's "Company / Team" field is validated client-side but has no
       // server-side effect yet; renaming the auto-created organization is
       // a job for the team page once the API exposes a rename endpoint.
+      let firstName: string;
+      let lastName: string;
+      let email: string;
+      let password: string;
+
+      if (maybePassword !== undefined && emailOrPassword !== undefined) {
+        firstName = firstNameOrFullName.trim();
+        lastName = lastNameOrEmail.trim();
+        email = emailOrPassword.trim();
+        password = maybePassword;
+      } else {
+        const split = splitName(firstNameOrFullName);
+        firstName = split.firstName;
+        lastName = split.lastName;
+        email = lastNameOrEmail.trim();
+        password = emailOrPassword || "";
+      }
+
       setIsLoading(true);
       try {
-        const { firstName, lastName } = splitName(name);
         await authApi.register({
           email,
           password,

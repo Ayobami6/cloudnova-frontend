@@ -50,22 +50,20 @@ export function PricingCalculator() {
               <button
                 type="button"
                 onClick={() => setDisplayCurrency("NGN")}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                  displayCurrency === "NGN"
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${displayCurrency === "NGN"
                     ? "bg-white dark:bg-[#232834] text-[#1E1E1E] dark:text-white shadow-xs"
                     : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                }`}
+                  }`}
               >
                 🇳🇬 Naira (NGN)
               </button>
               <button
                 type="button"
                 onClick={() => setDisplayCurrency("USD")}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                  displayCurrency === "USD"
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${displayCurrency === "USD"
                     ? "bg-white dark:bg-[#232834] text-[#1E1E1E] dark:text-white shadow-xs"
                     : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                }`}
+                  }`}
               >
                 🇺🇸 Dollars (USD)
               </button>
@@ -265,7 +263,7 @@ export function PricingCalculator() {
                 href="/register"
                 className="w-full h-11 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
               >
-                <span>Deploy with ₦10,000 Free Credit</span>
+                <span>Deploy</span>
                 <MaterialIcon name="arrow_forward" size={16} />
               </Link>
             </div>

@@ -63,20 +63,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
 
-        {/* Bottom: SLA Guarantees */}
-        <div className="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-white/60">
-          <div className="flex items-center gap-5">
-            <span className="flex items-center gap-1.5 text-[#4EA871]">
-              <MaterialIcon name="verified" size={16} />
-              99.995% Uptime SLA
-            </span>
-            <span>•</span>
-            <span>SOC2 Type II</span>
-            <span>•</span>
-            <span>Zero Egress Tax</span>
-          </div>
-          <span className="font-mono text-[11px]">v2.4.0-prod</span>
-        </div>
       </div>
 
       {/* Right side: Auth Form Container */}

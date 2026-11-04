@@ -11,7 +11,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const { register, loginWithGoogle, loginWithGithub, isLoading } = useAuth();
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +59,8 @@ export default function RegisterPage() {
     setError(null);
 
     const validation = RegisterSchema.safeParse({
-      name,
+      firstName,
+      lastName,
       email,
       company,
       password,
@@ -70,7 +72,7 @@ export default function RegisterPage() {
       return;
     }
 
-    const res = await register(name, email, password);
+    const res = await register(firstName, lastName, email, password);
     if (res.success) {
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } else {
@@ -148,14 +150,14 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Full Name</label>
+            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">First Name</label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
               <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Sarah Connor"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Sarah"
                 required
                 className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
               />
@@ -163,18 +165,33 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Company / Team</label>
+            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Last Name</label>
             <div className="relative">
-              <Building className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+              <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
               <input
                 type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                placeholder="Cyberdyne AI"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Connor"
                 required
                 className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Company / Team</label>
+          <div className="relative">
+            <Building className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+            <input
+              type="text"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              placeholder="Cyberdyne AI"
+              required
+              className="w-full h-9 pl-9 pr-3 rounded-md bg-white dark:bg-[#1C2029] border border-[#E7E4DF] dark:border-[#282D3A] text-xs text-[#1E1E1E] dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors"
+            />
           </div>
         </div>
 
