@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import { useCloud } from "@/lib/store/cloud-context";
 import {
   MaterialIcon,
@@ -26,6 +27,14 @@ interface UnifiedResourceRow {
   dropletId?: string;
 }
 
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return "Recent";
+  const d = new Date(dateStr);
+  return Number.isNaN(d.getTime())
+    ? dateStr
+    : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default function OverviewPage() {
   const {
     instances,
@@ -37,22 +46,13 @@ export default function OverviewPage() {
     searchQuery,
   } = useCloud();
 
-  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({
-    "row-1": true,
-  });
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 
   // Filter instances by global region if selected
   const filteredInstances = instances.filter(
     (i) => selectedRegion === "all" || i.region === selectedRegion
   );
   const activeInstances = filteredInstances.filter((i) => i.status === "active");
-  const avgCpu =
-    activeInstances.length > 0
-      ? Math.round(
-          activeInstances.reduce((acc, i) => acc + i.currentCpu, 0) /
-            activeInstances.length
-        )
-      : 0;
 
   const filteredDatabases = databases.filter(
     (db) => selectedRegion === "all" || db.region === selectedRegion
@@ -65,11 +65,11 @@ export default function OverviewPage() {
   const allRows: UnifiedResourceRow[] = [
     ...filteredInstances.map((inst, idx) => ({
       id: inst.id,
-      pillIcon: idx % 2 === 0 ? "chat" : "call",
-      pillLabel: idx % 2 === 0 ? "Droplet" : "KVM Node",
+      pillIcon: "dns",
+      pillLabel: "Droplet",
       pillVariant: (idx % 2 === 0 ? "blue" : "lavender") as PastelVariant,
       callerId: inst.name,
-      destination: `${inst.ipv4} (${inst.region.toUpperCase()})`,
+      destination: `${inst.ipv4 || "Provisioning IP"} (${inst.region.toUpperCase()})`,
       statusTone: (
         inst.status === "active"
           ? "completed"
@@ -83,13 +83,13 @@ export default function OverviewPage() {
           : inst.status === "provisioning"
           ? "Pending"
           : "Stopped",
-      dateLabel: `Jan 15, ${2 + idx}:${String(10 + idx * 12).padStart(2, "0")} PM`,
+      dateLabel: formatDate(inst.createdAt),
       isDroplet: true,
       dropletId: inst.id,
     })),
-    ...databases.slice(0, 2).map((db, idx) => ({
+    ...databases.slice(0, 4).map((db) => ({
       id: db.id,
-      pillIcon: "mail",
+      pillIcon: "database",
       pillLabel: db.engine.toUpperCase(),
       pillVariant: "yellow" as PastelVariant,
       callerId: db.name,
@@ -98,18 +98,22 @@ export default function OverviewPage() {
         db.status === "online" ? "completed" : "pending"
       ) as NixtioStatusTone,
       statusLabel: db.status === "online" ? "Completed" : "Pending",
-      dateLabel: `Jan 15, ${1 + idx}:50 PM`,
+      dateLabel: formatDate(db.createdAt),
     })),
-    ...volumes.slice(0, 1).map((vol) => ({
+    ...volumes.slice(0, 3).map((vol) => ({
       id: vol.id,
-      pillIcon: "chat",
+      pillIcon: "storage",
       pillLabel: "NVMe",
       pillVariant: "blue" as PastelVariant,
       callerId: vol.name,
       destination: `${vol.sizeGb} GB • ${vol.region.toUpperCase()}`,
-      statusTone: "completed" as NixtioStatusTone,
-      statusLabel: "Completed",
-      dateLabel: "Jan 15, 7:54 AM",
+      statusTone: (
+        vol.status === "available" || vol.status === "in_use"
+          ? "completed"
+          : "pending"
+      ) as NixtioStatusTone,
+      statusLabel: vol.status === "in_use" ? "In Use" : vol.status === "available" ? "Ready" : "Pending",
+      dateLabel: formatDate(vol.createdAt),
     })),
   ].filter(
     (row) =>
@@ -169,84 +173,120 @@ export default function OverviewPage() {
           <div className="col-span-3 sm:col-span-2 text-right pr-4">Date</div>
         </div>
 
-        {/* Individual Floating White Pill Rows */}
-        <div className="space-y-2.5">
-          {allRows.map((row, idx) => {
-            const isChecked = !!selectedRows[row.id] || idx === 1;
-            const matchingDroplet = row.isDroplet
-              ? instances.find((i) => i.id === row.dropletId)
-              : undefined;
+        {/* Individual Floating White Pill Rows or Empty State */}
+        {allRows.length === 0 ? (
+          <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] p-12 text-center flex flex-col items-center justify-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-[#CFE0EC]/40 text-[#1E1E1E] dark:text-white flex items-center justify-center">
+              <MaterialIcon name="cloud_queue" size={24} />
+            </div>
+            <div className="max-w-md space-y-1">
+              <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white">
+                No Active Resources Found
+              </h3>
+              <p className="text-xs text-[#8C8B87] dark:text-slate-400">
+                {searchQuery
+                  ? "No cloud resources matched your search query. Try clearing the search."
+                  : "Deploy your first compute droplet, managed database cluster, or storage volume to monitor your infrastructure activity here."}
+              </p>
+            </div>
+            {!searchQuery && (
+              <div className="flex items-center gap-3 pt-2">
+                <Link
+                  href="/compute"
+                  className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <MaterialIcon name="add" size={16} />
+                  <span>Deploy Droplet</span>
+                </Link>
+                <Link
+                  href="/databases"
+                  className="h-9 px-4 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-xs font-semibold text-[#1E1E1E] dark:text-white hover:bg-[#E2DDD6] transition-colors inline-flex items-center gap-1.5"
+                >
+                  <MaterialIcon name="database" size={16} />
+                  <span>Create Database</span>
+                </Link>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {allRows.map((row) => {
+              const isChecked = !!selectedRows[row.id];
+              const matchingDroplet = row.isDroplet
+                ? instances.find((i) => i.id === row.dropletId)
+                : undefined;
 
-            return (
-              <div
-                key={row.id}
-                className="nixtio-floating-row grid grid-cols-12 items-center px-4 py-3 text-xs"
-              >
-                {/* Checkbox + Pastel Type Pill */}
-                <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => toggleRowSelection(row.id)}
-                    aria-label={`Select ${row.callerId}`}
-                    className={`w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
-                      isChecked
-                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E]"
-                        : "border border-[#D5D0C8] dark:border-[#383F52] bg-transparent"
-                    }`}
-                  >
-                    {isChecked && <MaterialIcon name="check" size={12} />}
-                  </button>
-
-                  <PastelTypePill
-                    icon={row.pillIcon}
-                    label={row.pillLabel}
-                    variant={row.pillVariant}
-                  />
-                </div>
-
-                {/* Caller ID / Resource Name */}
-                <div className="col-span-3 sm:col-span-2 font-medium text-[#1E1E1E] dark:text-slate-100 truncate pr-2">
-                  {row.callerId}
-                </div>
-
-                {/* Destination / IPv4 */}
-                <div className="hidden sm:block sm:col-span-3 text-[#5A5A58] dark:text-slate-300 font-mono text-[11px] truncate pr-2">
-                  {row.destination}
-                </div>
-
-                {/* Status Indicator */}
-                <div className="col-span-3 sm:col-span-2">
-                  <StatusIndicator
-                    status={row.statusTone}
-                    label={row.statusLabel}
-                  />
-                </div>
-
-                {/* Date + Action Menu */}
-                <div className="col-span-2 sm:col-span-2 flex items-center justify-end gap-2 text-[#5A5A58] dark:text-slate-400">
-                  <span className="hidden md:inline text-[11px] whitespace-nowrap">
-                    {row.dateLabel}
-                  </span>
-
-                  {matchingDroplet ? (
+              return (
+                <div
+                  key={row.id}
+                  className="nixtio-floating-row grid grid-cols-12 items-center px-4 py-3 text-xs"
+                >
+                  {/* Checkbox + Pastel Type Pill */}
+                  <div className="col-span-4 sm:col-span-3 flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => setTerminalInstance(matchingDroplet)}
-                      title="Open Web Console"
-                      className="w-7 h-7 rounded-full hover:bg-[#EFECE8] dark:hover:bg-[#232834] flex items-center justify-center text-[#1E1E1E] dark:text-slate-200 cursor-pointer"
+                      onClick={() => toggleRowSelection(row.id)}
+                      aria-label={`Select ${row.callerId}`}
+                      className={`w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
+                        isChecked
+                          ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E]"
+                          : "border border-[#D5D0C8] dark:border-[#383F52] bg-transparent"
+                      }`}
                     >
-                      <MaterialIcon name="more_vert" size={18} />
+                      {isChecked && <MaterialIcon name="check" size={12} />}
                     </button>
-                  ) : (
-                    <span className="w-7 h-7 rounded-full flex items-center justify-center text-[#5A5A58]">
-                      <MaterialIcon name="more_vert" size={18} />
+
+                    <PastelTypePill
+                      icon={row.pillIcon}
+                      label={row.pillLabel}
+                      variant={row.pillVariant}
+                    />
+                  </div>
+
+                  {/* Caller ID / Resource Name */}
+                  <div className="col-span-3 sm:col-span-2 font-medium text-[#1E1E1E] dark:text-slate-100 truncate pr-2">
+                    {row.callerId}
+                  </div>
+
+                  {/* Destination / IPv4 */}
+                  <div className="hidden sm:block sm:col-span-3 text-[#5A5A58] dark:text-slate-300 font-mono text-[11px] truncate pr-2">
+                    {row.destination}
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className="col-span-3 sm:col-span-2">
+                    <StatusIndicator
+                      status={row.statusTone}
+                      label={row.statusLabel}
+                    />
+                  </div>
+
+                  {/* Date + Action Menu */}
+                  <div className="col-span-2 sm:col-span-2 flex items-center justify-end gap-2 text-[#5A5A58] dark:text-slate-400">
+                    <span className="hidden md:inline text-[11px] whitespace-nowrap">
+                      {row.dateLabel}
                     </span>
-                  )}
+
+                    {matchingDroplet ? (
+                      <button
+                        type="button"
+                        onClick={() => setTerminalInstance(matchingDroplet)}
+                        title="Open Web Console"
+                        className="w-7 h-7 rounded-full hover:bg-[#EFECE8] dark:hover:bg-[#232834] flex items-center justify-center text-[#1E1E1E] dark:text-slate-200 cursor-pointer"
+                      >
+                        <MaterialIcon name="more_vert" size={18} />
+                      </button>
+                    ) : (
+                      <span className="w-7 h-7 rounded-full flex items-center justify-center text-[#5A5A58]">
+                        <MaterialIcon name="more_vert" size={18} />
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

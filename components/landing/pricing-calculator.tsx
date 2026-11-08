@@ -12,11 +12,11 @@ export function PricingCalculator() {
   const [displayCurrency, setDisplayCurrency] = useState<"NGN" | "USD">("NGN");
 
   // Fixed transparent exchange rate translation: 1 USD = ₦1,600
-  const FX_RATE = 1600;
+  const FX_RATE = 1400;
 
   // Upstream TibiCloud calculation in USD:
   // vCPU: $4/mo, RAM: $2.5/GB/mo, NVMe: $0.08/GB/mo, S3: $0.015/GB/mo
-  const novaMonthlyUSD = vcpu * 4 + ramGb * 2.5 + nvmeGb * 0.08 + s3Gb * 0.015;
+  const novaMonthlyUSD = vcpu * 2 + ramGb * 2.5 + nvmeGb * 0.08 + s3Gb * 0.015;
   const novaMonthlyNGN = Math.round(novaMonthlyUSD * FX_RATE);
 
   const novaHourlyUSD = novaMonthlyUSD / 730;
@@ -51,8 +51,8 @@ export function PricingCalculator() {
                 type="button"
                 onClick={() => setDisplayCurrency("NGN")}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${displayCurrency === "NGN"
-                    ? "bg-white dark:bg-[#232834] text-[#1E1E1E] dark:text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "bg-white dark:bg-[#232834] text-[#1E1E1E] dark:text-white shadow-xs"
+                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
               >
                 🇳🇬 Naira (NGN)
@@ -61,8 +61,8 @@ export function PricingCalculator() {
                 type="button"
                 onClick={() => setDisplayCurrency("USD")}
                 className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${displayCurrency === "USD"
-                    ? "bg-white dark:bg-[#232834] text-[#1E1E1E] dark:text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                  ? "bg-white dark:bg-[#232834] text-[#1E1E1E] dark:text-white shadow-xs"
+                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
               >
                 🇺🇸 Dollars (USD)

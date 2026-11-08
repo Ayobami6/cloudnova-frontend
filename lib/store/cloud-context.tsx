@@ -21,17 +21,6 @@ import {
   SSHKey,
 } from "../types/cloud";
 import {
-  INITIAL_INSTANCES,
-  INITIAL_DATABASES,
-  INITIAL_VOLUMES,
-  INITIAL_BUCKETS,
-  INITIAL_FIREWALLS,
-  INITIAL_VPCS,
-  INITIAL_LOAD_BALANCERS,
-  INITIAL_FLOATING_IPS,
-  INITIAL_DOMAINS,
-  INITIAL_CLIENTS,
-  INITIAL_ALERTS,
   COMPUTE_PLANS,
 } from "../mock-data/initial-state";
 import { CreateDropletInput } from "../schemas/cloud";
@@ -180,17 +169,17 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { user, isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
-  const [instances, setInstances] = useState<Instance[]>(INITIAL_INSTANCES);
-  const [databases, setDatabases] = useState<DatabaseCluster[]>(INITIAL_DATABASES);
-  const [volumes, setVolumes] = useState<Volume[]>(INITIAL_VOLUMES);
-  const [buckets, setBuckets] = useState<S3Bucket[]>(INITIAL_BUCKETS);
-  const [firewalls, setFirewalls] = useState<Firewall[]>(INITIAL_FIREWALLS);
-  const [vpcs, setVpcs] = useState<VPC[]>(INITIAL_VPCS);
-  const [loadBalancers, setLoadBalancers] = useState<LoadBalancer[]>(INITIAL_LOAD_BALANCERS);
-  const [floatingIps, setFloatingIps] = useState<FloatingIP[]>(INITIAL_FLOATING_IPS);
-  const [domains, setDomains] = useState<Domain[]>(INITIAL_DOMAINS);
-  const [clients, setClients] = useState<ClientTenant[]>(INITIAL_CLIENTS);
-  const [alerts, setAlerts] = useState<OperationalAlert[]>(INITIAL_ALERTS);
+  const [instances, setInstances] = useState<Instance[]>([]);
+  const [databases, setDatabases] = useState<DatabaseCluster[]>([]);
+  const [volumes, setVolumes] = useState<Volume[]>([]);
+  const [buckets, setBuckets] = useState<S3Bucket[]>([]);
+  const [firewalls, setFirewalls] = useState<Firewall[]>([]);
+  const [vpcs, setVpcs] = useState<VPC[]>([]);
+  const [loadBalancers, setLoadBalancers] = useState<LoadBalancer[]>([]);
+  const [floatingIps, setFloatingIps] = useState<FloatingIP[]>([]);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [clients, setClients] = useState<ClientTenant[]>([]);
+  const [alerts, setAlerts] = useState<OperationalAlert[]>([]);
   const [plans, setPlans] = useState<ComputePlan[]>(COMPUTE_PLANS);
   const [sshKeys, setSSHKeys] = useState<SSHKey[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -439,98 +428,63 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         message: `Allocating NVMe compute instance "${input.name}" in region ${input.region.toUpperCase()}...`,
       });
 
-      if (isAuthenticated) {
-        try {
-          const wire = await computeApi.createInstance({
-            name: input.name,
-            region: input.region,
-            image: input.image,
-            plan_id: backendPlanId,
-            tags: tagList,
-            vpc_id: input.vpcId || undefined,
-            security_group_ids:
-              input.securityGroupIds && input.securityGroupIds.length > 0
-                ? input.securityGroupIds
-                : undefined,
-            ssh_key_ids:
-              input.sshKeyIds && input.sshKeyIds.length > 0
-                ? input.sshKeyIds
-                : undefined,
-          });
-          const newInst = mapInstance(wire, plans);
-          setInstances((prev) => [newInst, ...prev]);
-          if (input.vpcId) {
-            setVpcs((prev) =>
-              prev.map((v) =>
-                v.id === input.vpcId
-                  ? { ...v, connectedInstancesCount: v.connectedInstancesCount + 1 }
-                  : v
-              )
-            );
-          }
-          if (input.securityGroupIds && input.securityGroupIds.length > 0) {
-            setFirewalls((prev) =>
-              prev.map((fw) =>
-                input.securityGroupIds?.includes(fw.id) &&
-                !fw.attachedInstanceIds.includes(newInst.id)
-                  ? { ...fw, attachedInstanceIds: [...fw.attachedInstanceIds, newInst.id] }
-                  : fw
-              )
-            );
-          }
-          return newInst;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "Provisioning Failed",
-            message: err instanceof Error ? err.message : "Failed to initiate instance provisioning.",
-          });
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to deploy instances.";
+        showToast({
+          type: "error",
+          title: "Provisioning Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const plan = plans.find((p) => p.id === input.planId || p.id === backendPlanId) || plans[0];
-      const octet3 = Math.floor(Math.random() * 200) + 10;
-      const octet4 = Math.floor(Math.random() * 250) + 2;
-      const fallbackInst: Instance = {
-        id: `inst-${Date.now().toString().slice(-6)}`,
-        name: input.name,
-        region: input.region,
-        image: input.image,
-        planId: plan.id,
-        plan,
-        status: "provisioning",
-        ipv4: `142.93.${octet3}.${octet4}`,
-        privateIpv4: `10.108.0.${octet4}`,
-        currentCpu: Math.floor(Math.random() * 15) + 5,
-        currentRamPercent: Math.floor(Math.random() * 25) + 20,
-        uptimeSeconds: 60,
-        tags: tagList,
-        clientId: input.clientId,
-        vpcId: input.vpcId,
-        securityGroupIds: input.securityGroupIds || [],
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setInstances((prev) => [fallbackInst, ...prev]);
-      if (input.vpcId) {
-        setVpcs((prev) =>
-          prev.map((v) =>
-            v.id === input.vpcId
-              ? { ...v, connectedInstancesCount: v.connectedInstancesCount + 1 }
-              : v
-          )
-        );
+      try {
+        const wire = await computeApi.createInstance({
+          name: input.name,
+          region: input.region,
+          image: input.image,
+          plan_id: backendPlanId,
+          tags: tagList,
+          vpc_id: input.vpcId || undefined,
+          security_group_ids:
+            input.securityGroupIds && input.securityGroupIds.length > 0
+              ? input.securityGroupIds
+              : undefined,
+          ssh_key_ids:
+            input.sshKeyIds && input.sshKeyIds.length > 0
+              ? input.sshKeyIds
+              : undefined,
+        });
+        const newInst = mapInstance(wire, plans);
+        setInstances((prev) => [newInst, ...prev]);
+        if (input.vpcId) {
+          setVpcs((prev) =>
+            prev.map((v) =>
+              v.id === input.vpcId
+                ? { ...v, connectedInstancesCount: v.connectedInstancesCount + 1 }
+                : v
+            )
+          );
+        }
+        if (input.securityGroupIds && input.securityGroupIds.length > 0) {
+          setFirewalls((prev) =>
+            prev.map((fw) =>
+              input.securityGroupIds?.includes(fw.id) &&
+              !fw.attachedInstanceIds.includes(newInst.id)
+                ? { ...fw, attachedInstanceIds: [...fw.attachedInstanceIds, newInst.id] }
+                : fw
+            )
+          );
+        }
+        return newInst;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "Provisioning Failed",
+          message: err instanceof Error ? err.message : "Failed to initiate instance provisioning.",
+        });
+        throw err;
       }
-      if (input.securityGroupIds && input.securityGroupIds.length > 0) {
-        setFirewalls((prev) =>
-          prev.map((fw) =>
-            input.securityGroupIds?.includes(fw.id) &&
-            !fw.attachedInstanceIds.includes(fallbackInst.id)
-              ? { ...fw, attachedInstanceIds: [...fw.attachedInstanceIds, fallbackInst.id] }
-              : fw
-          )
-        );
-      }
-      return fallbackInst;
     },
     [isAuthenticated, plans, showToast]
   );
@@ -610,57 +564,35 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         message: `Deploying managed ${(data.engine || "PostgreSQL").toUpperCase()} cluster "${data.name || "cluster"}"...`,
       });
 
-      if (isAuthenticated) {
-        try {
-          const wire = await databasesApi.createDatabaseCluster({
-            name: data.name || "new-database-cluster",
-            engine: data.engine || "postgresql",
-            region: data.region || "nyc1",
-            plan_id: "db-std-1",
-            ha_enabled: !!data.haEnabled,
-          });
-          const newDb = mapDatabaseCluster(wire);
-          setDatabases((prev) => [newDb, ...prev]);
-          return;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "Database Deployment Failed",
-            message: err instanceof Error ? err.message : "Failed to deploy database cluster.",
-          });
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to deploy database clusters.";
+        showToast({
+          type: "error",
+          title: "Database Deployment Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const fallbackDb: DatabaseCluster = {
-        id: `db-${Date.now().toString().slice(-6)}`,
-        name: data.name || "new-database-cluster",
-        engine: data.engine || "postgresql",
-        version: data.engine === "redis" ? "7.2" : data.engine === "mysql" ? "8.4" : "16.3",
-        region: data.region || "nyc1",
-        status: "provisioning",
-        nodesCount: data.haEnabled ? 2 : 1,
-        haEnabled: !!data.haEnabled,
-        diskAllocatedGb: 100,
-        diskUsedGb: 2.4,
-        ramGb: 8,
-        vcpu: 2,
-        port: data.engine === "redis" ? 6379 : data.engine === "mysql" ? 3306 : 5432,
-        host: `${data.name || "db"}.internal.tibicloud.net`,
-        defaultDb: "postgres",
-        adminUser: "tibicloud_admin",
-        adminPasswordReveal: "Secr3tP@ssw0rd!2026",
-        connectionUri: `postgresql://tibicloud_admin:Secr3tP@ssw0rd!2026@${data.name || "db"}.internal.tibicloud.net:5432/postgres?sslmode=require`,
-        wholesaleMonthly: 45.0,
-        retailMonthly: 67.5,
-        users: [{ username: "tibicloud_admin", role: "admin", createdAt: "Just now" }],
-        schemas: ["postgres"],
-        pools: [],
-        backups: [{ id: `bak-${Date.now()}`, createdAt: "Initial snapshot", sizeMb: 50, status: "completed" }],
-        replicas: [],
-        trustedSources: ["0.0.0.0/0"],
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setDatabases((prev) => [fallbackDb, ...prev]);
+      try {
+        const wire = await databasesApi.createDatabaseCluster({
+          name: data.name || "new-database-cluster",
+          engine: data.engine || "postgresql",
+          region: data.region || "nyc1",
+          plan_id: "db-std-1",
+          ha_enabled: !!data.haEnabled,
+        });
+        const newDb = mapDatabaseCluster(wire);
+        setDatabases((prev) => [newDb, ...prev]);
+        return;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "Database Deployment Failed",
+          message: err instanceof Error ? err.message : "Failed to deploy database cluster.",
+        });
+        throw err;
+      }
     },
     [isAuthenticated, showToast]
   );
@@ -729,33 +661,34 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         message: `Provisioning ${vol.sizeGb}GB NVMe volume "${vol.name}" in ${vol.region}...`,
       });
 
-      if (isAuthenticated) {
-        try {
-          const wire = await storageApi.createVolume({
-            name: vol.name,
-            region: vol.region,
-            size_gb: vol.sizeGb,
-            filesystem: vol.filesystem,
-          });
-          const newVol = mapVolume(wire);
-          setVolumes((prev) => [newVol, ...prev]);
-          return;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "Volume Creation Failed",
-            message: err instanceof Error ? err.message : "Failed to provision block volume.",
-          });
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to create block volumes.";
+        showToast({
+          type: "error",
+          title: "Volume Creation Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const fallbackVol: Volume = {
-        ...vol,
-        id: `vol-${Date.now().toString().slice(-6)}`,
-        status: vol.status || "provisioning",
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setVolumes((prev) => [fallbackVol, ...prev]);
+      try {
+        const wire = await storageApi.createVolume({
+          name: vol.name,
+          region: vol.region,
+          size_gb: vol.sizeGb,
+          filesystem: vol.filesystem,
+        });
+        const newVol = mapVolume(wire);
+        setVolumes((prev) => [newVol, ...prev]);
+        return;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "Volume Creation Failed",
+          message: err instanceof Error ? err.message : "Failed to provision block volume.",
+        });
+        throw err;
+      }
     },
     [isAuthenticated, showToast]
   );
@@ -842,36 +775,35 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         message: `Provisioning S3 bucket "${bucket.name}" in ${bucket.region}...`,
       });
 
-      if (isAuthenticated) {
-        try {
-          const wire = await storageApi.createBucket({
-            name: bucket.name,
-            region: bucket.region,
-            acl: bucket.acl,
-            storage_class: bucket.storageClass,
-            cdn_active: bucket.cdnActive,
-          });
-          const newBkt = mapBucket(wire);
-          setBuckets((prev) => [newBkt, ...prev]);
-          return;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "S3 Space Creation Failed",
-            message: err instanceof Error ? err.message : "Failed to create S3 bucket.",
-          });
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to create S3 buckets.";
+        showToast({
+          type: "error",
+          title: "S3 Space Creation Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const fallbackBucket: S3Bucket = {
-        ...bucket,
-        id: `bucket-${Date.now().toString().slice(-6)}`,
-        objects: [],
-        totalSizeBytes: 0,
-        objectCount: 0,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setBuckets((prev) => [fallbackBucket, ...prev]);
+      try {
+        const wire = await storageApi.createBucket({
+          name: bucket.name,
+          region: bucket.region,
+          acl: bucket.acl,
+          storage_class: bucket.storageClass,
+          cdn_active: bucket.cdnActive,
+        });
+        const newBkt = mapBucket(wire);
+        setBuckets((prev) => [newBkt, ...prev]);
+        return;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "S3 Space Creation Failed",
+          message: err instanceof Error ? err.message : "Failed to create S3 bucket.",
+        });
+        throw err;
+      }
     },
     [isAuthenticated, showToast]
   );
@@ -922,38 +854,41 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Firewall Actions
   const createFirewall = useCallback(
     async (name: string, rules: FirewallRule[]): Promise<Firewall> => {
-      if (isAuthenticated) {
-        try {
-          const wire = await networkApi.createFirewall({
-            name,
-            rules: rules.map((r) => ({
-              type: r.type,
-              protocol: r.protocol,
-              ports: r.ports,
-              sources: r.sources,
-              action: r.action,
-              label: r.label,
-            })),
-          });
-          const newFw = mapFirewall(wire);
-          setFirewalls((prev) => [newFw, ...prev]);
-          return newFw;
-        } catch {
-          // fallback
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to create security groups.";
+        showToast({
+          type: "error",
+          title: "Security Group Creation Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const fallbackFw: Firewall = {
-        id: `fw-${Date.now().toString().slice(-6)}`,
-        name,
-        rules,
-        attachedInstanceIds: [],
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setFirewalls((prev) => [fallbackFw, ...prev]);
-      return fallbackFw;
+      try {
+        const wire = await networkApi.createFirewall({
+          name,
+          rules: rules.map((r) => ({
+            type: r.type,
+            protocol: r.protocol,
+            ports: r.ports,
+            sources: r.sources,
+            action: r.action,
+            label: r.label,
+          })),
+        });
+        const newFw = mapFirewall(wire);
+        setFirewalls((prev) => [newFw, ...prev]);
+        return newFw;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "Security Group Creation Failed",
+          message: err instanceof Error ? err.message : "Failed to create security group.",
+        });
+        throw err;
+      }
     },
-    [isAuthenticated]
+    [isAuthenticated, showToast]
   );
 
   const deleteFirewall = useCallback(
@@ -1103,42 +1038,39 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         message: `Provisioning isolated VPC "${name}" (${cidr}) in ${region.toUpperCase()}...`,
       });
 
-      if (isAuthenticated) {
-        try {
-          const wire = await networkApi.createVPC({
-            name,
-            region,
-            cidr,
-            is_default: isDefault,
-          });
-          const newVpc = mapVPC(wire);
-          setVpcs((prev) => [newVpc, ...prev]);
-          showToast({
-            type: "success",
-            title: "VPC Ready",
-            message: `Virtual Private Cloud "${name}" is active.`,
-          });
-          return newVpc;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "VPC Creation Failed",
-            message: err instanceof Error ? err.message : "Failed to create VPC.",
-          });
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to create VPC networks.";
+        showToast({
+          type: "error",
+          title: "VPC Creation Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const fallbackVpc: VPC = {
-        id: `vpc-${Date.now().toString().slice(-6)}`,
-        name,
-        region,
-        cidr,
-        connectedInstancesCount: 0,
-        isDefault: isDefault ?? false,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setVpcs((prev) => [fallbackVpc, ...prev]);
-      return fallbackVpc;
+      try {
+        const wire = await networkApi.createVPC({
+          name,
+          region,
+          cidr,
+          is_default: isDefault,
+        });
+        const newVpc = mapVPC(wire);
+        setVpcs((prev) => [newVpc, ...prev]);
+        showToast({
+          type: "success",
+          title: "VPC Ready",
+          message: `Virtual Private Cloud "${name}" is active.`,
+        });
+        return newVpc;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "VPC Creation Failed",
+          message: err instanceof Error ? err.message : "Failed to create VPC.",
+        });
+        throw err;
+      }
     },
     [isAuthenticated, showToast]
   );
@@ -1153,32 +1085,27 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         message: `Removing Virtual Private Cloud "${name}"...`,
       });
 
-      if (isAuthenticated) {
-        try {
-          await networkApi.destroyVPC(id);
-          setVpcs((prev) => prev.filter((v) => v.id !== id));
-          showToast({
-            type: "success",
-            title: "VPC Deleted",
-            message: `Virtual Private Cloud "${name}" has been removed.`,
-          });
-          return;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "VPC Deletion Failed",
-            message: err instanceof Error ? err.message : "Failed to delete VPC.",
-          });
-          throw err;
-        }
+      if (!isAuthenticated) {
+        throw new Error("Authentication required to delete VPC networks.");
       }
 
-      setVpcs((prev) => prev.filter((v) => v.id !== id));
-      showToast({
-        type: "success",
-        title: "VPC Deleted",
-        message: `Virtual Private Cloud "${name}" removed.`,
-      });
+      try {
+        await networkApi.destroyVPC(id);
+        setVpcs((prev) => prev.filter((v) => v.id !== id));
+        showToast({
+          type: "success",
+          title: "VPC Deleted",
+          message: `Virtual Private Cloud "${name}" has been removed.`,
+        });
+        return;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "VPC Deletion Failed",
+          message: err instanceof Error ? err.message : "Failed to delete VPC.",
+        });
+        throw err;
+      }
     },
     [isAuthenticated, showToast, vpcs]
   );
@@ -1186,39 +1113,37 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // SSH Key Actions
   const createSSHKey = useCallback(
     async (name: string, publicKey: string): Promise<SSHKey> => {
-      if (isAuthenticated) {
-        try {
-          const wire = await computeApi.createSSHKey({
-            name,
-            public_key: publicKey,
-          });
-          const newKey = mapSSHKey(wire);
-          setSSHKeys((prev) => [newKey, ...prev.filter((k) => k.id !== newKey.id)]);
-          showToast({
-            type: "success",
-            title: "SSH Key Registered",
-            message: `Saved and encrypted key "${name}" (${newKey.fingerprint.slice(0, 16)}...).`,
-          });
-          return newKey;
-        } catch (err: unknown) {
-          showToast({
-            type: "error",
-            title: "SSH Key Registration Failed",
-            message: err instanceof Error ? err.message : "Failed to register SSH key.",
-          });
-          throw err;
-        }
+      if (!isAuthenticated) {
+        const errorMsg = "Authentication required to register SSH keys.";
+        showToast({
+          type: "error",
+          title: "SSH Key Registration Failed",
+          message: errorMsg,
+        });
+        throw new Error(errorMsg);
       }
 
-      const fallbackKey: SSHKey = {
-        id: `ssh-${Date.now().toString().slice(-6)}`,
-        name,
-        publicKey,
-        fingerprint: `SHA256:mock${Date.now().toString(36)}`,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setSSHKeys((prev) => [fallbackKey, ...prev]);
-      return fallbackKey;
+      try {
+        const wire = await computeApi.createSSHKey({
+          name,
+          public_key: publicKey,
+        });
+        const newKey = mapSSHKey(wire);
+        setSSHKeys((prev) => [newKey, ...prev.filter((k) => k.id !== newKey.id)]);
+        showToast({
+          type: "success",
+          title: "SSH Key Registered",
+          message: `Saved and encrypted key "${name}" (${newKey.fingerprint.slice(0, 16)}...).`,
+        });
+        return newKey;
+      } catch (err: unknown) {
+        showToast({
+          type: "error",
+          title: "SSH Key Registration Failed",
+          message: err instanceof Error ? err.message : "Failed to register SSH key.",
+        });
+        throw err;
+      }
     },
     [isAuthenticated, showToast]
   );
@@ -1250,6 +1175,9 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const checkDomainAvailability = useCallback(
     async (domainName: string) => {
       const cleanName = domainName.trim().toLowerCase();
+      const parts = cleanName.split(".");
+      const tld = parts.length > 1 ? parts[parts.length - 1] : "com";
+
       if (isAuthenticated) {
         try {
           const res = await domainsApi.checkDomainAvailability(cleanName);
@@ -1267,19 +1195,15 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       }
 
-      // Deterministic fallback mock check
-      const parts = cleanName.split(".");
-      const tld = parts.length > 1 ? parts[parts.length - 1] : "com";
-      const existing = domains.some((d) => d.name.toLowerCase() === cleanName);
       return {
         name: cleanName,
         tld,
-        available: !existing,
+        available: false,
         wholesalePrice: 10.0,
         retailPrice: 15.0,
       };
     },
-    [isAuthenticated, domains]
+    [isAuthenticated]
   );
 
   const registerDomain = useCallback(
@@ -1294,40 +1218,22 @@ export const CloudProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ? domainName.toLowerCase()
         : `${domainName.toLowerCase()}${normalizedTld}`;
 
-      if (isAuthenticated) {
-        try {
-          const wire = await domainsApi.registerDomain({ name: fullDomain });
-          const newDom = mapDomain(wire);
-          setDomains((prev) => [newDom, ...prev.filter((d) => d.name !== newDom.name)]);
-          return { success: true, domain: newDom };
-        } catch (err: unknown) {
-          const msg =
-            err instanceof ApiError
-              ? err.firstFieldError || err.detail || "Failed to register domain."
-              : "Failed to register domain.";
-          return { success: false, error: msg };
-        }
+      if (!isAuthenticated) {
+        return { success: false, error: "Authentication required to register domains." };
       }
 
-      const fallbackDomain: Domain = {
-        id: `dom-${Date.now().toString().slice(-6)}`,
-        name: fullDomain,
-        tld: normalizedTld,
-        status: "active",
-        whoisPrivacy: true,
-        autoRenew: true,
-        dnssec: true,
-        sslActive: true,
-        expiresAt: new Date(Date.now() + 365 * 86400000).toISOString().split("T")[0],
-        wholesaleAnnual: wholesale,
-        retailAnnual: retail,
-        records: [
-          { id: `rec-${Date.now()}-1`, type: "NS", name: "@", value: "ns1.tibicloud-dns.net", ttl: 86400 },
-          { id: `rec-${Date.now()}-2`, type: "NS", name: "@", value: "ns2.tibicloud-dns.net", ttl: 86400 },
-        ],
-      };
-      setDomains((prev) => [fallbackDomain, ...prev]);
-      return { success: true, domain: fallbackDomain };
+      try {
+        const wire = await domainsApi.registerDomain({ name: fullDomain });
+        const newDom = mapDomain(wire);
+        setDomains((prev) => [newDom, ...prev.filter((d) => d.name !== newDom.name)]);
+        return { success: true, domain: newDom };
+      } catch (err: unknown) {
+        const msg =
+          err instanceof ApiError
+            ? err.firstFieldError || err.detail || "Failed to register domain."
+            : "Failed to register domain.";
+        return { success: false, error: msg };
+      }
     },
     [isAuthenticated]
   );

@@ -37,7 +37,7 @@ export function Header({ onOpenDeploy }: { onOpenDeploy: () => void }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState<boolean>(false);
   const unreadAlerts = alerts.filter((a) => !a.read);
 
-  const firstName = user?.name ? user.name.split(" ")[0] : "Alexandra";
+  const firstName = user?.name ? user.name.split(" ")[0] : user?.email ? user.email.split("@")[0] : "there";
 
   return (
     <header className="pt-6 pb-3 px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 shrink-0 z-20">

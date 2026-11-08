@@ -302,72 +302,98 @@ export default function DomainsPage() {
       </div>
 
       {/* Domain Portfolio Table */}
-      <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
-        <table className="w-full text-left text-xs">
-          <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
-            <tr>
-              <th className="py-2.5 px-4">Domain Name</th>
-              <th className="py-2.5 px-4">Security & SSL</th>
-              <th className="py-2.5 px-4">Auto-Renew & Expiry</th>
-              <th className="py-2.5 px-4">Linked Cloud Resource</th>
-              <th className="py-2.5 px-4">Annual Price</th>
-              <th className="py-2.5 px-4 text-right">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
-            {domains.map((dom) => (
-              <tr key={dom.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02] transition-colors">
-                <td className="py-3 px-4">
-                  <span className="font-semibold text-slate-900 dark:text-slate-200 block">{dom.name}</span>
-                  <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] flex items-center gap-1 mt-0.5 font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                    Anycast Active
-                  </span>
-                </td>
-                <td className="py-3 px-4">
-                  <div className="flex items-center gap-2 text-[11px] text-slate-700 dark:text-slate-300">
-                    <span className="flex items-center gap-1 text-[#4EA871] dark:text-[#56B87C] font-medium">
-                      <Lock className="w-3 h-3" /> SSL 90d
-                    </span>
-                    <span className="text-slate-400">•</span>
-                    <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
-                      <ShieldCheck className="w-3 h-3" /> WHOIS Private
-                    </span>
-                  </div>
-                </td>
-                <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400 text-[11px]">
-                  <span>{dom.expiresAt}</span>
-                  <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Auto-renew enabled</span>
-                </td>
-                <td className="py-3 px-4">
-                  {dom.linkedResourceId ? (
-                    <span className="text-[#1E1E1E] dark:text-slate-200 flex items-center gap-1.5 font-mono text-[11px]">
-                      <Server className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                      {dom.linkedResourceId}
-                    </span>
-                  ) : (
-                    <span className="text-slate-400 italic">Unlinked (Custom DNS)</span>
-                  )}
-                </td>
-                <td className="py-3 px-4 font-mono">
-                  <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(dom.retailAnnual)}/yr</span>
-                </td>
-                <td className="py-3 px-4 text-right">
-                  <button
-                    onClick={() => setSelectedDomainId(dom.id)}
-                    className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${activeDomain?.id === dom.id
-                        ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
-                        : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
-                      }`}
-                  >
-                    Manage DNS
-                  </button>
-                </td>
+      {domains.length === 0 ? (
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] p-12 text-center flex flex-col items-center justify-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+            <Globe className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+              No Domain Zones Registered
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+              Register domain names with automated DNSSEC, Anycast DNS routing, and 1-click binding to your droplets and buckets.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setIsRegisterOpen(true);
+              setRegisterError(null);
+            }}
+            className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Register Domain</span>
+          </button>
+        </div>
+      ) : (
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 uppercase tracking-wider font-medium text-[11px] border-b border-[#E7E4DF] dark:border-[#282D3A]">
+              <tr>
+                <th className="py-2.5 px-4">Domain Name</th>
+                <th className="py-2.5 px-4">Security & SSL</th>
+                <th className="py-2.5 px-4">Auto-Renew & Expiry</th>
+                <th className="py-2.5 px-4">Linked Cloud Resource</th>
+                <th className="py-2.5 px-4">Annual Price</th>
+                <th className="py-2.5 px-4 text-right">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A]">
+              {domains.map((dom) => (
+                <tr key={dom.id} className="hover:bg-slate-50/75 dark:hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3 px-4">
+                    <span className="font-semibold text-slate-900 dark:text-slate-200 block">{dom.name}</span>
+                    <span className="text-[10px] text-[#4EA871] dark:text-[#56B87C] flex items-center gap-1 mt-0.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      Anycast Active
+                    </span>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-2 text-[11px] text-slate-700 dark:text-slate-300">
+                      <span className="flex items-center gap-1 text-[#4EA871] dark:text-[#56B87C] font-medium">
+                        <Lock className="w-3 h-3" /> SSL 90d
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">
+                        <ShieldCheck className="w-3 h-3" /> WHOIS Private
+                      </span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400 text-[11px]">
+                    <span>{dom.expiresAt}</span>
+                    <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Auto-renew enabled</span>
+                  </td>
+                  <td className="py-3 px-4">
+                    {dom.linkedResourceId ? (
+                      <span className="text-[#1E1E1E] dark:text-slate-200 flex items-center gap-1.5 font-mono text-[11px]">
+                        <Server className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                        {dom.linkedResourceId}
+                      </span>
+                    ) : (
+                      <span className="text-slate-400 italic">Unlinked (Custom DNS)</span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 font-mono">
+                    <span className="text-slate-900 dark:text-slate-200 font-semibold block">{formatMoney(dom.retailAnnual)}/yr</span>
+                  </td>
+                  <td className="py-3 px-4 text-right">
+                    <button
+                      onClick={() => setSelectedDomainId(dom.id)}
+                      className={`h-7 px-3 rounded text-[11px] font-medium transition-colors cursor-pointer ${activeDomain?.id === dom.id
+                          ? "bg-[#222222] text-white dark:bg-white dark:text-[#1E1E1E] font-semibold shadow-sm"
+                          : "bg-[#EFECE8] dark:bg-[#232834] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#252B3D] border border-[#E7E4DF] dark:border-[#282D3A]"
+                        }`}
+                    >
+                      Manage DNS
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Active DNS Zone Editor */}
       {activeDomain && (

@@ -132,8 +132,26 @@ export default function ComputePage() {
         </div>
 
         {filteredInstances.length === 0 ? (
-          <div className="nixtio-card p-10 text-center text-xs text-[#8C8B87]">
-            No compute droplets found matching your current filter criteria.
+          <div className="nixtio-card p-12 text-center flex flex-col items-center justify-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+              <MaterialIcon name="dns" size={24} />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                No Compute Droplets Deployed
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+                Deploy high-performance virtual machines with NVMe storage, isolated VPC networking, and global edge locations.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsDeployOpen(true)}
+              className="h-8 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <MaterialIcon name="add" size={15} />
+              <span>Deploy Droplet</span>
+            </button>
           </div>
         ) : (
           filteredInstances.map((inst, idx) => {

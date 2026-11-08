@@ -1047,7 +1047,7 @@ export function TerminalModal({
         ...envVars,
         PWD: currentDir,
         HOSTNAME: instance.name,
-        AWS_SSM_SESSION_ID: sessionData?.session_id || "mock-session",
+        AWS_SSM_SESSION_ID: sessionData?.session_id || "",
       };
       for (const [k, v] of Object.entries(allVars)) {
         lines.push({ text: `${k}=${v}`, type: "output" });

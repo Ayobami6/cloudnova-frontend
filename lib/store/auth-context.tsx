@@ -63,6 +63,31 @@ function extractErrorMessage(err: unknown, fallback: string): string {
   if (err instanceof ApiError) {
     return err.firstFieldError || err.detail || fallback;
   }
+  if (err && typeof err === "object") {
+    const errorObj = err as { code?: string; message?: string };
+    if (errorObj.code) {
+      switch (errorObj.code) {
+        case "auth/unauthorized-domain":
+          return "Domain unauthorized: Add tibicloud.com to Authorized Domains in Firebase Console > Authentication > Settings.";
+        case "auth/operation-not-allowed":
+          return "Sign-in provider not enabled: Enable this provider in Firebase Console > Authentication > Sign-in method.";
+        case "auth/popup-blocked":
+          return "Sign-in popup was blocked by your browser. Please allow popups for tibicloud.com.";
+        case "auth/cancelled-popup-request":
+          return "Sign-in popup was closed or superseded by another request.";
+        case "auth/account-exists-with-different-credential":
+          return "An account already exists with the same email using a different sign-in method.";
+        case "auth/network-request-failed":
+          return "Network connection to authentication service failed. Please check your connection.";
+      }
+    }
+    if (typeof errorObj.message === "string" && errorObj.message.trim()) {
+      return errorObj.message.replace(/^Firebase:\s*/i, "").trim();
+    }
+  }
+  if (err instanceof Error && err.message) {
+    return err.message;
+  }
   return fallback;
 }
 
@@ -158,6 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await refreshSession();
       return { success: true };
     } catch (err: unknown) {
+      console.error("Google sign-in failed:", err);
       const firebaseCode = (err as { code?: string })?.code;
       if (firebaseCode === "auth/popup-closed-by-user") {
         return { success: false, error: "Sign-in popup was closed before completing." };
@@ -178,6 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await refreshSession();
       return { success: true };
     } catch (err: unknown) {
+      console.error("GitHub sign-in failed:", err);
       const firebaseCode = (err as { code?: string })?.code;
       if (firebaseCode === "auth/popup-closed-by-user") {
         return { success: false, error: "Sign-in popup was closed before completing." };

@@ -26,14 +26,14 @@ export function RightInspectorPanel({
   const [isSignoutConfirmOpen, setIsSignoutConfirmOpen] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState(false);
 
-  const displayName = user?.name || "TibiCloud Operator";
-  const email = user?.email || "operator@tibicloud.io";
-  const organizationName = user?.company || "Primary Team";
+  const displayName = user?.name || user?.email?.split("@")[0] || "Operator";
+  const email = user?.email || "";
+  const organizationName = user?.company || "Personal";
   const roleName = user?.role || "OWNER";
   const accountNumber =
     user?.accountNumber ||
     balance?.account_number ||
-    (user?.accountId ? `acct_${user.accountId.slice(0, 8)}` : "acct_live_01");
+    (user?.accountId ? `acct_${user.accountId.slice(0, 8)}` : "");
 
   const initials =
     displayName

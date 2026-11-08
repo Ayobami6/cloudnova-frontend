@@ -77,7 +77,7 @@ export function LandingNavbar() {
                 href="/register"
                 className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-medium inline-flex items-center gap-1.5 shadow-2xs transition-colors"
               >
-                <span>Deploy with ₦10,000 Free</span>
+                <span>Deploy</span>
                 <MaterialIcon name="arrow_forward" size={15} />
               </Link>
             </div>

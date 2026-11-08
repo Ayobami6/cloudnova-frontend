@@ -103,15 +103,9 @@ export default function DatabasesPage() {
   const handleRunQuery = (e: React.FormEvent) => {
     e.preventDefault();
     const startTime = performance.now();
-    setTimeout(() => {
-      setQueryResult([
-        { id: 101, name: "Alice Jenkins", status: "active", created_at: "2026-08-10" },
-        { id: 102, name: "Marcus Vance", status: "active", created_at: "2026-08-12" },
-        { id: 103, name: "Elena Rostova", status: "suspended", created_at: "2026-08-15" },
-        { id: 104, name: "Siddharth Rao", status: "active", created_at: "2026-08-20" },
-      ]);
-      setQueryExecutionTime(Number((performance.now() - startTime).toFixed(1)));
-    }, 150);
+    // Execute query placeholder - no mock users
+    setQueryResult([]);
+    setQueryExecutionTime(Number((performance.now() - startTime).toFixed(1)));
   };
 
   const handleCreateCluster = (e: React.FormEvent) => {
@@ -215,73 +209,99 @@ export default function DatabasesPage() {
         </div>
       </div>
 
-      {/* Cluster Cards Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        {filteredDatabases.map((db) => {
-          const isSelected = activeDb?.id === db.id;
-          const statusTone =
-            db.status === "online"
-              ? "completed"
-              : db.status === "provisioning" || db.status === "rebuilding"
-              ? "pending"
-              : "failed";
+      {/* Cluster Cards Strip or Empty State */}
+      {filteredDatabases.length === 0 ? (
+        <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] p-12 text-center flex flex-col items-center justify-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-[#CFE0EC]/40 text-[#1E1E1E] dark:text-white flex items-center justify-center">
+            <MaterialIcon name="database" size={24} />
+          </div>
+          <div className="max-w-md space-y-1">
+            <h3 className="text-sm font-semibold text-[#1E1E1E] dark:text-white">
+              No Managed Databases Found
+            </h3>
+            <p className="text-xs text-[#8C8B87] dark:text-slate-400">
+              {engineFilter !== "all"
+                ? `No ${engineFilter} database clusters match your filter. Switch back to "All" or create a new cluster.`
+                : "Fully managed PostgreSQL, MySQL, Redis, and MongoDB clusters with automated daily snapshots, multi-AZ failover, and connection pooling."}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="h-9 px-4 rounded-full bg-[#222222] hover:bg-[#111111] dark:bg-white dark:hover:bg-slate-200 dark:text-[#1E1E1E] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+          >
+            <MaterialIcon name="add" size={16} />
+            <span>Create Database Cluster</span>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {filteredDatabases.map((db) => {
+            const isSelected = activeDb?.id === db.id;
+            const statusTone =
+              db.status === "online"
+                ? "completed"
+                : db.status === "provisioning" || db.status === "rebuilding"
+                ? "pending"
+                : "failed";
 
-          return (
-            <button
-              key={db.id}
-              onClick={() => setActiveDbId(db.id)}
-              className={`rounded-[22px] p-4.5 text-left transition-all border cursor-pointer ${
-                isSelected
-                  ? "bg-white dark:bg-[#1C2029] border-[#222222] dark:border-white ring-2 ring-[#222222]/10 dark:ring-white/20 shadow-xs"
-                  : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#1C2029] hover:border-[#D5D0C8] dark:hover:border-[#383F52]"
-              }`}
-            >
-              {/* Row 1: Cluster Name & Status */}
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-semibold text-xs text-[#1E1E1E] dark:text-white truncate block">
-                  {db.name}
-                </span>
-                <StatusIndicator status={statusTone} label={db.status} />
-              </div>
+            return (
+              <button
+                key={db.id}
+                onClick={() => setActiveDbId(db.id)}
+                className={`rounded-[22px] p-4.5 text-left transition-all border cursor-pointer ${
+                  isSelected
+                    ? "bg-white dark:bg-[#1C2029] border-[#222222] dark:border-white ring-2 ring-[#222222]/10 dark:ring-white/20 shadow-xs"
+                    : "bg-[#F6F6F4] dark:bg-[#161920] border-[#E7E4DF] dark:border-[#282D3A] hover:bg-white dark:hover:bg-[#1C2029] hover:border-[#D5D0C8] dark:hover:border-[#383F52]"
+                }`}
+              >
+                {/* Row 1: Cluster Name & Status */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold text-xs text-[#1E1E1E] dark:text-white truncate block">
+                    {db.name}
+                  </span>
+                  <StatusIndicator status={statusTone} label={db.status} />
+                </div>
 
-              {/* Row 2: Engine & Region */}
-              <div className="mt-2.5 flex items-center justify-between gap-2">
-                <PastelTypePill
-                  icon="database"
-                  label={`${db.engine} ${db.version}`}
-                  variant={getEnginePillVariant(db.engine)}
-                  size="sm"
-                />
-                <span className="font-mono text-[11px] text-[#8C8B87] dark:text-slate-400 font-medium uppercase">
-                  {db.region}
-                </span>
-              </div>
-
-              {/* Row 3: HA Standby Pill & Price */}
-              <div className="mt-3 pt-2.5 border-t border-[#E7E4DF]/60 dark:border-[#282D3A] flex items-center justify-between gap-2">
-                {db.haEnabled ? (
+                {/* Row 2: Engine & Region */}
+                <div className="mt-2.5 flex items-center justify-between gap-2">
                   <PastelTypePill
-                    icon="verified_user"
-                    label="HA Standby"
-                    variant="sage"
+                    icon="database"
+                    label={`${db.engine} ${db.version}`}
+                    variant={getEnginePillVariant(db.engine)}
                     size="sm"
                   />
-                ) : (
-                  <PastelTypePill
-                    icon="dns"
-                    label="Single Node"
-                    variant="stone"
-                    size="sm"
-                  />
-                )}
-                <span className="font-mono text-xs font-semibold text-[#1E1E1E] dark:text-white">
-                  {formatMoney(db.retailMonthly, 0)}/mo
-                </span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+                  <span className="font-mono text-[11px] text-[#8C8B87] dark:text-slate-400 font-medium uppercase">
+                    {db.region}
+                  </span>
+                </div>
+
+                {/* Row 3: HA Standby Pill & Price */}
+                <div className="mt-3 pt-2.5 border-t border-[#E7E4DF]/60 dark:border-[#282D3A] flex items-center justify-between gap-2">
+                  {db.haEnabled ? (
+                    <PastelTypePill
+                      icon="verified_user"
+                      label="HA Standby"
+                      variant="sage"
+                      size="sm"
+                    />
+                  ) : (
+                    <PastelTypePill
+                      icon="dns"
+                      label="Single Node"
+                      variant="stone"
+                      size="sm"
+                    />
+                  )}
+                  <span className="font-mono text-xs font-semibold text-[#1E1E1E] dark:text-white">
+                    {formatMoney(db.retailMonthly, 0)}/mo
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {activeDb && (
         <div className="nixtio-card border border-[#E7E4DF]/60 dark:border-[#282D3A] overflow-hidden">
@@ -660,33 +680,39 @@ func main() {
                   <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Database Users</h4>
                   <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">{activeDb.users.length} active users</span>
                 </div>
-                <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-[22px] overflow-hidden">
-                  <table className="w-full text-left text-xs">
-                    <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase border-b border-[#E7E4DF] dark:border-[#282D3A]">
-                      <tr>
-                        <th className="py-3 px-4">Username</th>
-                        <th className="py-3 px-4">Role</th>
-                        <th className="py-3 px-4">Created</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] bg-white dark:bg-[#1C2029]">
-                      {activeDb.users.map((u) => (
-                        <tr key={u.username} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
-                          <td className="py-3 px-4 font-mono font-medium text-[#1E1E1E] dark:text-slate-200">{u.username}</td>
-                          <td className="py-3 px-4">
-                            <PastelTypePill
-                              icon="badge"
-                              label={u.role}
-                              variant={u.role === "admin" ? "lavender" : "blue"}
-                              size="sm"
-                            />
-                          </td>
-                          <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400 font-mono text-[11px]">{u.createdAt}</td>
+                {activeDb.users.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-[#8C8B87] rounded-[22px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
+                    No database users configured yet. Default administrative credentials are shown in Connection Parameters.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-[22px] overflow-hidden">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase border-b border-[#E7E4DF] dark:border-[#282D3A]">
+                        <tr>
+                          <th className="py-3 px-4">Username</th>
+                          <th className="py-3 px-4">Role</th>
+                          <th className="py-3 px-4">Created</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] bg-white dark:bg-[#1C2029]">
+                        {activeDb.users.map((u) => (
+                          <tr key={u.username} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors">
+                            <td className="py-3 px-4 font-mono font-medium text-[#1E1E1E] dark:text-slate-200">{u.username}</td>
+                            <td className="py-3 px-4">
+                              <PastelTypePill
+                                icon="badge"
+                                label={u.role}
+                                variant={u.role === "admin" ? "lavender" : "blue"}
+                                size="sm"
+                              />
+                            </td>
+                            <td className="py-3 px-4 text-[#8C8B87] dark:text-slate-400 font-mono text-[11px]">{u.createdAt}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
 
@@ -726,25 +752,31 @@ func main() {
                   <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Point-in-Time Recovery Snapshots</h4>
                   <span className="text-[11px] text-[#4EA871] dark:text-[#56B87C] font-medium">PITR Retention: 7 Days</span>
                 </div>
-                <div className="space-y-2.5">
-                  {activeDb.backups.map((b) => (
-                    <div
-                      key={b.id}
-                      className="p-4 rounded-[20px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between gap-3"
-                    >
-                      <div>
-                        <span className="text-xs font-medium text-[#1E1E1E] dark:text-white block">{b.createdAt}</span>
-                        <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">{b.sizeMb} MB compressed NVMe snapshot</span>
-                      </div>
-                      <button
-                        type="button"
-                        className="h-8 px-3.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-xs font-medium text-[#1E1E1E] dark:text-white hover:bg-slate-200 dark:hover:bg-[#282D3A] transition-colors cursor-pointer"
+                {activeDb.backups.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-[#8C8B87] rounded-[22px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
+                    No snapshots captured yet. Automated daily snapshots start once the cluster has been operational.
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {activeDb.backups.map((b) => (
+                      <div
+                        key={b.id}
+                        className="p-4 rounded-[20px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] flex items-center justify-between gap-3"
                       >
-                        Restore to Point
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                        <div>
+                          <span className="text-xs font-medium text-[#1E1E1E] dark:text-white block">{b.createdAt}</span>
+                          <span className="text-[11px] text-[#8C8B87] dark:text-slate-400">{b.sizeMb} MB compressed NVMe snapshot</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="h-8 px-3.5 rounded-full bg-[#EFECE8] dark:bg-[#232834] text-xs font-medium text-[#1E1E1E] dark:text-white hover:bg-slate-200 dark:hover:bg-[#282D3A] transition-colors cursor-pointer"
+                        >
+                          Restore to Point
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -805,28 +837,34 @@ func main() {
                       <span>Query Results ({queryResult.length} rows)</span>
                       <span className="font-mono text-[#4EA871] dark:text-[#56B87C]">Executed in {queryExecutionTime}ms</span>
                     </div>
-                    <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-[22px] overflow-hidden">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase border-b border-[#E7E4DF] dark:border-[#282D3A]">
-                          <tr>
-                            <th className="py-2.5 px-3.5">id</th>
-                            <th className="py-2.5 px-3.5">name</th>
-                            <th className="py-2.5 px-3.5">status</th>
-                            <th className="py-2.5 px-3.5">created_at</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] font-mono text-[11px] bg-white dark:bg-[#1C2029]">
-                          {queryResult.map((row) => (
-                            <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
-                              <td className="py-2.5 px-3.5 text-[#8C8B87] dark:text-slate-400">{row.id}</td>
-                              <td className="py-2.5 px-3.5 text-[#1E1E1E] dark:text-slate-200 font-sans">{row.name}</td>
-                              <td className="py-2.5 px-3.5 text-[#4EA871] dark:text-[#56B87C]">{row.status}</td>
-                              <td className="py-2.5 px-3.5 text-[#8C8B87] dark:text-slate-400">{row.created_at}</td>
+                    {queryResult.length === 0 ? (
+                      <div className="p-6 text-center text-xs text-[#8C8B87] rounded-[22px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
+                        Query executed with 0 rows returned. Connect directly via psql / MySQL client for live interactive shell sessions.
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto border border-[#E7E4DF] dark:border-[#282D3A] rounded-[22px] overflow-hidden">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-[#F6F6F4] dark:bg-[#161920] text-[#8C8B87] dark:text-slate-400 text-[11px] uppercase border-b border-[#E7E4DF] dark:border-[#282D3A]">
+                            <tr>
+                              <th className="py-2.5 px-3.5">id</th>
+                              <th className="py-2.5 px-3.5">name</th>
+                              <th className="py-2.5 px-3.5">status</th>
+                              <th className="py-2.5 px-3.5">created_at</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody className="divide-y divide-[#E7E4DF] dark:divide-[#282D3A] font-mono text-[11px] bg-white dark:bg-[#1C2029]">
+                            {queryResult.map((row) => (
+                              <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02]">
+                                <td className="py-2.5 px-3.5 text-[#8C8B87] dark:text-slate-400">{row.id}</td>
+                                <td className="py-2.5 px-3.5 text-[#1E1E1E] dark:text-slate-200 font-sans">{row.name}</td>
+                                <td className="py-2.5 px-3.5 text-[#4EA871] dark:text-[#56B87C]">{row.status}</td>
+                                <td className="py-2.5 px-3.5 text-[#8C8B87] dark:text-slate-400">{row.created_at}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -837,17 +875,23 @@ func main() {
               <div className="space-y-3.5 max-w-xl">
                 <h4 className="text-xs font-semibold text-[#1E1E1E] dark:text-white">Inbound Network Whitelist (CIDRs)</h4>
                 <p className="text-xs text-[#8C8B87] dark:text-slate-400">Connections from outside these ranges will be dropped by the cloud firewall.</p>
-                <div className="space-y-2">
-                  {activeDb.trustedSources.map((src) => (
-                    <div
-                      key={src}
-                      className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200"
-                    >
-                      <span>{src}</span>
-                      <PastelTypePill icon="shield" label="Whitelisted" variant="sage" size="sm" />
-                    </div>
-                  ))}
-                </div>
+                {activeDb.trustedSources.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-[#8C8B87] rounded-[22px] bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A]">
+                    No trusted IP sources configured. Cluster is accessible across internal VPC networks.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {activeDb.trustedSources.map((src) => (
+                      <div
+                        key={src}
+                        className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F6F6F4] dark:bg-[#161920] border border-[#E7E4DF] dark:border-[#282D3A] font-mono text-xs text-[#1E1E1E] dark:text-slate-200"
+                      >
+                        <span>{src}</span>
+                        <PastelTypePill icon="shield" label="Whitelisted" variant="sage" size="sm" />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
